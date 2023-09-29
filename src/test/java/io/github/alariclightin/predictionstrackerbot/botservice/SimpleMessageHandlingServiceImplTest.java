@@ -10,11 +10,8 @@ import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
-import org.telegram.telegrambots.meta.api.objects.Message;
-import org.telegram.telegrambots.meta.api.objects.User;
-
 import io.github.alariclightin.predictionstrackerbot.commands.WaitedResponseHandler;
+import io.github.alariclightin.predictionstrackerbot.messages.BotMessage;
 import io.github.alariclightin.predictionstrackerbot.states.StateHolderService;
 import io.github.alariclightin.predictionstrackerbot.states.WaitedResponseState;
 
@@ -50,10 +47,11 @@ public class SimpleMessageHandlingServiceImplTest {
         when(stateHolderService.getState(TestUtils.TEST_CHAT_ID))
             .thenReturn(state);
 
-        SendMessage result = simpleMessageHandlingService.handle(
-                createTestMessage());
+        BotMessage result = simpleMessageHandlingService.handle(
+                TestUtils.createTestMessage(false, "some text"));
 
-        assertThat(result.getText()).isEqualTo(responseText);
+        assertThat(result)
+            .hasFieldOrPropertyWithValue("text", responseText);
     }
 
     private static Object[][] dataForShouldChooseHandlerCorrectly() {
@@ -61,17 +59,5 @@ public class SimpleMessageHandlingServiceImplTest {
             { "command1", "response1" },
             { "command2", "response2" }
         };
-    }
-
-    private Message createTestMessage() {
-        var message = mock(Message.class);
-        when(message.isCommand()).thenReturn(false);
-        when(message.getText()).thenReturn("some text");
-
-        var user = mock(User.class);
-        when(user.getId()).thenReturn(TestUtils.TEST_CHAT_ID);
-        when(message.getFrom()).thenReturn(user);
-
-        return message;       
     }
 }

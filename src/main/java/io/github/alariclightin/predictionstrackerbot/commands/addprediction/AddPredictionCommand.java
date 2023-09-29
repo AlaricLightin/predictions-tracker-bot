@@ -4,11 +4,12 @@ import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 
 import org.springframework.stereotype.Service;
-import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
 
 import io.github.alariclightin.predictionstrackerbot.commands.AbstractCommand;
 import io.github.alariclightin.predictionstrackerbot.commands.WaitedResponseHandler;
+import io.github.alariclightin.predictionstrackerbot.messages.BotMessage;
+import io.github.alariclightin.predictionstrackerbot.messages.BotTextMessage;
 import io.github.alariclightin.predictionstrackerbot.states.StateHolderService;
 import io.github.alariclightin.predictionstrackerbot.states.WaitedResponseState;
 
@@ -21,13 +22,11 @@ class AddPredictionCommand extends AbstractCommand implements WaitedResponseHand
     }
 
     @Override
-    public SendMessage handleCommand(Message message) {
+    public BotMessage handleCommand(Message message) {
         var userId = getUserId(message);
         WaitedResponseState state = createWaitedResponseState(AddPredictionPhase.TEXT, new PredictionData());
         stateHolderService.saveState(userId, state);
-        return createResponseMessageBuilder(message)
-            .text("What is your prediction?")
-            .build();
+        return new BotTextMessage("What is your prediction?");
     }
 
     @Override
@@ -37,7 +36,7 @@ class AddPredictionCommand extends AbstractCommand implements WaitedResponseHand
 
     @Override
     // TODO make more generic and add validations
-    public SendMessage handleWaitedResponse(Message message) {
+    public BotMessage handleWaitedResponse(Message message) {
         var userId = getUserId(message);
         WaitedResponseState state = stateHolderService.getState(userId);
         if (state == null)
@@ -51,37 +50,29 @@ class AddPredictionCommand extends AbstractCommand implements WaitedResponseHand
             case TEXT:
                 stateHolderService.saveState(userId, 
                     createWaitedResponseState(AddPredictionPhase.DATE, data.addText(message.getText())));
-                return createResponseMessageBuilder(message)
-                    .text("What is the deadline?")
-                    .build();
+                return new BotTextMessage("What is the deadline?");
             case DATE:
                 try {
                     LocalDate date = LocalDate.parse(message.getText());
                     stateHolderService.saveState(userId, 
                         createWaitedResponseState(AddPredictionPhase.PROBABILITY, data.addDate(date)));
-                    return createResponseMessageBuilder(message)
-                        .text("What is the probability?")
-                        .build();
+                    return new BotTextMessage("What is the probability?");
 
                 }
                 catch (DateTimeParseException e) {
-                    return createResponseMessageBuilder(message)
-                        .text("Wrong date format. Try again.")
-                        .build();
+                    return new BotTextMessage("Wrong date format. Try again.");
                 }
             case PROBABILITY:
                 data.addProbability(Integer.parseInt(message.getText()));
                 stateHolderService.deleteState(userId);
-                return createResponseMessageBuilder(message)
-                    .text(
+                return new BotTextMessage(
                         String.format("""
                                 Prediction added.
                                 Prediction: %s
                                 Date: %s
                                 Probability: %d
                                 """, data.getText(), data.getDate(), data.getProbability())
-                        )
-                    .build();
+                    );
 
             default: throw new IllegalStateException("Unknown phase when adding prediction: " + phase);
         }

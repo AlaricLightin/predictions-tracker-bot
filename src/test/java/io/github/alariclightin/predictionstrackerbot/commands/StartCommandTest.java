@@ -9,6 +9,8 @@ import org.junit.jupiter.api.Test;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.User;
 
+import io.github.alariclightin.predictionstrackerbot.messages.BotTextMessage;
+
 class StartCommandTest {
     private StartCommand command;
 
@@ -28,7 +30,9 @@ class StartCommandTest {
 
         var result = command.handleCommand(message);
         assertThat(result)
-            .hasFieldOrPropertyWithValue("chatId", chatId.toString())
-            .as("checkText", result.getText().contains("Hello"));
+            .isInstanceOf(BotTextMessage.class)
+            .extracting(m -> ((BotTextMessage) m).text())
+            .asString()
+            .contains("Hello");
     }
 }

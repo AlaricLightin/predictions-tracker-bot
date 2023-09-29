@@ -4,10 +4,11 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
-import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
 
 import io.github.alariclightin.predictionstrackerbot.commands.WaitedResponseHandler;
+import io.github.alariclightin.predictionstrackerbot.messages.BotMessage;
+import io.github.alariclightin.predictionstrackerbot.messages.BotTextMessage;
 import io.github.alariclightin.predictionstrackerbot.states.StateHolderService;
 import io.github.alariclightin.predictionstrackerbot.states.WaitedResponseState;
 
@@ -25,7 +26,7 @@ class SimpleMessageHandlingServiceImpl implements SimpleMessageHandlingService {
     }
 
     @Override
-    public SendMessage handle(Message message) {
+    public BotMessage handle(Message message) {
         long userId = message.getFrom().getId();
         WaitedResponseState state = stateHolderService.getState(userId);
         if (state != null) {
@@ -37,11 +38,8 @@ class SimpleMessageHandlingServiceImpl implements SimpleMessageHandlingService {
                 throw new IllegalStateException("No handler for command " + state.commandName());
         }
         else
-            return SendMessage.builder()
-                    .chatId(userId)
-                    // TODO fix message
-                    .text("I don't understand you.")
-                    .build();
+            // TODO fix message
+            return new BotTextMessage("I don't understand you."); 
     }
     
 }

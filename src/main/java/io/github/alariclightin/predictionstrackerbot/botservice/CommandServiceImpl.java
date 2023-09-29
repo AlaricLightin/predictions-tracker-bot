@@ -5,11 +5,12 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
-import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.commands.BotCommand;
 
 import io.github.alariclightin.predictionstrackerbot.commands.CommandProcessor;
+import io.github.alariclightin.predictionstrackerbot.messages.BotMessage;
+import io.github.alariclightin.predictionstrackerbot.messages.BotTextMessage;
 import io.github.alariclightin.predictionstrackerbot.states.StateHolderService;
 
 @Service
@@ -26,7 +27,7 @@ class CommandServiceImpl implements CommandHandlingService, CommandManagementSer
     }
 
     @Override
-    public SendMessage handle(Message message) {
+    public BotMessage handle(Message message) {
         String command = message.getText().split(" ")[0].substring(1);
         if (command.isBlank())
             throw new IllegalArgumentException("Command is blank");
@@ -36,10 +37,7 @@ class CommandServiceImpl implements CommandHandlingService, CommandManagementSer
         if (processor != null)
             return processor.handleCommand(message);
         else
-            return SendMessage.builder()
-                .chatId(message.getFrom().getId())
-                .text(command + " is not a valid command")
-                .build();
+            return new BotTextMessage(command + " is not a valid command");
     }
 
     @Override

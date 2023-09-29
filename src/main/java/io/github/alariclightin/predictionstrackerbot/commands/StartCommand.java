@@ -1,17 +1,17 @@
 package io.github.alariclightin.predictionstrackerbot.commands;
 
 import org.springframework.stereotype.Service;
-import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
+
+import io.github.alariclightin.predictionstrackerbot.messages.BotMessage;
+import io.github.alariclightin.predictionstrackerbot.messages.BotTextMessage;
 
 @Service
 class StartCommand extends AbstractCommand {
 
     @Override
-    public SendMessage handleCommand(Message message) {
-        return createResponseMessageBuilder(message)
-            .text("Hello, " + message.getFrom().getFirstName() + "!")
-            .build();
+    public BotMessage handleCommand(Message message) {
+        return new BotTextMessage("Hello, " + message.getFrom().getFirstName() + "!");
     }
 
     @Override

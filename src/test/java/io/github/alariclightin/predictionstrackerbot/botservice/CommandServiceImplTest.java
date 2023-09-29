@@ -14,12 +14,10 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
-import org.telegram.telegrambots.meta.api.objects.Message;
-import org.telegram.telegrambots.meta.api.objects.User;
 import org.telegram.telegrambots.meta.api.objects.commands.BotCommand;
 
 import io.github.alariclightin.predictionstrackerbot.commands.CommandProcessor;
+import io.github.alariclightin.predictionstrackerbot.messages.BotMessage;
 import io.github.alariclightin.predictionstrackerbot.states.StateHolderService;
 
 public class CommandServiceImplTest {
@@ -53,13 +51,12 @@ public class CommandServiceImplTest {
     @MethodSource("dataForShouldChooseProcessorCorrectly")
     void shouldChooseProcessorCorrectly(
             String command, String responseText) {
-        SendMessage result = commandService.handle(
-                createTestMessage(command));
+        BotMessage result = commandService.handle(
+                TestUtils.createTestMessage(true, "/" + command));
 
         verify(stateHolderService).deleteState(TestUtils.TEST_CHAT_ID);
 
         assertThat(result)
-            .hasFieldOrPropertyWithValue("chatId", TestUtils.TEST_CHAT_ID.toString())
             .hasFieldOrPropertyWithValue("text", responseText);
     }
 
@@ -68,18 +65,6 @@ public class CommandServiceImplTest {
                 Arguments.of("command1", "response1"),
                 Arguments.of("command2", "response2"),
                 Arguments.of("command3", "command3 is not a valid command"));
-    }
-
-    private Message createTestMessage(String command) {
-        var message = mock(Message.class);
-        when(message.isCommand()).thenReturn(true);
-        when(message.getText()).thenReturn("/" + command);
-
-        var user = mock(User.class);
-        when(user.getId()).thenReturn(TestUtils.TEST_CHAT_ID);
-        when(message.getFrom()).thenReturn(user);
-
-        return message;
     }
 
     @Test

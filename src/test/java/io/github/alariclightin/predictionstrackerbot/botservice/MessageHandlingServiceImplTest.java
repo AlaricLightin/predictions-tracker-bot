@@ -9,23 +9,34 @@ import org.junit.jupiter.api.Test;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
 
+import io.github.alariclightin.predictionstrackerbot.messages.BotMessage;
+
 class MessageHandlingServiceImplTest {
     private MessageHandlingServiceImpl messageHandlingService;
     private CommandHandlingService commandService;
     private SimpleMessageHandlingService simpleMessageService;
+    private SendMessageService sendMessageService;
+
+    private BotMessage botMessage = mock(BotMessage.class);
 
     @BeforeEach
     void setUp() {
         commandService = mock(CommandHandlingService.class);
         simpleMessageService = mock(SimpleMessageHandlingService.class);
-        messageHandlingService = new MessageHandlingServiceImpl(commandService, simpleMessageService);
+        sendMessageService = mock(SendMessageService.class);
+        messageHandlingService = new MessageHandlingServiceImpl(
+            commandService, 
+            simpleMessageService,
+            sendMessageService);
     }
 
     @Test
     void shouldHandleCommands() {
-        Message commandMessage = createTestMessage(true);
+        Message commandMessage = TestUtils.createTestMessage(true, "/cmd");
         SendMessage mockedResponse = mock(SendMessage.class);
-        when(commandService.handle(commandMessage)).thenReturn(mockedResponse);
+        when(commandService.handle(commandMessage)).thenReturn(botMessage);
+        when(sendMessageService.create(TestUtils.TEST_CHAT_ID, botMessage))
+            .thenReturn(mockedResponse);
         
         SendMessage result = messageHandlingService.handlMessage(commandMessage);
         assertThat(result)
@@ -34,19 +45,16 @@ class MessageHandlingServiceImplTest {
 
     @Test
     void shouldHandleOtherMessages() {
-        Message simpleMessage = createTestMessage(false);
+        Message simpleMessage = TestUtils.createTestMessage(false, "some text");
+        BotMessage botMessage = mock(BotMessage.class);
         SendMessage mockedResponse = mock(SendMessage.class);
-        when(simpleMessageService.handle(simpleMessage)).thenReturn(mockedResponse);
+        when(simpleMessageService.handle(simpleMessage)).thenReturn(botMessage);
+        when(sendMessageService.create(TestUtils.TEST_CHAT_ID, botMessage))
+            .thenReturn(mockedResponse);
         
         SendMessage result = messageHandlingService.handlMessage(simpleMessage);
         assertThat(result)
             .isEqualTo(mockedResponse);
-    }
-
-    private Message createTestMessage(boolean isCommand) {
-        var message = mock(Message.class);
-        when(message.isCommand()).thenReturn(isCommand);
-        return message;
     }
 
 }

@@ -24,15 +24,15 @@ class StartCommandTest {
         final Long chatId = 111L;
         Message message = mock(Message.class);
         User user = mock(User.class);
-        when(user.getFirstName()).thenReturn("Test");
+        when(user.getFirstName()).thenReturn("Test name");
         when(user.getId()).thenReturn(chatId);
         when(message.getFrom()).thenReturn(user);
 
         var result = command.handleCommand(message);
         assertThat(result)
             .isInstanceOf(BotTextMessage.class)
-            .extracting(m -> ((BotTextMessage) m).text())
-            .asString()
-            .contains("Hello");
+            .extracting(m -> ((BotTextMessage) m))
+            .hasFieldOrPropertyWithValue("messageId", "bot.responses.start")
+            .hasFieldOrPropertyWithValue("args", new Object[] {"Test name"});
     }
 }

@@ -26,7 +26,7 @@ class AddPredictionCommand extends AbstractCommand implements WaitedResponseHand
         var userId = getUserId(message);
         WaitedResponseState state = createWaitedResponseState(AddPredictionPhase.TEXT, new PredictionData());
         stateHolderService.saveState(userId, state);
-        return new BotTextMessage("What is your prediction?");
+        return new BotTextMessage("bot.responses.ask-prediction-text");
     }
 
     @Override
@@ -50,28 +50,24 @@ class AddPredictionCommand extends AbstractCommand implements WaitedResponseHand
             case TEXT:
                 stateHolderService.saveState(userId, 
                     createWaitedResponseState(AddPredictionPhase.DATE, data.addText(message.getText())));
-                return new BotTextMessage("What is the deadline?");
+                return new BotTextMessage("bot.responses.ask-deadline");
             case DATE:
                 try {
                     LocalDate date = LocalDate.parse(message.getText());
                     stateHolderService.saveState(userId, 
                         createWaitedResponseState(AddPredictionPhase.PROBABILITY, data.addDate(date)));
-                    return new BotTextMessage("What is the probability?");
+                    return new BotTextMessage("bot.responses.ask-probability");
 
                 }
                 catch (DateTimeParseException e) {
-                    return new BotTextMessage("Wrong date format. Try again.");
+                    return new BotTextMessage("bot.responses.wrong-date-format");
                 }
             case PROBABILITY:
                 data.addProbability(Integer.parseInt(message.getText()));
                 stateHolderService.deleteState(userId);
                 return new BotTextMessage(
-                        String.format("""
-                                Prediction added.
-                                Prediction: %s
-                                Date: %s
-                                Probability: %d
-                                """, data.getText(), data.getDate(), data.getProbability())
+                        "bot.responses.prediction-added",
+                        data.getText(), data.getDate(), data.getProbability()
                     );
 
             default: throw new IllegalStateException("Unknown phase when adding prediction: " + phase);

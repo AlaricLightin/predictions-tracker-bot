@@ -11,7 +11,7 @@ class StartCommand extends AbstractCommand {
 
     @Override
     public BotMessage handleCommand(Message message) {
-        return new BotTextMessage("Hello, " + message.getFrom().getFirstName() + "!");
+        return new BotTextMessage("bot.responses.start", message.getFrom().getFirstName());
     }
 
     @Override

@@ -29,11 +29,11 @@ public class CommandServiceImplTest {
     @BeforeEach
     void setUp() {
         commandProcessor1 = mock(CommandProcessor.class);
-        when(commandProcessor1.handleCommand(any())).thenReturn(TestUtils.createTestResponseMessage("response1"));
+        when(commandProcessor1.handleCommand(any())).thenReturn(TestUtils.createTestResponseMessage("responseId1"));
         when(commandProcessor1.createBotCommand()).thenReturn(
             new BotCommand("command1", "description1"));
         commandProcessor2 = mock(CommandProcessor.class);
-        when(commandProcessor2.handleCommand(any())).thenReturn(TestUtils.createTestResponseMessage("response2"));
+        when(commandProcessor2.handleCommand(any())).thenReturn(TestUtils.createTestResponseMessage("responseId2"));
         when(commandProcessor2.createBotCommand()).thenReturn(
             new BotCommand("command2", "description2"));
 
@@ -50,21 +50,21 @@ public class CommandServiceImplTest {
     @ParameterizedTest
     @MethodSource("dataForShouldChooseProcessorCorrectly")
     void shouldChooseProcessorCorrectly(
-            String command, String responseText) {
+            String command, String responseId) {
         BotMessage result = commandService.handle(
                 TestUtils.createTestMessage(true, "/" + command));
 
-        verify(stateHolderService).deleteState(TestUtils.TEST_CHAT_ID);
+        verify(stateHolderService).deleteState(TestUtils.CHAT_ID);
 
         assertThat(result)
-            .hasFieldOrPropertyWithValue("text", responseText);
+            .hasFieldOrPropertyWithValue("messageId", responseId);
     }
 
     private static Stream<Arguments> dataForShouldChooseProcessorCorrectly() {
         return Stream.of(
-                Arguments.of("command1", "response1"),
-                Arguments.of("command2", "response2"),
-                Arguments.of("command3", "command3 is not a valid command"));
+                Arguments.of("command1", "responseId1"),
+                Arguments.of("command2", "responseId2"),
+                Arguments.of("command3", "bot.responses.error.unexpected-command"));
     }
 
     @Test

@@ -9,10 +9,11 @@ import org.telegram.telegrambots.meta.api.objects.User;
 import io.github.alariclightin.predictionstrackerbot.messages.BotTextMessage;
 
 class TestUtils {
-    static final Long TEST_CHAT_ID = 123L;
+    static final Long CHAT_ID = 123L;
+    static final String LANGUAGE_CODE = "en";
 
-    static BotTextMessage createTestResponseMessage(String text) {
-        return new BotTextMessage(text);
+    static BotTextMessage createTestResponseMessage(String responseId) {
+        return new BotTextMessage(responseId);
     }
 
     static Message createTestMessage(boolean isCommand, String text) {
@@ -21,7 +22,8 @@ class TestUtils {
         when(message.getText()).thenReturn(text);
 
         var user = mock(User.class);
-        when(user.getId()).thenReturn(TestUtils.TEST_CHAT_ID);
+        when(user.getId()).thenReturn(TestUtils.CHAT_ID);
+        when(user.getLanguageCode()).thenReturn(TestUtils.LANGUAGE_CODE);
         when(message.getFrom()).thenReturn(user);
 
         return message;       

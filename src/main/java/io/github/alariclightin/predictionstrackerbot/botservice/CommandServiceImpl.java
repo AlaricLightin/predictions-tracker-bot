@@ -37,7 +37,7 @@ class CommandServiceImpl implements CommandHandlingService, CommandManagementSer
         if (processor != null)
             return processor.handleCommand(message);
         else
-            return new BotTextMessage(command + " is not a valid command");
+            return new BotTextMessage("bot.responses.error.unexpected-command", command);
     }
 
     @Override

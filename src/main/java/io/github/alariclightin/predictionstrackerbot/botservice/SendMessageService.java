@@ -6,6 +6,6 @@ import io.github.alariclightin.predictionstrackerbot.messages.BotMessage;
 
 public interface SendMessageService {
 
-    SendMessage create(long id, BotMessage botMessage);
+    SendMessage create(long userId, String langugeCode, BotMessage botMessage);
 
 }

@@ -33,7 +33,9 @@ class MessageHandlingServiceTest {
         SendMessage response = messageHandlingService.handlMessage(message);
         assertThat(response)
             .hasFieldOrPropertyWithValue("chatId", USER_ID.toString())
-            .as("checkText", response.getText().contains("Hello"));
+            .extracting(SendMessage::getText)
+            .asString()
+            .contains("Hello");
     }
 
     @Test
@@ -42,7 +44,7 @@ class MessageHandlingServiceTest {
         SendMessage response = messageHandlingService.handlMessage(message);
         assertThat(response)
             .hasFieldOrPropertyWithValue("chatId", USER_ID.toString())
-            .extracting("text")
+            .extracting(SendMessage::getText)
             .asString()
             .contains("What is your prediction?");
     }
@@ -90,7 +92,7 @@ class MessageHandlingServiceTest {
                     SendMessage response = messageHandlingService.handlMessage(message);
                     assertThat(response)
                         .hasFieldOrPropertyWithValue("chatId", USER_ID.toString())
-                        .extracting("text")
+                        .extracting(SendMessage::getText)
                         .asString()
                         .contains("Prediction added.", "test prediction", "60");
                 }
@@ -114,9 +116,20 @@ class MessageHandlingServiceTest {
         SendMessage response = messageHandlingService.handlMessage(message);
         assertThat(response)
             .hasFieldOrPropertyWithValue("chatId", USER_ID.toString())
-            .extracting("text")
+            .extracting(SendMessage::getText)
             .asString()
             .contains("I don't understand you.");
+    }
+
+    @Test
+    void shouldHandleInvalidCommand() {
+        Message message = createTestMessage("/invalid");
+        SendMessage response = messageHandlingService.handlMessage(message);
+        assertThat(response)
+            .hasFieldOrPropertyWithValue("chatId", USER_ID.toString())
+            .extracting(SendMessage::getText)
+            .asString()
+            .contains("invalid", "is not a valid command");
     }
 
     private Message createTestMessage(String string) {
@@ -126,6 +139,7 @@ class MessageHandlingServiceTest {
         
         var user = mock(User.class);
         when(user.getId()).thenReturn(USER_ID);
+        when(user.getLanguageCode()).thenReturn("en");
         when(message.getFrom()).thenReturn(user);
         when(message.getChatId()).thenReturn(111L);
         return message;

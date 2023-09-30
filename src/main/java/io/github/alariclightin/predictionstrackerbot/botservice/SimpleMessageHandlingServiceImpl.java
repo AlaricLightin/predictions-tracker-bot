@@ -38,8 +38,7 @@ class SimpleMessageHandlingServiceImpl implements SimpleMessageHandlingService {
                 throw new IllegalStateException("No handler for command " + state.commandName());
         }
         else
-            // TODO fix message
-            return new BotTextMessage("I don't understand you."); 
+            return new BotTextMessage("bot.responses.error.unexpected-message"); 
     }
     
 }

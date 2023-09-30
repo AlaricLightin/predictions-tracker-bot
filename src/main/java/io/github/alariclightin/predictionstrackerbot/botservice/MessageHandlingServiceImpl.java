@@ -3,6 +3,7 @@ package io.github.alariclightin.predictionstrackerbot.botservice;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
+import org.telegram.telegrambots.meta.api.objects.User;
 
 import io.github.alariclightin.predictionstrackerbot.messages.BotMessage;
 
@@ -27,7 +28,8 @@ class MessageHandlingServiceImpl implements MessageHandlingService {
         BotMessage botMessage = message.isCommand() ? commandService.handle(message) 
             : simpleMessageService.handle(message);
 
-        return sendMessageService.create(message.getFrom().getId(), botMessage);
+        User user = message.getFrom();
+        return sendMessageService.create(user.getId(), user.getLanguageCode(), botMessage);
     }
 
 }

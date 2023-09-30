@@ -44,14 +44,14 @@ public class SimpleMessageHandlingServiceImplTest {
             String command, String responseText) {
 
         WaitedResponseState state = new WaitedResponseState(command, "some phase", null);
-        when(stateHolderService.getState(TestUtils.TEST_CHAT_ID))
+        when(stateHolderService.getState(TestUtils.CHAT_ID))
             .thenReturn(state);
 
         BotMessage result = simpleMessageHandlingService.handle(
                 TestUtils.createTestMessage(false, "some text"));
 
         assertThat(result)
-            .hasFieldOrPropertyWithValue("text", responseText);
+            .hasFieldOrPropertyWithValue("messageId", responseText);
     }
 
     private static Object[][] dataForShouldChooseHandlerCorrectly() {

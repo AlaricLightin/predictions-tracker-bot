@@ -35,7 +35,7 @@ class MessageHandlingServiceImplTest {
         Message commandMessage = TestUtils.createTestMessage(true, "/cmd");
         SendMessage mockedResponse = mock(SendMessage.class);
         when(commandService.handle(commandMessage)).thenReturn(botMessage);
-        when(sendMessageService.create(TestUtils.TEST_CHAT_ID, botMessage))
+        when(sendMessageService.create(TestUtils.CHAT_ID, TestUtils.LANGUAGE_CODE, botMessage))
             .thenReturn(mockedResponse);
         
         SendMessage result = messageHandlingService.handlMessage(commandMessage);
@@ -49,7 +49,7 @@ class MessageHandlingServiceImplTest {
         BotMessage botMessage = mock(BotMessage.class);
         SendMessage mockedResponse = mock(SendMessage.class);
         when(simpleMessageService.handle(simpleMessage)).thenReturn(botMessage);
-        when(sendMessageService.create(TestUtils.TEST_CHAT_ID, botMessage))
+        when(sendMessageService.create(TestUtils.CHAT_ID, TestUtils.LANGUAGE_CODE, botMessage))
             .thenReturn(mockedResponse);
         
         SendMessage result = messageHandlingService.handlMessage(simpleMessage);

@@ -4,6 +4,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -35,7 +37,6 @@ class MessageHandlingServiceTest {
     }
 
     @Test
-    // TODO change to Nested tests
     void shouldAddPrediction() {
         Message message = createTestMessage("/add");
         SendMessage response = messageHandlingService.handlMessage(message);
@@ -44,25 +45,68 @@ class MessageHandlingServiceTest {
             .extracting("text")
             .asString()
             .contains("What is your prediction?");
-
-        message = createTestMessage("test prediction");
-        response = messageHandlingService.handlMessage(message);
-        assertThat(response.getText())
-            .contains("What is the deadline?");
-
-        message = createTestMessage("2021-01-01");
-        response = messageHandlingService.handlMessage(message);
-        assertThat(response.getText())
-            .contains("probability");
-
-        message = createTestMessage("60");
-        response = messageHandlingService.handlMessage(message);
-        assertThat(response)
-            .hasFieldOrPropertyWithValue("chatId", USER_ID.toString())
-            .extracting("text")
-            .asString()
-            .contains("Prediction added.", "test prediction", "60");
     }
+
+    @Nested
+    class WhenAddPredictionStarted {
+        @BeforeEach
+        void setUp() {
+            messageHandlingService.handlMessage(createTestMessage("/add"));
+        }
+
+        @Test
+        void shouldHandlePredictionText() {
+            Message message = createTestMessage("test prediction");
+            SendMessage response = messageHandlingService.handlMessage(message);
+            assertThat(response.getText())
+                .contains("deadline");
+        }
+
+        @Nested
+        class WhenPredictionTextAdded {
+            @BeforeEach
+            void setUp() {
+                messageHandlingService.handlMessage(createTestMessage("test prediction"));
+            }
+
+            @Test
+            void shouldHandleCorrectDeadlineText() {
+                Message message = createTestMessage("2021-01-01");
+                SendMessage response = messageHandlingService.handlMessage(message);
+                assertThat(response.getText())
+                    .contains("probability");
+            }
+
+            @Nested
+            class WhenDeadlineTextAdded {
+                @BeforeEach
+                void setUp() {
+                    messageHandlingService.handlMessage(createTestMessage("2021-01-01"));
+                }
+
+                @Test
+                void shouldHandleProbabilityText() {
+                    Message message = createTestMessage("60");
+                    SendMessage response = messageHandlingService.handlMessage(message);
+                    assertThat(response)
+                        .hasFieldOrPropertyWithValue("chatId", USER_ID.toString())
+                        .extracting("text")
+                        .asString()
+                        .contains("Prediction added.", "test prediction", "60");
+                }
+            }
+
+            @Test
+            void shouldHandleIncorrectDeadlineText() {
+                Message message = createTestMessage("incorrect deadline");
+                SendMessage response = messageHandlingService.handlMessage(message);
+                assertThat(response.getText())
+                    .contains("Wrong date");
+            }
+
+        }
+    }
+
 
     @Test
     void shouldHandleUnpredictedTextMessage() {

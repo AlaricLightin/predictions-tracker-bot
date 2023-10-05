@@ -4,21 +4,37 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.time.Instant;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.test.jdbc.JdbcTestUtils;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.User;
+import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
 import io.github.alariclightin.predictionstrackerbot.bot.Bot;
 import io.github.alariclightin.predictionstrackerbot.botservice.MessageHandlingService;
 
 @SpringBootTest
+@Testcontainers
 class MessageHandlingServiceTest {
+    @Container
+    @ServiceConnection
+    static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:14.9-alpine");
+
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
+
     @MockBean
     private Bot bot;
     
@@ -77,6 +93,11 @@ class MessageHandlingServiceTest {
                 SendMessage response = messageHandlingService.handlMessage(message);
                 assertThat(response.getText())
                     .contains("probability");
+
+                assertThat(JdbcTestUtils.countRowsInTable(jdbcTemplate, "predictions.questions"))
+                    .isZero();
+                assertThat(JdbcTestUtils.countRowsInTable(jdbcTemplate, "predictions.predictions"))
+                    .isZero();
             }
 
             @Nested
@@ -95,6 +116,11 @@ class MessageHandlingServiceTest {
                         .extracting(SendMessage::getText)
                         .asString()
                         .contains("Prediction added.", "test prediction", "60");
+
+                    assertThat(JdbcTestUtils.countRowsInTable(jdbcTemplate, "predictions.questions"))
+                        .isEqualTo(1);
+                    assertThat(JdbcTestUtils.countRowsInTable(jdbcTemplate, "predictions.predictions"))
+                        .isEqualTo(1);
                 }
             }
 
@@ -142,6 +168,7 @@ class MessageHandlingServiceTest {
         when(user.getLanguageCode()).thenReturn("en");
         when(message.getFrom()).thenReturn(user);
         when(message.getChatId()).thenReturn(111L);
+        when(message.getDate()).thenReturn((int) Instant.now().getEpochSecond());
         return message;
     }
 }

@@ -1,6 +1,9 @@
 package io.github.alariclightin.predictionstrackerbot.commands.addprediction;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.ZoneOffset;
+import java.time.Instant;
 import java.time.format.DateTimeParseException;
 
 import org.springframework.stereotype.Service;
@@ -8,6 +11,9 @@ import org.telegram.telegrambots.meta.api.objects.Message;
 
 import io.github.alariclightin.predictionstrackerbot.commands.AbstractCommand;
 import io.github.alariclightin.predictionstrackerbot.commands.WaitedResponseHandler;
+import io.github.alariclightin.predictionstrackerbot.data.predictions.Prediction;
+import io.github.alariclightin.predictionstrackerbot.data.predictions.PredictionDbService;
+import io.github.alariclightin.predictionstrackerbot.data.predictions.Question;
 import io.github.alariclightin.predictionstrackerbot.messages.BotMessage;
 import io.github.alariclightin.predictionstrackerbot.messages.BotTextMessage;
 import io.github.alariclightin.predictionstrackerbot.states.StateHolderService;
@@ -16,9 +22,12 @@ import io.github.alariclightin.predictionstrackerbot.states.WaitedResponseState;
 @Service
 class AddPredictionCommand extends AbstractCommand implements WaitedResponseHandler {
     private final StateHolderService stateHolderService;
+    private final PredictionDbService predictionDbService;
 
-    AddPredictionCommand(StateHolderService stateHolderService) {
+    AddPredictionCommand(StateHolderService stateHolderService,
+            PredictionDbService predictionDbService) {
         this.stateHolderService = stateHolderService;
+        this.predictionDbService = predictionDbService;
     }
 
     @Override
@@ -37,7 +46,7 @@ class AddPredictionCommand extends AbstractCommand implements WaitedResponseHand
     @Override
     // TODO make more generic and add validations
     public BotMessage handleWaitedResponse(Message message) {
-        var userId = getUserId(message);
+        long userId = getUserId(message);
         WaitedResponseState state = stateHolderService.getState(userId);
         if (state == null)
             throw new IllegalStateException("No state for user " + userId);
@@ -51,6 +60,7 @@ class AddPredictionCommand extends AbstractCommand implements WaitedResponseHand
                 stateHolderService.saveState(userId, 
                     createWaitedResponseState(AddPredictionPhase.DATE, data.addText(message.getText())));
                 return new BotTextMessage("bot.responses.ask-deadline");
+
             case DATE:
                 try {
                     LocalDate date = LocalDate.parse(message.getText());
@@ -62,8 +72,18 @@ class AddPredictionCommand extends AbstractCommand implements WaitedResponseHand
                 catch (DateTimeParseException e) {
                     return new BotTextMessage("bot.responses.wrong-date-format");
                 }
+                
             case PROBABILITY:
                 data.addProbability(Integer.parseInt(message.getText()));
+                Question question = new Question(
+                    data.getText(), 
+                    // TODO: make timezone configurable
+                    // TODO add time
+                    data.getDate().atTime(LocalTime.MIDNIGHT).toInstant(ZoneOffset.UTC), 
+                    userId);
+                Prediction prediction = new Prediction(question, userId, 
+                    Instant.ofEpochSecond(message.getDate()));
+                predictionDbService.addPrediction(question, prediction);
                 stateHolderService.deleteState(userId);
                 return new BotTextMessage(
                         "bot.responses.prediction-added",

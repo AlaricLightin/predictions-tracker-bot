@@ -43,7 +43,7 @@ class MessageHandlingServiceTest extends AbstractIntegrationTest {
     @Test
     void shouldHandleStartCommand() {
         Message message = createTestMessage("/start");
-        SendMessage response = messageHandlingService.handlMessage(message);
+        SendMessage response = messageHandlingService.handleMessage(message);
         assertThat(response)
             .hasFieldOrPropertyWithValue("chatId", USER_ID.toString())
             .extracting(SendMessage::getText)
@@ -54,7 +54,7 @@ class MessageHandlingServiceTest extends AbstractIntegrationTest {
     @Test
     void shouldAddPrediction() {
         Message message = createTestMessage("/add");
-        SendMessage response = messageHandlingService.handlMessage(message);
+        SendMessage response = messageHandlingService.handleMessage(message);
         assertThat(response)
             .hasFieldOrPropertyWithValue("chatId", USER_ID.toString())
             .extracting(SendMessage::getText)
@@ -66,13 +66,13 @@ class MessageHandlingServiceTest extends AbstractIntegrationTest {
     class WhenAddPredictionStarted {
         @BeforeEach
         void setUp() {
-            messageHandlingService.handlMessage(createTestMessage("/add"));
+            messageHandlingService.handleMessage(createTestMessage("/add"));
         }
 
         @Test
         void shouldHandlePredictionText() {
             Message message = createTestMessage("test prediction");
-            SendMessage response = messageHandlingService.handlMessage(message);
+            SendMessage response = messageHandlingService.handleMessage(message);
             assertThat(response.getText())
                 .contains("deadline");
         }
@@ -81,13 +81,13 @@ class MessageHandlingServiceTest extends AbstractIntegrationTest {
         class WhenPredictionTextAdded {
             @BeforeEach
             void setUp() {
-                messageHandlingService.handlMessage(createTestMessage("test prediction"));
+                messageHandlingService.handleMessage(createTestMessage("test prediction"));
             }
 
             @Test
             void shouldHandleCorrectDeadlineText() {
                 Message message = createTestMessage("2021-01-01");
-                SendMessage response = messageHandlingService.handlMessage(message);
+                SendMessage response = messageHandlingService.handleMessage(message);
                 assertThat(response.getText())
                     .contains("probability");
 
@@ -101,13 +101,13 @@ class MessageHandlingServiceTest extends AbstractIntegrationTest {
             class WhenDeadlineTextAdded {
                 @BeforeEach
                 void setUp() {
-                    messageHandlingService.handlMessage(createTestMessage("2021-01-01"));
+                    messageHandlingService.handleMessage(createTestMessage("2021-01-01"));
                 }
 
                 @Test
                 void shouldHandleProbabilityText() {
                     Message message = createTestMessage("60");
-                    SendMessage response = messageHandlingService.handlMessage(message);
+                    SendMessage response = messageHandlingService.handleMessage(message);
                     assertThat(response)
                         .hasFieldOrPropertyWithValue("chatId", USER_ID.toString())
                         .extracting(SendMessage::getText)
@@ -124,7 +124,7 @@ class MessageHandlingServiceTest extends AbstractIntegrationTest {
             @Test
             void shouldHandleIncorrectDeadlineText() {
                 Message message = createTestMessage("incorrect deadline");
-                SendMessage response = messageHandlingService.handlMessage(message);
+                SendMessage response = messageHandlingService.handleMessage(message);
                 assertThat(response.getText())
                     .contains("Wrong date");
             }
@@ -136,7 +136,7 @@ class MessageHandlingServiceTest extends AbstractIntegrationTest {
     @Test
     void shouldHandleUnpredictedTextMessage() {
         Message message = createTestMessage("test message");
-        SendMessage response = messageHandlingService.handlMessage(message);
+        SendMessage response = messageHandlingService.handleMessage(message);
         assertThat(response)
             .hasFieldOrPropertyWithValue("chatId", USER_ID.toString())
             .extracting(SendMessage::getText)
@@ -147,7 +147,7 @@ class MessageHandlingServiceTest extends AbstractIntegrationTest {
     @Test
     void shouldHandleInvalidCommand() {
         Message message = createTestMessage("/invalid");
-        SendMessage response = messageHandlingService.handlMessage(message);
+        SendMessage response = messageHandlingService.handleMessage(message);
         assertThat(response)
             .hasFieldOrPropertyWithValue("chatId", USER_ID.toString())
             .extracting(SendMessage::getText)

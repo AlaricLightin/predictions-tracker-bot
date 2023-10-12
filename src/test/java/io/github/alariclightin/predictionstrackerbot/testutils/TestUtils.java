@@ -1,4 +1,4 @@
-package io.github.alariclightin.predictionstrackerbot.botservice;
+package io.github.alariclightin.predictionstrackerbot.testutils;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -8,15 +8,15 @@ import org.telegram.telegrambots.meta.api.objects.User;
 
 import io.github.alariclightin.predictionstrackerbot.messages.BotTextMessage;
 
-class TestUtils {
-    static final Long CHAT_ID = 123L;
-    static final String LANGUAGE_CODE = "en";
+public class TestUtils {
+    public static final Long CHAT_ID = 123L;
+    public static final String LANGUAGE_CODE = "en";
 
-    static BotTextMessage createTestResponseMessage(String responseId) {
+    public static BotTextMessage createTestResponseMessage(String responseId) {
         return new BotTextMessage(responseId);
     }
 
-    static Message createTestMessage(boolean isCommand, String text) {
+    public static Message createTestMessage(boolean isCommand, String text) {
         var message = mock(Message.class);
         when(message.isCommand()).thenReturn(isCommand);
         when(message.getText()).thenReturn(text);

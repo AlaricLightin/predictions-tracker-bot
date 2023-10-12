@@ -12,7 +12,10 @@ class StateHolderServiceImpl implements StateHolderService {
 
     @Override
     public void saveState(long userId, WaitedResponseState state) {
-        states.put(userId, state);
+        if (state != null)
+            states.put(userId, state);
+        else
+            deleteState(userId);
     }
 
     @Override

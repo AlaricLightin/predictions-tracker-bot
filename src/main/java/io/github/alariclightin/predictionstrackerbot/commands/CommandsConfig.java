@@ -7,21 +7,29 @@ import java.util.Map;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import io.github.alariclightin.predictionstrackerbot.messages.BotTextMessage;
+
 @Configuration
 class CommandsConfig {
-    @Bean("commandProcessorMap")
-    Map<String, CommandProcessor> commandProcessorMap(List<CommandProcessor> commandProcessors) {
-        Map<String, CommandProcessor> result = new HashMap<>();
-        commandProcessors.forEach(processor -> result.put(processor.getCommandName(), processor));
+
+    @Bean("messageHandlersMap")
+    Map<String, Map<String, MessageHandler>> messageHandlersMap(
+        List<MessageHandler> messageHandlersMap) {
+            
+        Map<String, Map<String, MessageHandler>> result = new HashMap<>();
+        messageHandlersMap.forEach(handler -> {
+            var commandMap = result.computeIfAbsent(handler.getCommandName(), k -> new HashMap<>());
+            commandMap.put(handler.getPhaseName(), handler);
+        });
         return result;
     }
 
-    @Bean("waitedResponseHandlerMap")
-    Map<String, WaitedResponseHandler> waitedResponseHandlerMap(
-        List<WaitedResponseHandler> waitedResponseHandlers) {
-            
-        Map<String, WaitedResponseHandler> result = new HashMap<>();
-        waitedResponseHandlers.forEach(handler -> result.put(handler.getCommandName(), handler));
-        return result;
+    @Bean
+    MessageHandler startCommand() {
+        return new MessageHandlerBuilder<>()
+            .setCommandName("start")
+            .setResponseMessageFunc(message -> 
+                new BotTextMessage("bot.responses.start", message.getFrom().getFirstName()))
+            .build();
     }
 }

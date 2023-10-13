@@ -36,6 +36,7 @@ class SimpleMessageHandler<T> implements MessageHandler {
     public MessageHandlingResult handle(Message message, WaitedResponseState state) 
         throws UnexpectedMessageException {
 
+        @SuppressWarnings("unchecked")
         T data = state != null ? (T) state.data() : null;
         T nextStateData = stateUpdater.apply(message.getText(), data);
         resultAction.apply(message, nextStateData);

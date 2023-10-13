@@ -1,44 +1,50 @@
 package io.github.alariclightin.predictionstrackerbot.commands;
 
 import java.util.function.BiFunction;
-import java.util.function.Function;
-
 import org.telegram.telegrambots.meta.api.objects.Message;
 
+import io.github.alariclightin.predictionstrackerbot.exceptions.UnexpectedMessageException;
 import io.github.alariclightin.predictionstrackerbot.messages.BotMessage;
 import io.github.alariclightin.predictionstrackerbot.states.WaitedResponseState;
 
 class SimpleMessageHandler<T> implements MessageHandler {
     private String commandName;
     private String phaseName = MessageHandler.START_PHASE;
-    private Function<Message, BotMessage> responseMessageFunc;
+    private BiFunction<Message, T, BotMessage> responseMessageFunc;
     private String nextPhase;
-    private BiFunction<String, T, T> stateUpdater;
+    private StateUpdater<T> stateUpdater;
+    private ResultAction<T> resultAction; 
     
     SimpleMessageHandler(
         String commandName,
         String phaseName,
-        Function<Message, BotMessage> responseMessageFunc,
+        BiFunction<Message, T, BotMessage> responseMessageFunc,
         String nextPhase,
-        BiFunction<String, T, T> stateUpdater
+        StateUpdater<T> stateUpdater,
+        ResultAction<T> resultAction
     ) {
         this.commandName = commandName;
         this.phaseName = phaseName;
         this.responseMessageFunc = responseMessageFunc;
         this.nextPhase = nextPhase;
         this.stateUpdater = stateUpdater;
+        this.resultAction = resultAction;
     }
 
 
     @Override
-    public MessageHandlingResult handle(Message message, WaitedResponseState state) {
+    public MessageHandlingResult handle(Message message, WaitedResponseState state) 
+        throws UnexpectedMessageException {
+
+        T data = state != null ? (T) state.data() : null;
+        T nextStateData = stateUpdater.apply(message.getText(), data);
+        resultAction.apply(message, nextStateData);
+        
         WaitedResponseState nextState = null;
         if (nextPhase != null) {
-            T data = state != null ? (T) state.data() : null;
-            nextState = new WaitedResponseState(commandName, nextPhase, stateUpdater.apply(message.getText(), data));
+            nextState = new WaitedResponseState(commandName, nextPhase, nextStateData);
         }
-        
-        return new MessageHandlingResult(responseMessageFunc.apply(message), nextState);
+        return new MessageHandlingResult(responseMessageFunc.apply(message, nextStateData), nextState);
     }
 
 

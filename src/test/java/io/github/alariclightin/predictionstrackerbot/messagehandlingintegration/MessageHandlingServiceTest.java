@@ -10,6 +10,8 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -118,6 +120,23 @@ class MessageHandlingServiceTest extends AbstractIntegrationTest {
                         .isEqualTo(1);
                     assertThat(JdbcTestUtils.countRowsInTable(jdbcTemplate, "predictions.predictions"))
                         .isEqualTo(1);
+                }
+
+                @Test
+                void shouldHandleWhenProbabilityIsNotANumber() {
+                    Message message = createTestMessage("not a number");
+                    SendMessage response = messageHandlingService.handleMessage(message);
+                    assertThat(response.getText())
+                        .contains("Probability must be a number");
+                }
+
+                @ParameterizedTest
+                @ValueSource(strings = {"-1", "0", "100"})
+                void shouldHandleWhenProbabilityOutOfRange() {
+                    Message message = createTestMessage("0");
+                    SendMessage response = messageHandlingService.handleMessage(message);
+                    assertThat(response.getText())
+                        .contains("Probability must be between 1 and 99");
                 }
             }
 

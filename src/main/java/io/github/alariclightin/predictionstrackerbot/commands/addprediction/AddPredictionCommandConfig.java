@@ -1,10 +1,15 @@
 package io.github.alariclightin.predictionstrackerbot.commands.addprediction;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import io.github.alariclightin.predictionstrackerbot.commands.MessageHandler;
 import io.github.alariclightin.predictionstrackerbot.commands.MessageHandlerBuilder;
+import io.github.alariclightin.predictionstrackerbot.exceptions.UnexpectedMessageException;
+import io.github.alariclightin.predictionstrackerbot.messages.BotTextMessage;
 
 @Configuration
 class AddPredictionCommandConfig {
@@ -27,6 +32,56 @@ class AddPredictionCommandConfig {
             .setNextPhasePromptMessageId("bot.responses.ask-deadline")
             .setNextPhase(AddPredictionConsts.DATE_PHASE)
             .setStateUpdater((text, data) -> data.addText(text))
+            .build();
+    }
+
+    @Bean
+    MessageHandler addPredictionDatePhase() {
+        return new MessageHandlerBuilder<PredictionData>()
+            .setCommandName(AddPredictionConsts.COMMAND_NAME)
+            .setPhaseName(AddPredictionConsts.DATE_PHASE)
+            .setNextPhasePromptMessageId("bot.responses.ask-probability")
+            .setNextPhase(AddPredictionConsts.PROBABILITY_PHASE)
+            .setStateUpdater((text, data) -> {
+                try {
+                    LocalDate date = LocalDate.parse(text);
+                    return data.addDate(date);
+                }
+                catch (DateTimeParseException e) {
+                    throw new UnexpectedMessageException("bot.responses.wrong-date-format");
+                }
+            })
+            .build();
+    }
+
+    @Bean
+    MessageHandler addPredictionProbabilityPhase(
+        PredictionSaver predictionSaver
+    ) {
+
+        return new MessageHandlerBuilder<PredictionData>()
+            .setCommandName(AddPredictionConsts.COMMAND_NAME)
+            .setPhaseName(AddPredictionConsts.PROBABILITY_PHASE)
+            
+            .setStateUpdater((text, data) -> {
+                try {
+                    int probability = Integer.parseInt(text);
+                    if (probability <= 0 || probability >= 100)
+                        throw new UnexpectedMessageException("bot.responses.probability-out-of-range");
+                    return data.addProbability(probability);
+                }
+                catch (NumberFormatException e) {
+                    throw new UnexpectedMessageException("bot.responses.propability-not-a-number");
+                }
+            })
+            
+            .setResponseMessageFunc((message, data) -> 
+                new BotTextMessage(
+                    "bot.responses.prediction-added",
+                    data.getText(), data.getDate(), data.getProbability())
+            )
+            
+            .setResultAction(predictionSaver)
             .build();
     }
     

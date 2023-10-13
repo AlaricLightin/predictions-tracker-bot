@@ -28,7 +28,7 @@ class CommandsConfig {
     MessageHandler startCommand() {
         return new MessageHandlerBuilder<>()
             .setCommandName("start")
-            .setResponseMessageFunc(message -> 
+            .setResponseMessageFunc((message, data) -> 
                 new BotTextMessage("bot.responses.start", message.getFrom().getFirstName()))
             .build();
     }

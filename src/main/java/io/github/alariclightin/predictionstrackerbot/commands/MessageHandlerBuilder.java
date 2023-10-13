@@ -1,8 +1,6 @@
 package io.github.alariclightin.predictionstrackerbot.commands;
 
 import java.util.function.BiFunction;
-import java.util.function.Function;
-
 import org.telegram.telegrambots.meta.api.objects.Message;
 
 import io.github.alariclightin.predictionstrackerbot.messages.BotMessage;
@@ -16,9 +14,10 @@ public class MessageHandlerBuilder<T> {
     private String commandName;
     private String phaseName = MessageHandler.START_PHASE;
     private String nextPhasePromptMessageId;
-    private Function<Message, BotMessage> responseMessageFunc;
-    private BiFunction<String, T, T> stateUpdater;
-    private String nextPhase = null;
+    private BiFunction<Message, T, BotMessage> responseMessageFunc;
+    private StateUpdater<T> stateUpdater;
+    private String nextPhase;
+    private ResultAction<T> resultAction; 
 
     public MessageHandlerBuilder<T> setCommandName(String commandName) {
         this.commandName = commandName;
@@ -30,12 +29,15 @@ public class MessageHandlerBuilder<T> {
         return this;
     }
 
+    /**
+     * Sets the message id of the prompt message that will be sent to the user
+     */
     public MessageHandlerBuilder<T> setNextPhasePromptMessageId(String promptMessageId) {
         this.nextPhasePromptMessageId = promptMessageId;
         return this;
     }
 
-    public MessageHandlerBuilder<T> setStateUpdater(BiFunction<String, T, T> stateUpdater) {
+    public MessageHandlerBuilder<T> setStateUpdater(StateUpdater<T> stateUpdater) {
         this.stateUpdater = stateUpdater;
         return this;
     }
@@ -45,8 +47,16 @@ public class MessageHandlerBuilder<T> {
         return this;
     }
 
-    public MessageHandlerBuilder<T> setResponseMessageFunc(Function<Message, BotMessage> responseMessageFunc) {
+    public MessageHandlerBuilder<T> setResponseMessageFunc(BiFunction<Message, T, BotMessage> responseMessageFunc) {
         this.responseMessageFunc = responseMessageFunc;
+        return this;
+    }
+
+    /**
+     * Sets the action that will be executed after the message is handled.
+     */
+    public MessageHandlerBuilder<T> setResultAction(ResultAction<T> resultAction) {
+        this.resultAction = resultAction;
         return this;
     }
 
@@ -57,20 +67,25 @@ public class MessageHandlerBuilder<T> {
         if (this.nextPhasePromptMessageId == null && this.responseMessageFunc == null)
             throw new IllegalStateException("Prompt message id or function must be set");
 
-        Function<Message, BotMessage> promptMessageIdFunc = this.responseMessageFunc != null
+        BiFunction<Message, T, BotMessage> promptMessageIdFunc = this.responseMessageFunc != null
             ? this.responseMessageFunc
-            : (message) -> new BotTextMessage(this.nextPhasePromptMessageId);    
+            : (message, data) -> new BotTextMessage(this.nextPhasePromptMessageId);    
 
-        BiFunction<String, T, T> stateUpdater = this.stateUpdater != null
+        StateUpdater<T> stateUpdater = this.stateUpdater != null
             ? this.stateUpdater
             : (text, state) -> null;
+
+        ResultAction<T> resultAction = this.resultAction != null
+            ? this.resultAction
+            : (userId, state) -> {};
 
         return new SimpleMessageHandler<T>(
             this.commandName,
             this.phaseName,
             promptMessageIdFunc,
             this.nextPhase,
-            stateUpdater
+            stateUpdater,
+            resultAction
         );
     }
     

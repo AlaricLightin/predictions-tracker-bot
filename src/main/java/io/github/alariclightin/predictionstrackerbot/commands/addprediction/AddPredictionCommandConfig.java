@@ -1,6 +1,8 @@
 package io.github.alariclightin.predictionstrackerbot.commands.addprediction;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.format.DateTimeParseException;
 
 import org.springframework.context.annotation.Bean;
@@ -40,15 +42,34 @@ class AddPredictionCommandConfig {
         return new MessageHandlerBuilder<PredictionData>()
             .setCommandName(AddPredictionConsts.COMMAND_NAME)
             .setPhaseName(AddPredictionConsts.DATE_PHASE)
-            .setNextPhasePromptMessageId("bot.responses.ask-probability")
-            .setNextPhase(AddPredictionConsts.PROBABILITY_PHASE)
+            .setNextPhasePromptMessageId("bot.responses.ask-deadline-time")
+            .setNextPhase(AddPredictionConsts.TIME_PHASE)
             .setStateUpdater((text, data) -> {
                 try {
                     LocalDate date = LocalDate.parse(text);
                     return data.addDate(date);
                 }
                 catch (DateTimeParseException e) {
-                    throw new UnexpectedMessageException("bot.responses.wrong-date-format");
+                    throw new UnexpectedMessageException("bot.responses.error.wrong-date-format");
+                }
+            })
+            .build();
+    }
+
+    @Bean
+    MessageHandler addPredictionTimePhase() {
+        return new MessageHandlerBuilder<PredictionData>()
+            .setCommandName(AddPredictionConsts.COMMAND_NAME)
+            .setPhaseName(AddPredictionConsts.TIME_PHASE)
+            .setNextPhasePromptMessageId("bot.responses.ask-probability")
+            .setNextPhase(AddPredictionConsts.PROBABILITY_PHASE)
+            .setStateUpdater((text, data) -> {
+                try {
+                    LocalTime time = LocalTime.parse(text);
+                    return data.addTime(time);
+                }
+                catch (DateTimeParseException e) {
+                    throw new UnexpectedMessageException("bot.responses.error.wrong-time-format");
                 }
             })
             .build();
@@ -67,19 +88,20 @@ class AddPredictionCommandConfig {
                 try {
                     int probability = Integer.parseInt(text);
                     if (probability <= 0 || probability >= 100)
-                        throw new UnexpectedMessageException("bot.responses.probability-out-of-range");
+                        throw new UnexpectedMessageException("bot.responses.error.probability-out-of-range");
                     return data.addProbability(probability);
                 }
                 catch (NumberFormatException e) {
-                    throw new UnexpectedMessageException("bot.responses.propability-not-a-number");
+                    throw new UnexpectedMessageException("bot.responses.error.propability-not-a-number");
                 }
             })
             
-            .setResponseMessageFunc((message, data) -> 
-                new BotTextMessage(
+            .setResponseMessageFunc((message, data) -> {
+                LocalDateTime datetime = LocalDateTime.of(data.getDate(), data.getTime());
+                return new BotTextMessage(
                     "bot.responses.prediction-added",
-                    data.getText(), data.getDate(), data.getProbability())
-            )
+                    data.getText(), datetime, data.getProbability());
+            })
             
             .setResultAction(predictionSaver)
             .build();

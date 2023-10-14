@@ -1,7 +1,6 @@
 package io.github.alariclightin.predictionstrackerbot.commands.addprediction;
 
 import java.time.Instant;
-import java.time.LocalTime;
 import java.time.ZoneOffset;
 
 import org.springframework.stereotype.Component;
@@ -26,12 +25,12 @@ class PredictionSaver implements ResultAction<PredictionData> {
         Question question = new Question(
                 data.getText(),
                 // TODO: make timezone configurable
-                // TODO add time
-                data.getDate().atTime(LocalTime.MIDNIGHT).toInstant(ZoneOffset.UTC),
+                data.getDate().atTime(data.getTime()).toInstant(ZoneOffset.UTC),
                 userId);
 
         Prediction prediction = new Prediction(question, userId,
-                Instant.ofEpochSecond(message.getDate()));
+                Instant.ofEpochSecond(message.getDate()),
+                data.getProbability());
         predictionDbService.addPrediction(question, prediction);
     }
     

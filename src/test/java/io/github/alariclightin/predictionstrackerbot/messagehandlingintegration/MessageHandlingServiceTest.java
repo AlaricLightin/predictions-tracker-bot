@@ -76,7 +76,7 @@ class MessageHandlingServiceTest extends AbstractIntegrationTest {
             Message message = createTestMessage("test prediction");
             SendMessage response = messageHandlingService.handleMessage(message);
             assertThat(response.getText())
-                .contains("deadline");
+                .contains("check the result");
         }
 
         @Nested
@@ -91,7 +91,7 @@ class MessageHandlingServiceTest extends AbstractIntegrationTest {
                 Message message = createTestMessage("2021-01-01");
                 SendMessage response = messageHandlingService.handleMessage(message);
                 assertThat(response.getText())
-                    .contains("probability");
+                    .contains("time");
 
                 assertThat(JdbcTestUtils.countRowsInTable(jdbcTemplate, "predictions.questions"))
                     .isZero();
@@ -107,36 +107,66 @@ class MessageHandlingServiceTest extends AbstractIntegrationTest {
                 }
 
                 @Test
-                void shouldHandleProbabilityText() {
-                    Message message = createTestMessage("60");
+                void shouldHandleCorrectDeadlineTimeText() {
+                    Message message = createTestMessage("12:00");
                     SendMessage response = messageHandlingService.handleMessage(message);
-                    assertThat(response)
-                        .hasFieldOrPropertyWithValue("chatId", USER_ID.toString())
-                        .extracting(SendMessage::getText)
-                        .asString()
-                        .contains("Prediction added.", "test prediction", "60");
+                    assertThat(response.getText())
+                        .contains("probability");
 
                     assertThat(JdbcTestUtils.countRowsInTable(jdbcTemplate, "predictions.questions"))
-                        .isEqualTo(1);
+                        .isZero();
                     assertThat(JdbcTestUtils.countRowsInTable(jdbcTemplate, "predictions.predictions"))
-                        .isEqualTo(1);
+                        .isZero();
+                }
+
+                @Nested
+                class WhenDeadLineTimeAdded {
+                    @BeforeEach
+                    void setUp() {
+                        messageHandlingService.handleMessage(createTestMessage("12:00"));
+                    }
+
+                    @Test
+                    void shouldHandleProbabilityText() {
+                        Message message = createTestMessage("60");
+                        SendMessage response = messageHandlingService.handleMessage(message);
+                        assertThat(response)
+                                .hasFieldOrPropertyWithValue("chatId", USER_ID.toString())
+                                .extracting(SendMessage::getText)
+                                .asString()
+                                .contains("Prediction added.", "test prediction", "60");
+
+                        assertThat(JdbcTestUtils.countRowsInTable(jdbcTemplate, "predictions.questions"))
+                                .isEqualTo(1);
+                        assertThat(JdbcTestUtils.countRowsInTable(jdbcTemplate, "predictions.predictions"))
+                                .isEqualTo(1);
+                    }
+
+                    @Test
+                    void shouldHandleWhenProbabilityIsNotANumber() {
+                        Message message = createTestMessage("not a number");
+                        SendMessage response = messageHandlingService.handleMessage(message);
+                        assertThat(response.getText())
+                                .contains("Probability must be a number");
+                    }
+
+                    @ParameterizedTest
+                    @ValueSource(strings = { "-1", "0", "100" })
+                    void shouldHandleWhenProbabilityOutOfRange() {
+                        Message message = createTestMessage("0");
+                        SendMessage response = messageHandlingService.handleMessage(message);
+                        assertThat(response.getText())
+                                .contains("Probability must be between 1 and 99");
+                    }
+
                 }
 
                 @Test
-                void shouldHandleWhenProbabilityIsNotANumber() {
-                    Message message = createTestMessage("not a number");
+                void shouldHandleIncorrectDeadlineTimeText() {
+                    Message message = createTestMessage("incorrect time");
                     SendMessage response = messageHandlingService.handleMessage(message);
                     assertThat(response.getText())
-                        .contains("Probability must be a number");
-                }
-
-                @ParameterizedTest
-                @ValueSource(strings = {"-1", "0", "100"})
-                void shouldHandleWhenProbabilityOutOfRange() {
-                    Message message = createTestMessage("0");
-                    SendMessage response = messageHandlingService.handleMessage(message);
-                    assertThat(response.getText())
-                        .contains("Probability must be between 1 and 99");
+                        .contains("Wrong time format");
                 }
             }
 

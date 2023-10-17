@@ -3,9 +3,12 @@ package io.github.alariclightin.predictionstrackerbot.testutils;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.time.Instant;
+
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.User;
 
+import io.github.alariclightin.predictionstrackerbot.data.predictions.Question;
 import io.github.alariclightin.predictionstrackerbot.messages.BotTextMessage;
 
 public class TestUtils {
@@ -25,7 +28,14 @@ public class TestUtils {
         when(user.getId()).thenReturn(TestUtils.CHAT_ID);
         when(user.getLanguageCode()).thenReturn(TestUtils.LANGUAGE_CODE);
         when(message.getFrom()).thenReturn(user);
+        when(message.getChatId()).thenReturn(TestUtils.CHAT_ID);
+        when(message.getDate()).thenReturn((int) Instant.now().getEpochSecond());
 
         return message;       
     }
+
+    public static Question createQuestion(int id, Boolean result) {
+        return new Question(id, "test", Instant.now(), TestUtils.CHAT_ID, result);
+    }
+
 }

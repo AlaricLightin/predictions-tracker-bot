@@ -1,6 +1,7 @@
 package io.github.alariclightin.predictionstrackerbot.botservice;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.User;
@@ -31,6 +32,7 @@ class MessageHandlingServiceImpl implements MessageHandlingService {
     }
 
     @Override
+    @Transactional
     public SendMessage handleMessage(Message message) {
         User user = message.getFrom();
         long userId = user.getId();

@@ -17,6 +17,6 @@ class CommandManagementServiceImplIntegrationTest extends AbstractIntegrationTes
     void shouldCorrectGetBotCommandList() {
         assertThat(commandManagementService.getBotCommands())
             .extracting("command")
-            .containsExactlyInAnyOrder("start", "add");
+            .containsExactlyInAnyOrder("start", "add", "setresults");
     }
 }

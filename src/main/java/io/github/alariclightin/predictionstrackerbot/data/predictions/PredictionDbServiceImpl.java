@@ -1,9 +1,11 @@
 package io.github.alariclightin.predictionstrackerbot.data.predictions;
 
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 
 @Service
-class PredictionDbServiceImpl implements PredictionDbService {
+class PredictionDbServiceImpl implements PredictionDbService, PredictionsResultDbService {
     private final PredictionRepository predictionRepository;
     private final QuestionRepository questionRepository;
 
@@ -23,6 +25,23 @@ class PredictionDbServiceImpl implements PredictionDbService {
         }
         
         predictionRepository.save(prediction);
+    }
+
+    @Override
+    public List<Integer> getWaitingQuestionsIds(long userId) {
+        return questionRepository.getWaitingQuestionsIds(userId);
+    }
+
+    @Override
+    public Question getQuestion(int questionId) {
+        return questionRepository.findById(questionId)
+            .orElseThrow(() -> new IllegalArgumentException(
+                String.format("Question with id = %d not found", questionId)));
+    }
+
+    @Override
+    public void setResult(int id, boolean result) {
+        questionRepository.setResult(id, result);
     }
     
 }

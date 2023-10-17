@@ -19,9 +19,9 @@ public class TestUtils {
         return new BotTextMessage(responseId);
     }
 
-    public static Message createTestMessage(boolean isCommand, String text) {
+    public static Message createTestMessage(String text) {
         var message = mock(Message.class);
-        when(message.isCommand()).thenReturn(isCommand);
+        when(message.isCommand()).thenReturn(text.charAt(0) == '/');
         when(message.getText()).thenReturn(text);
 
         var user = mock(User.class);

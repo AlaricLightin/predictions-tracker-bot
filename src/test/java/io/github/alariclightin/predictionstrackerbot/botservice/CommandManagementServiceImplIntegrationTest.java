@@ -6,10 +6,10 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import io.github.alariclightin.predictionstrackerbot.integrationutils.AbstractIntegrationTest;
+import io.github.alariclightin.predictionstrackerbot.testutils.TestWithContainer;
 
 @SpringBootTest
-class CommandManagementServiceImplIntegrationTest extends AbstractIntegrationTest {
+class CommandManagementServiceImplIntegrationTest extends TestWithContainer {
     @Autowired
     private CommandManagementServiceImpl commandManagementService;
 

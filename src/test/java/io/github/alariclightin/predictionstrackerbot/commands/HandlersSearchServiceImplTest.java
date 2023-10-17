@@ -55,19 +55,19 @@ class HandlersSearchServiceImplTest {
     private static Stream<Arguments> dataForGetHandlerTest() {
         return Stream.of(
             Arguments.of(
-                TestUtils.createTestMessage(true, "/firstCommand"),
+                TestUtils.createTestMessage("/firstCommand"),
                 null,
                 firstCommandHandler
             ),
 
             Arguments.of(
-                TestUtils.createTestMessage(true, "/secondCommand"),
+                TestUtils.createTestMessage("/secondCommand"),
                 null,
                 secondCommandHandler
             ),
 
             Arguments.of(
-                TestUtils.createTestMessage(false, "some text"),
+                TestUtils.createTestMessage("some text"),
                 new WaitedResponseState("firstCommand", END_PHASE, null),
                 endPhaseOfFirstCommandHandler
             )
@@ -76,14 +76,14 @@ class HandlersSearchServiceImplTest {
 
     @Test
     void shouldHandleUnexpectedCommand() {
-        Message message = TestUtils.createTestMessage(true, "/unexpectedCommand");
+        Message message = TestUtils.createTestMessage("/unexpectedCommand");
         assertThrows(UnexpectedMessageException.class, 
             () -> handlersSearchService.getHandler(message, null));
     }
 
     @Test
     void shouldHandleUnexpectedText() {
-        Message message = TestUtils.createTestMessage(false, "some text");
+        Message message = TestUtils.createTestMessage("some text");
         assertThrows(UnexpectedMessageException.class, 
             () -> handlersSearchService.getHandler(message, null));
     }

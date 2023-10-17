@@ -40,7 +40,7 @@ class SetResultPhaseHandlerTest {
     @ValueSource(strings = {"yes", "no"})
     void shouldHandleAddResultCommandWhenNoOtherQuestions(String command) throws UnexpectedMessageException {
         final int questionId = 11;
-        Message message = TestUtils.createTestMessage(false, command);
+        Message message = TestUtils.createTestMessage(command);
         WaitedResponseState state = new WaitedResponseState(
             setResultPhaseHandler.getCommandName(), 
             setResultPhaseHandler.getPhaseName(),
@@ -70,7 +70,7 @@ class SetResultPhaseHandlerTest {
     @Test
     void shouldHandleSkipCommandWhenNoOtherQuestions() throws UnexpectedMessageException {
         final int questionId = 11;
-        Message message = TestUtils.createTestMessage(false, "skip");
+        Message message = TestUtils.createTestMessage("skip");
         WaitedResponseState state = new WaitedResponseState(
             setResultPhaseHandler.getCommandName(), 
             setResultPhaseHandler.getPhaseName(),
@@ -99,7 +99,7 @@ class SetResultPhaseHandlerTest {
         final int questionId = 11;
         final int nextQuestionId = 22;
         final int nextNextQuestionId = 2345;
-        Message message = TestUtils.createTestMessage(false, command);
+        Message message = TestUtils.createTestMessage(command);
         WaitedResponseState state = new WaitedResponseState(
             setResultPhaseHandler.getCommandName(), 
             setResultPhaseHandler.getPhaseName(),
@@ -128,7 +128,7 @@ class SetResultPhaseHandlerTest {
 
     @Test
     void shouldHandleSkipAllCommand() throws UnexpectedMessageException {
-        Message message = TestUtils.createTestMessage(false, "skip_all");
+        Message message = TestUtils.createTestMessage("skip_all");
         WaitedResponseState state = new WaitedResponseState(
             setResultPhaseHandler.getCommandName(), 
             setResultPhaseHandler.getPhaseName(),
@@ -147,7 +147,7 @@ class SetResultPhaseHandlerTest {
 
     @Test
     void shouldHandleInvalidCommand() {
-        Message message = TestUtils.createTestMessage(false, "invalid");
+        Message message = TestUtils.createTestMessage("invalid");
         WaitedResponseState state = new WaitedResponseState(
             setResultPhaseHandler.getCommandName(), 
             setResultPhaseHandler.getPhaseName(),

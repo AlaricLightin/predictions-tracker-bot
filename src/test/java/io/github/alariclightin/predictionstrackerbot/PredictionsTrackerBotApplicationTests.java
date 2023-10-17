@@ -2,10 +2,11 @@ package io.github.alariclightin.predictionstrackerbot;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
-import io.github.alariclightin.predictionstrackerbot.integrationutils.AbstractIntegrationTest;
+
+import io.github.alariclightin.predictionstrackerbot.testutils.TestWithContainer;
 
 @SpringBootTest
-class PredictionsTrackerBotApplicationTests extends AbstractIntegrationTest {
+class PredictionsTrackerBotApplicationTests extends TestWithContainer {
 
 	@Test
 	void contextLoads() {

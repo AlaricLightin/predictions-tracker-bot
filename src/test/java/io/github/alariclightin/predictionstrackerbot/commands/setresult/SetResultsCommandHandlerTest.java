@@ -29,7 +29,7 @@ class SetResultsCommandHandlerTest {
     void shouldHandleCommandIfNoWaitingQuestions() throws UnexpectedMessageException {
         when(predictionsResultDbService.getWaitingQuestionsIds(TestUtils.CHAT_ID)).thenReturn(List.of());
         MessageHandlingResult result = setResultsCommandHandler.handle(
-            TestUtils.createTestMessage(true, "/setresults"), null);
+            TestUtils.createTestMessage("/setresults"), null);
 
         assertThat(result.botMessage())
             .isInstanceOf(BotTextMessage.class)
@@ -48,7 +48,7 @@ class SetResultsCommandHandlerTest {
         when(predictionsResultDbService.getQuestion(2))
             .thenReturn(TestUtils.createQuestion(2, null));
         MessageHandlingResult result = setResultsCommandHandler.handle(
-            TestUtils.createTestMessage(true, "/setresults"), null);
+            TestUtils.createTestMessage("/setresults"), null);
 
         assertThat(result.botMessage())
             .isInstanceOf(BotTextMessage.class)

@@ -12,11 +12,11 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
 
-import io.github.alariclightin.predictionstrackerbot.integrationutils.AbstractIntegrationTest;
+import io.github.alariclightin.predictionstrackerbot.testutils.TestWithContainer;
 
 @DataJdbcTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-class QuestionRepositoryTest extends AbstractIntegrationTest {
+class QuestionRepositoryTest extends TestWithContainer {
     @Autowired
     private QuestionRepository questionRepository;
 

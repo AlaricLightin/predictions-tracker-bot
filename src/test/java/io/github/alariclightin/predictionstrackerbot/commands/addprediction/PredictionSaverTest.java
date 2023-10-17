@@ -18,7 +18,7 @@ import io.github.alariclightin.predictionstrackerbot.data.predictions.Prediction
 import io.github.alariclightin.predictionstrackerbot.data.predictions.Question;
 import io.github.alariclightin.predictionstrackerbot.testutils.TestUtils;
 
-public class PredictionSaverTest {
+class PredictionSaverTest {
     private PredictionSaver predictionSaver;
     private PredictionDbService predictionDbService;
 
@@ -40,7 +40,7 @@ public class PredictionSaverTest {
                 .addTime(deadlineTime)
                 .addProbability(probability);
         
-        Message message = TestUtils.createTestMessage(false, "60");
+        Message message = TestUtils.createTestMessage("60");
 
         predictionSaver.apply(message, data);
         

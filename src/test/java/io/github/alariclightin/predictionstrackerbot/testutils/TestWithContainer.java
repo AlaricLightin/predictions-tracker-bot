@@ -1,11 +1,11 @@
-package io.github.alariclightin.predictionstrackerbot.integrationutils;
+package io.github.alariclightin.predictionstrackerbot.testutils;
 
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.PostgreSQLContainer;
 
-public abstract class AbstractIntegrationTest {
+public abstract class TestWithContainer {
     static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:14.9-alpine");
 
     static {

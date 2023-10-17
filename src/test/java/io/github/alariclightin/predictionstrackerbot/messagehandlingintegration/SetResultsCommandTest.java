@@ -20,12 +20,12 @@ import org.telegram.telegrambots.meta.api.objects.Message;
 import io.github.alariclightin.predictionstrackerbot.bot.Bot;
 import io.github.alariclightin.predictionstrackerbot.botservice.MessageHandlingService;
 import io.github.alariclightin.predictionstrackerbot.data.predictions.Question;
-import io.github.alariclightin.predictionstrackerbot.integrationutils.AbstractIntegrationTest;
+import io.github.alariclightin.predictionstrackerbot.testutils.TestWithContainer;
 import io.github.alariclightin.predictionstrackerbot.testutils.TestDbUtils;
 import io.github.alariclightin.predictionstrackerbot.testutils.TestUtils;
 
 @SpringBootTest
-class SetResultsCommandTest extends AbstractIntegrationTest {
+class SetResultsCommandTest extends TestWithContainer {
     
     @Autowired
     private JdbcTemplate jdbcTemplate;
@@ -45,7 +45,7 @@ class SetResultsCommandTest extends AbstractIntegrationTest {
 
     @Test
     void shouldRespondAboutAbsentWaitingQuestions() {
-        Message message = TestUtils.createTestMessage(true, "/setresults");
+        Message message = TestUtils.createTestMessage("/setresults");
         SendMessage response = messageHandlingService.handleMessage(message);
 
         assertThat(response)
@@ -58,7 +58,7 @@ class SetResultsCommandTest extends AbstractIntegrationTest {
     @Sql(scripts = { "classpath:sql/waiting-question-ids.sql" }, 
         executionPhase = ExecutionPhase.BEFORE_TEST_METHOD)
     void shouldRespondToCommandIfWaitingQuestionsExist() {
-        Message message = TestUtils.createTestMessage(true, "/setresults");
+        Message message = TestUtils.createTestMessage("/setresults");
         SendMessage response = messageHandlingService.handleMessage(message);
 
         assertThat(response)
@@ -74,13 +74,13 @@ class SetResultsCommandTest extends AbstractIntegrationTest {
         
         @BeforeEach
         void setUp() {
-            messageHandlingService.handleMessage(TestUtils.createTestMessage(true, "/setresults"));
+            messageHandlingService.handleMessage(TestUtils.createTestMessage("/setresults"));
         }
 
         @ParameterizedTest
         @ValueSource(strings = { "yes", "no" })
         void shouldHandleSetResultCommand(String command) {
-            Message message = TestUtils.createTestMessage(false, command);
+            Message message = TestUtils.createTestMessage(command);
             SendMessage response = messageHandlingService.handleMessage(message);
 
             assertThat(response)
@@ -95,7 +95,7 @@ class SetResultsCommandTest extends AbstractIntegrationTest {
 
         @Test
         void voidShouldHandleSkipCommand() {
-            Message message = TestUtils.createTestMessage(false, "skip");
+            Message message = TestUtils.createTestMessage("skip");
             SendMessage response = messageHandlingService.handleMessage(message);
 
             assertThat(response)
@@ -110,7 +110,7 @@ class SetResultsCommandTest extends AbstractIntegrationTest {
 
         @Test
         void shouldHandleSkipAllCommand() {
-            Message message = TestUtils.createTestMessage(false, "skip_all");
+            Message message = TestUtils.createTestMessage("skip_all");
             SendMessage response = messageHandlingService.handleMessage(message);
 
             assertThat(response)
@@ -125,7 +125,7 @@ class SetResultsCommandTest extends AbstractIntegrationTest {
 
         @Test
         void shouldHandleInvalidCommand() {
-            Message message = TestUtils.createTestMessage(false, "invalid");
+            Message message = TestUtils.createTestMessage("invalid");
             SendMessage response = messageHandlingService.handleMessage(message);
 
             assertThat(response)

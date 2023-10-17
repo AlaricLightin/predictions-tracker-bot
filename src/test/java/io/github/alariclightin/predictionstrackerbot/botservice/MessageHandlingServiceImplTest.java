@@ -44,7 +44,7 @@ class MessageHandlingServiceImplTest {
     @Test
     void shouldHandleMessage() throws UnexpectedMessageException {
         // given
-        Message incomingMessage = TestUtils.createTestMessage(false, "test");
+        Message incomingMessage = TestUtils.createTestMessage("test");
         MessageHandler messageHandler = mock(MessageHandler.class);
         WaitedResponseState oldState = mock(WaitedResponseState.class);
         WaitedResponseState newState = mock(WaitedResponseState.class);
@@ -67,7 +67,7 @@ class MessageHandlingServiceImplTest {
     @Test
     void shouldHandleUnexpectedMessages() throws UnexpectedMessageException {
         // given
-        Message incomingMessage = TestUtils.createTestMessage(false, "test");
+        Message incomingMessage = TestUtils.createTestMessage("test");
         WaitedResponseState oldState = mock(WaitedResponseState.class);
         when(stateHolderService.getState(TestUtils.CHAT_ID)).thenReturn(oldState);
         when(handlersService.getHandler(incomingMessage, oldState)).thenThrow(new UnexpectedMessageException("test"));

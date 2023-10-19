@@ -2,6 +2,7 @@ package io.github.alariclightin.predictionstrackerbot.botservice;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -101,7 +102,7 @@ class MessageHandlingServiceImplTest {
         SendMessage result = messageHandlingService.handleMessage(incomingMessage);
 
         // then
-        verify(stateHolderService, never()).saveState(eq(TestUtils.CHAT_ID), any());
+        verify(stateHolderService, never()).saveState(anyLong(), any());
 
         assertThat(result).isEqualTo(resultMessage);
     }

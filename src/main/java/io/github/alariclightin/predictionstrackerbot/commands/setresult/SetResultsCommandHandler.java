@@ -1,6 +1,8 @@
 package io.github.alariclightin.predictionstrackerbot.commands.setresult;
 
 import java.util.ArrayList;
+import java.util.List;
+
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.Message;
 
@@ -11,7 +13,7 @@ import io.github.alariclightin.predictionstrackerbot.exceptions.UnexpectedMessag
 import io.github.alariclightin.predictionstrackerbot.states.WaitedResponseState;
 
 @Component
-class SetResultsCommandHandler extends AbstractSetResultsHandler {
+class SetResultsCommandHandler extends AbstractSetResultsHandler implements SetResultsMessageCreator {
     
     SetResultsCommandHandler(PredictionsResultDbService predictionsResultDbService) {
         super(predictionsResultDbService);
@@ -39,6 +41,19 @@ class SetResultsCommandHandler extends AbstractSetResultsHandler {
     @Override
     public String getPhaseName() {
         return MessageHandler.START_PHASE;
+    }
+
+    @Override
+    public MessageHandlingResult createMessage(List<Integer> questionIds) {
+        QuestionsData questionsData = getHandlingResult(new ArrayList<>(questionIds));
+        if (questionsData.question() != null) {
+            return new MessageHandlingResult(
+                getPromptForResult(questionsData.question()), 
+                new WaitedResponseState(COMMAND, SET_RESULT_PHASE, questionsData)
+            );
+        }
+        else    
+            return null;
     }
     
 }

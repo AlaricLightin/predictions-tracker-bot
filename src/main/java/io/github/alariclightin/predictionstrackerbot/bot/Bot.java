@@ -15,7 +15,7 @@ import io.github.alariclightin.predictionstrackerbot.botservice.CommandManagemen
 import io.github.alariclightin.predictionstrackerbot.botservice.MessageHandlingService;
 
 @Component
-public class Bot extends TelegramLongPollingBot{
+public class Bot extends TelegramLongPollingBot implements BotService {
     private final TelegramBotConfig config;
     private final MessageHandlingService messageHandlingService;
     private final CommandManagementService commandManagementService;
@@ -38,14 +38,7 @@ public class Bot extends TelegramLongPollingBot{
         }
         
         SendMessage message = messageHandlingService.handleMessage(incomingMessage);
-
-        if (message != null) {
-            try {
-                execute(message);
-            } catch (TelegramApiException e) {
-                throw new RuntimeException(e);
-            }
-        }
+        sendMessage(message);
     }
 
     @Override
@@ -60,6 +53,17 @@ public class Bot extends TelegramLongPollingBot{
         }
         catch (TelegramApiException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public void sendMessage(SendMessage sendMessage) {
+        if (sendMessage != null) {
+            try {
+                execute(sendMessage);
+            } catch (TelegramApiException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 }

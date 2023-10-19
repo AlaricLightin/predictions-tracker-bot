@@ -3,21 +3,26 @@ package io.github.alariclightin.predictionstrackerbot.data.predictions;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 class PredictionDbServiceImpl implements PredictionDbService, PredictionsResultDbService {
     private final PredictionRepository predictionRepository;
     private final QuestionRepository questionRepository;
+    private final ReminderDao reminderDao;
 
     public PredictionDbServiceImpl(
         PredictionRepository predictionRepository, 
-        QuestionRepository questionRepository) {
+        QuestionRepository questionRepository,
+        ReminderDao reminderDao) {
 
         this.predictionRepository = predictionRepository;
         this.questionRepository = questionRepository;
+        this.reminderDao = reminderDao;
     }
 
     @Override
+    @Transactional
     public void addPrediction(Question question, Prediction prediction) {
         if (question.id() == 0) {
             var savedQuestion = questionRepository.save(question);
@@ -28,11 +33,13 @@ class PredictionDbServiceImpl implements PredictionDbService, PredictionsResultD
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<Integer> getWaitingQuestionsIds(long userId) {
         return questionRepository.getWaitingQuestionsIds(userId);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Question getQuestion(int questionId) {
         return questionRepository.findById(questionId)
             .orElseThrow(() -> new IllegalArgumentException(
@@ -40,8 +47,10 @@ class PredictionDbServiceImpl implements PredictionDbService, PredictionsResultD
     }
 
     @Override
+    @Transactional
     public void setResult(int id, boolean result) {
         questionRepository.setResult(id, result);
+        reminderDao.delete(id);
     }
     
 }

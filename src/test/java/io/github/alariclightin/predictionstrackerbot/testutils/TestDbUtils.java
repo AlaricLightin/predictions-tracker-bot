@@ -1,7 +1,7 @@
 package io.github.alariclightin.predictionstrackerbot.testutils;
 
+import java.util.List;
 import org.springframework.jdbc.core.JdbcTemplate;
-
 import io.github.alariclightin.predictionstrackerbot.data.predictions.Question;
 
 public class TestDbUtils {
@@ -18,4 +18,18 @@ public class TestDbUtils {
             id
         );
     }
+
+    public static List<Reminder> getReminders(JdbcTemplate jdbcTemplate) {
+        return jdbcTemplate.query(
+            "SELECT * FROM predictions.reminders ORDER BY question_id",
+            (rs, rowNum) -> new Reminder(
+                rs.getInt("question_id"),
+                rs.getBoolean("sent")
+            )
+        );
+    }
+
+    public record Reminder(int questionId, boolean isSent) {
+    }
+
 }

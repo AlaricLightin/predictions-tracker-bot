@@ -20,6 +20,6 @@ public abstract class TestWithContainer {
     }
 
     protected static void clearAllTables(JdbcTemplate jdbcTemplate) {
-        jdbcTemplate.execute("TRUNCATE TABLE predictions.questions, predictions.predictions");
+        jdbcTemplate.execute("TRUNCATE TABLE predictions.questions, predictions.predictions, predictions.reminders");
     }
 }

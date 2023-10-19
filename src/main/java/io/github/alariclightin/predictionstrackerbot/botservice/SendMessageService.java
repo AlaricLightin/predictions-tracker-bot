@@ -8,4 +8,6 @@ public interface SendMessageService {
 
     SendMessage create(long userId, String langugeCode, BotMessage botMessage);
 
+    SendMessage create(long userId, BotMessage botMessage);
+
 }

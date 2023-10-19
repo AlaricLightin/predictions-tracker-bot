@@ -17,3 +17,10 @@ CREATE TABLE IF NOT EXISTS predictions.predictions (
 
     FOREIGN KEY (question_id) REFERENCES predictions.questions(id)
 );
+
+CREATE TABLE IF NOT EXISTS predictions.reminders (
+    question_id INT NOT NULL PRIMARY KEY,
+    sent BOOLEAN NOT NULL DEFAULT FALSE,
+
+    FOREIGN KEY (question_id) REFERENCES predictions.questions(id)
+);

@@ -50,11 +50,34 @@ class MessageHandlingServiceImplTest {
         WaitedResponseState newState = mock(WaitedResponseState.class);
         when(stateHolderService.getState(TestUtils.CHAT_ID)).thenReturn(oldState);
         MessageHandlingResult handlingResult = new MessageHandlingResult(botMessage, newState);
-        when(handlersService.getHandler(incomingMessage, oldState)).thenReturn(messageHandler);
+        when(handlersService.getHandler(oldState)).thenReturn(messageHandler);
         when(messageHandler.handle(incomingMessage, oldState)).thenReturn(handlingResult);
         when(sendMessageService.create(TestUtils.CHAT_ID, TestUtils.LANGUAGE_CODE, botMessage))
             .thenReturn(resultMessage);
 
+        // when
+        SendMessage result = messageHandlingService.handleMessage(incomingMessage);
+
+        // then
+        verify(stateHolderService).saveState(TestUtils.CHAT_ID, newState);
+
+        assertThat(result).isEqualTo(resultMessage);
+    }
+
+    @Test
+    void shouldHandleCommand() throws UnexpectedMessageException {
+        //given
+        Message incomingMessage = TestUtils.createTestMessage("/test");
+        MessageHandler messageHandler = mock(MessageHandler.class);
+        WaitedResponseState oldState = new WaitedResponseState("test", MessageHandler.START_PHASE, null);
+        WaitedResponseState newState = mock(WaitedResponseState.class);
+        when(handlersService.getHandler(eq(oldState)))
+            .thenReturn(messageHandler);
+        MessageHandlingResult handlingResult = new MessageHandlingResult(botMessage, newState);
+        when(messageHandler.handle(eq(incomingMessage), eq(oldState))).thenReturn(handlingResult);
+        when(sendMessageService.create(eq(TestUtils.CHAT_ID), eq(TestUtils.LANGUAGE_CODE), any()))
+            .thenReturn(resultMessage);
+        
         // when
         SendMessage result = messageHandlingService.handleMessage(incomingMessage);
 
@@ -70,7 +93,7 @@ class MessageHandlingServiceImplTest {
         Message incomingMessage = TestUtils.createTestMessage("test");
         WaitedResponseState oldState = mock(WaitedResponseState.class);
         when(stateHolderService.getState(TestUtils.CHAT_ID)).thenReturn(oldState);
-        when(handlersService.getHandler(incomingMessage, oldState)).thenThrow(new UnexpectedMessageException("test"));
+        when(handlersService.getHandler(oldState)).thenThrow(new UnexpectedMessageException("test"));
         when(sendMessageService.create(eq(TestUtils.CHAT_ID), eq(TestUtils.LANGUAGE_CODE), any()))
             .thenReturn(resultMessage);
 

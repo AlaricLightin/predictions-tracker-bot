@@ -60,4 +60,36 @@ class SetResultsCommandHandlerTest {
             .extracting(d -> ((QuestionsData) d).question().id())
             .isEqualTo(2);
     }
+
+    @Test
+    void shouldCreateCommandWithWaitingQuestion() {
+        when(predictionsResultDbService.getQuestion(1))
+            .thenReturn(TestUtils.createQuestion(1, true));
+        when(predictionsResultDbService.getQuestion(2))
+            .thenReturn(TestUtils.createQuestion(2, null));
+
+        MessageHandlingResult result = setResultsCommandHandler.createMessage(List.of(1, 2));
+
+        assertThat(result.botMessage())
+            .isInstanceOf(BotTextMessage.class)
+            .extracting(m -> ((BotTextMessage) m).messageId())
+            .isEqualTo("bot.responses.setresults.set-result");
+
+        assertThat(result.newState().data())
+            .isInstanceOf(QuestionsData.class)
+            .extracting(d -> ((QuestionsData) d).question().id())
+            .isEqualTo(2);
+    }
+
+    @Test
+    void shouldCreateCommandWithoutWaitingQuestion() {
+        when(predictionsResultDbService.getQuestion(1))
+            .thenReturn(TestUtils.createQuestion(1, true));
+        when(predictionsResultDbService.getQuestion(2))
+            .thenReturn(TestUtils.createQuestion(2, false));
+
+        MessageHandlingResult result = setResultsCommandHandler.createMessage(List.of(1, 2));
+        assertThat(result)
+            .isNull();
+    }
 }

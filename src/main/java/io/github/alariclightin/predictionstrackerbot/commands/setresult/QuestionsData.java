@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 import io.github.alariclightin.predictionstrackerbot.data.predictions.Question;
 
-record QuestionsData(
+public record QuestionsData(
     ArrayList<Integer> waitingQuestionsIds,
     Question question
 ) {

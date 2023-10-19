@@ -56,5 +56,11 @@ class SendMessageServiceImpl implements SendMessageService{
             .text(text)
             .build();
     }
+
+    @Override
+    public SendMessage create(long userId, BotMessage botMessage) {
+        // TODO store language code in user settings
+        return create(userId, "en", botMessage);
+    }
     
 }

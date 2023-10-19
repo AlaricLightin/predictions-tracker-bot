@@ -12,11 +12,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.telegram.telegrambots.meta.api.objects.Message;
-
 import io.github.alariclightin.predictionstrackerbot.exceptions.UnexpectedMessageException;
 import io.github.alariclightin.predictionstrackerbot.states.WaitedResponseState;
-import io.github.alariclightin.predictionstrackerbot.testutils.TestUtils;
 
 class HandlersSearchServiceImplTest {
     private HandlersSearchServiceImpl handlersSearchService;
@@ -44,10 +41,10 @@ class HandlersSearchServiceImplTest {
 
     @ParameterizedTest
     @MethodSource("dataForGetHandlerTest")
-    void shouldGetHandler(Message message, WaitedResponseState state, MessageHandler expectedHandler) 
+    void shouldGetHandler(WaitedResponseState state, MessageHandler expectedHandler) 
         throws UnexpectedMessageException {
 
-        MessageHandler actualHandler = handlersSearchService.getHandler(message, state);
+        MessageHandler actualHandler = handlersSearchService.getHandler(state);
         assertThat(actualHandler)
             .isEqualTo(expectedHandler);
     }
@@ -55,19 +52,16 @@ class HandlersSearchServiceImplTest {
     private static Stream<Arguments> dataForGetHandlerTest() {
         return Stream.of(
             Arguments.of(
-                TestUtils.createTestMessage("/firstCommand"),
-                null,
+                new WaitedResponseState("firstCommand", MessageHandler.START_PHASE, null),
                 firstCommandHandler
             ),
 
             Arguments.of(
-                TestUtils.createTestMessage("/secondCommand"),
-                null,
+                new WaitedResponseState("secondCommand", MessageHandler.START_PHASE, null),
                 secondCommandHandler
             ),
 
             Arguments.of(
-                TestUtils.createTestMessage("some text"),
                 new WaitedResponseState("firstCommand", END_PHASE, null),
                 endPhaseOfFirstCommandHandler
             )
@@ -76,15 +70,15 @@ class HandlersSearchServiceImplTest {
 
     @Test
     void shouldHandleUnexpectedCommand() {
-        Message message = TestUtils.createTestMessage("/unexpectedCommand");
         assertThrows(UnexpectedMessageException.class, 
-            () -> handlersSearchService.getHandler(message, null));
+            () -> handlersSearchService.getHandler(
+                new WaitedResponseState("unexpectedCommand", MessageHandler.START_PHASE, null)
+            ));
     }
 
     @Test
     void shouldHandleUnexpectedText() {
-        Message message = TestUtils.createTestMessage("some text");
         assertThrows(UnexpectedMessageException.class, 
-            () -> handlersSearchService.getHandler(message, null));
+            () -> handlersSearchService.getHandler(null));
     }
 }

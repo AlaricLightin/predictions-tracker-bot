@@ -2,10 +2,10 @@ package io.github.alariclightin.predictionstrackerbot.commands.setresult;
 
 import java.util.List;
 
-import io.github.alariclightin.predictionstrackerbot.commands.MessageHandlingResult;
+import io.github.alariclightin.predictionstrackerbot.commands.ActionResult;
 
 public interface SetResultsMessageCreator {
 
-    MessageHandlingResult createMessage(List<Integer> questionIds);
+    ActionResult createMessage(List<Integer> questionIds);
     
 }

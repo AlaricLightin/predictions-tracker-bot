@@ -7,8 +7,8 @@ import org.telegram.telegrambots.meta.api.objects.User;
 
 import io.github.alariclightin.predictionstrackerbot.commands.MessageHandler;
 import io.github.alariclightin.predictionstrackerbot.commands.HandlersSearchService;
-import io.github.alariclightin.predictionstrackerbot.commands.MessageHandlingResult;
-import io.github.alariclightin.predictionstrackerbot.exceptions.UnexpectedMessageException;
+import io.github.alariclightin.predictionstrackerbot.commands.ActionResult;
+import io.github.alariclightin.predictionstrackerbot.exceptions.UnexpectedUserMessageException;
 import io.github.alariclightin.predictionstrackerbot.messages.BotMessage;
 import io.github.alariclightin.predictionstrackerbot.messages.BotTextMessage;
 import io.github.alariclightin.predictionstrackerbot.states.StateHolderService;
@@ -45,10 +45,10 @@ class MessageHandlingServiceImpl implements MessageHandlingService {
         BotMessage resultBotMessage;
         try {
             MessageHandler handler = handlersService.getHandler(state);
-            MessageHandlingResult result = handler.handle(message, state);
+            ActionResult result = handler.handle(message, state);
             stateHolderService.saveState(userId, result.newState());
             resultBotMessage = result.botMessage();
-        } catch (UnexpectedMessageException e) {
+        } catch (UnexpectedUserMessageException e) {
             resultBotMessage = new BotTextMessage(e.getMessageId(), e.getParameters());
         }
 

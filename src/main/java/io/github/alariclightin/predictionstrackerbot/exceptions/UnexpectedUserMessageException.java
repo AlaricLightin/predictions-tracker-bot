@@ -1,10 +1,10 @@
 package io.github.alariclightin.predictionstrackerbot.exceptions;
 
-public class UnexpectedMessageException extends Exception {
+public class UnexpectedUserMessageException extends Exception {
     private final String messageId;
     private final Object[] parameters;
 
-    public UnexpectedMessageException(String messageId, Object... parameters) {
+    public UnexpectedUserMessageException(String messageId, Object... parameters) {
         this.messageId = messageId;
         this.parameters = parameters;
     }

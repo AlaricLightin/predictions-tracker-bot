@@ -3,7 +3,7 @@ package io.github.alariclightin.predictionstrackerbot.commands;
 import java.util.function.BiFunction;
 import org.telegram.telegrambots.meta.api.objects.Message;
 
-import io.github.alariclightin.predictionstrackerbot.exceptions.UnexpectedMessageException;
+import io.github.alariclightin.predictionstrackerbot.exceptions.UnexpectedUserMessageException;
 import io.github.alariclightin.predictionstrackerbot.messages.BotMessage;
 import io.github.alariclightin.predictionstrackerbot.states.WaitedResponseState;
 
@@ -33,8 +33,8 @@ class SimpleMessageHandler<T> implements MessageHandler {
 
 
     @Override
-    public MessageHandlingResult handle(Message message, WaitedResponseState state) 
-        throws UnexpectedMessageException {
+    public ActionResult handle(Message message, WaitedResponseState state) 
+        throws UnexpectedUserMessageException {
 
         @SuppressWarnings("unchecked")
         T data = state != null ? (T) state.data() : null;
@@ -45,7 +45,7 @@ class SimpleMessageHandler<T> implements MessageHandler {
         if (nextPhase != null) {
             nextState = new WaitedResponseState(commandName, nextPhase, nextStateData);
         }
-        return new MessageHandlingResult(responseMessageFunc.apply(message, nextStateData), nextState);
+        return new ActionResult(responseMessageFunc.apply(message, nextStateData), nextState);
     }
 
 

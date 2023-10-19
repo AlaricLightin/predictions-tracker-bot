@@ -17,10 +17,10 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.ArgumentCaptor;
 import org.telegram.telegrambots.meta.api.objects.Message;
 
-import io.github.alariclightin.predictionstrackerbot.commands.MessageHandlingResult;
+import io.github.alariclightin.predictionstrackerbot.commands.ActionResult;
 import io.github.alariclightin.predictionstrackerbot.data.predictions.PredictionsResultDbService;
 import io.github.alariclightin.predictionstrackerbot.data.predictions.Question;
-import io.github.alariclightin.predictionstrackerbot.exceptions.UnexpectedMessageException;
+import io.github.alariclightin.predictionstrackerbot.exceptions.UnexpectedUserMessageException;
 import io.github.alariclightin.predictionstrackerbot.messages.BotMessageList;
 import io.github.alariclightin.predictionstrackerbot.messages.BotTextMessage;
 import io.github.alariclightin.predictionstrackerbot.states.WaitedResponseState;
@@ -38,7 +38,7 @@ class SetResultPhaseHandlerTest {
 
     @ParameterizedTest
     @ValueSource(strings = {"yes", "no"})
-    void shouldHandleAddResultCommandWhenNoOtherQuestions(String command) throws UnexpectedMessageException {
+    void shouldHandleAddResultCommandWhenNoOtherQuestions(String command) throws UnexpectedUserMessageException {
         final int questionId = 11;
         Message message = TestUtils.createTestMessage(command);
         WaitedResponseState state = new WaitedResponseState(
@@ -46,7 +46,7 @@ class SetResultPhaseHandlerTest {
             setResultPhaseHandler.getPhaseName(),
             new QuestionsData(new ArrayList<>(), TestUtils.createQuestion(questionId, null)));
 
-        MessageHandlingResult result = setResultPhaseHandler.handle(message, state);
+        ActionResult result = setResultPhaseHandler.handle(message, state);
 
         ArgumentCaptor<Boolean> resultCaptor = ArgumentCaptor.forClass(Boolean.class);
         ArgumentCaptor<Integer> questionIdCaptor = ArgumentCaptor.forClass(Integer.class);
@@ -68,7 +68,7 @@ class SetResultPhaseHandlerTest {
     }
 
     @Test
-    void shouldHandleSkipCommandWhenNoOtherQuestions() throws UnexpectedMessageException {
+    void shouldHandleSkipCommandWhenNoOtherQuestions() throws UnexpectedUserMessageException {
         final int questionId = 11;
         Message message = TestUtils.createTestMessage("skip");
         WaitedResponseState state = new WaitedResponseState(
@@ -76,7 +76,7 @@ class SetResultPhaseHandlerTest {
             setResultPhaseHandler.getPhaseName(),
             new QuestionsData(new ArrayList<>(), TestUtils.createQuestion(questionId, null)));
 
-        MessageHandlingResult result = setResultPhaseHandler.handle(message, state);
+        ActionResult result = setResultPhaseHandler.handle(message, state);
 
         assertThat(result.botMessage())
             .isInstanceOf(BotTextMessage.class)
@@ -95,7 +95,7 @@ class SetResultPhaseHandlerTest {
     })
     void shouldHandleCommandsWhenOtherQuestionsExist(
         String command, 
-        String firstExpectedMessageId) throws UnexpectedMessageException {
+        String firstExpectedMessageId) throws UnexpectedUserMessageException {
         final int questionId = 11;
         final int nextQuestionId = 22;
         final int nextNextQuestionId = 2345;
@@ -112,7 +112,7 @@ class SetResultPhaseHandlerTest {
         when(predictionsResultDbService.getQuestion(nextQuestionId))
             .thenReturn(nextQuestion);
 
-        MessageHandlingResult result = setResultPhaseHandler.handle(message, state);
+        ActionResult result = setResultPhaseHandler.handle(message, state);
         assertThat(result.botMessage())
             .isInstanceOf(BotMessageList.class)
             .extracting(m -> ((BotMessageList) m).botMessages())
@@ -127,14 +127,14 @@ class SetResultPhaseHandlerTest {
     }
 
     @Test
-    void shouldHandleSkipAllCommand() throws UnexpectedMessageException {
+    void shouldHandleSkipAllCommand() throws UnexpectedUserMessageException {
         Message message = TestUtils.createTestMessage("skip_all");
         WaitedResponseState state = new WaitedResponseState(
             setResultPhaseHandler.getCommandName(), 
             setResultPhaseHandler.getPhaseName(),
             new QuestionsData(new ArrayList<>(), TestUtils.createQuestion(11, null)));
 
-        MessageHandlingResult result = setResultPhaseHandler.handle(message, state);
+        ActionResult result = setResultPhaseHandler.handle(message, state);
 
         assertThat(result.botMessage())
             .isInstanceOf(BotTextMessage.class)
@@ -153,6 +153,6 @@ class SetResultPhaseHandlerTest {
             setResultPhaseHandler.getPhaseName(),
             new QuestionsData(new ArrayList<>(), TestUtils.createQuestion(11, null)));
 
-        assertThrows(UnexpectedMessageException.class, () -> setResultPhaseHandler.handle(message, state));
+        assertThrows(UnexpectedUserMessageException.class, () -> setResultPhaseHandler.handle(message, state));
     }
 }

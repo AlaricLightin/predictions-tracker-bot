@@ -9,9 +9,9 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import io.github.alariclightin.predictionstrackerbot.commands.MessageHandlingResult;
+import io.github.alariclightin.predictionstrackerbot.commands.ActionResult;
 import io.github.alariclightin.predictionstrackerbot.data.predictions.PredictionsResultDbService;
-import io.github.alariclightin.predictionstrackerbot.exceptions.UnexpectedMessageException;
+import io.github.alariclightin.predictionstrackerbot.exceptions.UnexpectedUserMessageException;
 import io.github.alariclightin.predictionstrackerbot.messages.BotTextMessage;
 import io.github.alariclightin.predictionstrackerbot.testutils.TestUtils;
 
@@ -26,9 +26,9 @@ class SetResultsCommandHandlerTest {
     }
 
     @Test
-    void shouldHandleCommandIfNoWaitingQuestions() throws UnexpectedMessageException {
+    void shouldHandleCommandIfNoWaitingQuestions() throws UnexpectedUserMessageException {
         when(predictionsResultDbService.getWaitingQuestionsIds(TestUtils.CHAT_ID)).thenReturn(List.of());
-        MessageHandlingResult result = setResultsCommandHandler.handle(
+        ActionResult result = setResultsCommandHandler.handle(
             TestUtils.createTestMessage("/setresults"), null);
 
         assertThat(result.botMessage())
@@ -41,13 +41,13 @@ class SetResultsCommandHandlerTest {
     }
 
     @Test
-    void shouldHandleCommandWithWaitingQuestion() throws UnexpectedMessageException {
+    void shouldHandleCommandWithWaitingQuestion() throws UnexpectedUserMessageException {
         when(predictionsResultDbService.getWaitingQuestionsIds(TestUtils.CHAT_ID)).thenReturn(List.of(1, 2));
         when(predictionsResultDbService.getQuestion(1))
             .thenReturn(TestUtils.createQuestion(1, true));
         when(predictionsResultDbService.getQuestion(2))
             .thenReturn(TestUtils.createQuestion(2, null));
-        MessageHandlingResult result = setResultsCommandHandler.handle(
+        ActionResult result = setResultsCommandHandler.handle(
             TestUtils.createTestMessage("/setresults"), null);
 
         assertThat(result.botMessage())
@@ -68,7 +68,7 @@ class SetResultsCommandHandlerTest {
         when(predictionsResultDbService.getQuestion(2))
             .thenReturn(TestUtils.createQuestion(2, null));
 
-        MessageHandlingResult result = setResultsCommandHandler.createMessage(List.of(1, 2));
+        ActionResult result = setResultsCommandHandler.createMessage(List.of(1, 2));
 
         assertThat(result.botMessage())
             .isInstanceOf(BotTextMessage.class)
@@ -88,7 +88,7 @@ class SetResultsCommandHandlerTest {
         when(predictionsResultDbService.getQuestion(2))
             .thenReturn(TestUtils.createQuestion(2, false));
 
-        MessageHandlingResult result = setResultsCommandHandler.createMessage(List.of(1, 2));
+        ActionResult result = setResultsCommandHandler.createMessage(List.of(1, 2));
         assertThat(result)
             .isNull();
     }

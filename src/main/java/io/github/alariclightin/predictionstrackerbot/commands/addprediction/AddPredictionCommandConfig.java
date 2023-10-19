@@ -10,7 +10,7 @@ import org.springframework.context.annotation.Configuration;
 
 import io.github.alariclightin.predictionstrackerbot.commands.MessageHandler;
 import io.github.alariclightin.predictionstrackerbot.commands.MessageHandlerBuilder;
-import io.github.alariclightin.predictionstrackerbot.exceptions.UnexpectedMessageException;
+import io.github.alariclightin.predictionstrackerbot.exceptions.UnexpectedUserMessageException;
 import io.github.alariclightin.predictionstrackerbot.messages.BotTextMessage;
 
 @Configuration
@@ -50,7 +50,7 @@ class AddPredictionCommandConfig {
                     return data.addDate(date);
                 }
                 catch (DateTimeParseException e) {
-                    throw new UnexpectedMessageException("bot.responses.error.wrong-date-format");
+                    throw new UnexpectedUserMessageException("bot.responses.error.wrong-date-format");
                 }
             })
             .build();
@@ -69,7 +69,7 @@ class AddPredictionCommandConfig {
                     return data.addTime(time);
                 }
                 catch (DateTimeParseException e) {
-                    throw new UnexpectedMessageException("bot.responses.error.wrong-time-format");
+                    throw new UnexpectedUserMessageException("bot.responses.error.wrong-time-format");
                 }
             })
             .build();
@@ -88,11 +88,11 @@ class AddPredictionCommandConfig {
                 try {
                     int probability = Integer.parseInt(text);
                     if (probability <= 0 || probability >= 100)
-                        throw new UnexpectedMessageException("bot.responses.error.probability-out-of-range");
+                        throw new UnexpectedUserMessageException("bot.responses.error.probability-out-of-range");
                     return data.addProbability(probability);
                 }
                 catch (NumberFormatException e) {
-                    throw new UnexpectedMessageException("bot.responses.error.propability-not-a-number");
+                    throw new UnexpectedUserMessageException("bot.responses.error.propability-not-a-number");
                 }
             })
             

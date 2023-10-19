@@ -19,7 +19,7 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 
 import io.github.alariclightin.predictionstrackerbot.bot.BotService;
 import io.github.alariclightin.predictionstrackerbot.botservice.SendMessageService;
-import io.github.alariclightin.predictionstrackerbot.commands.MessageHandlingResult;
+import io.github.alariclightin.predictionstrackerbot.commands.ActionResult;
 import io.github.alariclightin.predictionstrackerbot.commands.setresult.QuestionsData;
 import io.github.alariclightin.predictionstrackerbot.commands.setresult.SetResultsMessageCreator;
 import io.github.alariclightin.predictionstrackerbot.messages.BotMessage;
@@ -85,7 +85,7 @@ class ReminderSenderImplTest {
             new ArrayList<>(List.of(200)), TestUtils.createQuestion(QUESTION_IDS.get(0), null));
         when(newState.data()).thenReturn(questionsData);
         BotMessage resultMessage = mock(BotMessage.class);
-        MessageHandlingResult actionResult = new MessageHandlingResult(resultMessage, newState);
+        ActionResult actionResult = new ActionResult(resultMessage, newState);
         when(setResultsMessageCreator.createMessage(QUESTION_IDS)).thenReturn(actionResult);
 
         SendMessage sendMessage = mock(SendMessage.class);

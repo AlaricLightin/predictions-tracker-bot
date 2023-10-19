@@ -15,8 +15,8 @@ import org.telegram.telegrambots.meta.api.objects.Message;
 
 import io.github.alariclightin.predictionstrackerbot.commands.MessageHandler;
 import io.github.alariclightin.predictionstrackerbot.commands.HandlersSearchService;
-import io.github.alariclightin.predictionstrackerbot.commands.MessageHandlingResult;
-import io.github.alariclightin.predictionstrackerbot.exceptions.UnexpectedMessageException;
+import io.github.alariclightin.predictionstrackerbot.commands.ActionResult;
+import io.github.alariclightin.predictionstrackerbot.exceptions.UnexpectedUserMessageException;
 import io.github.alariclightin.predictionstrackerbot.messages.BotMessage;
 import io.github.alariclightin.predictionstrackerbot.states.StateHolderService;
 import io.github.alariclightin.predictionstrackerbot.states.WaitedResponseState;
@@ -42,14 +42,14 @@ class MessageHandlingServiceImplTest {
     }
 
     @Test
-    void shouldHandleMessage() throws UnexpectedMessageException {
+    void shouldHandleMessage() throws UnexpectedUserMessageException {
         // given
         Message incomingMessage = TestUtils.createTestMessage("test");
         MessageHandler messageHandler = mock(MessageHandler.class);
         WaitedResponseState oldState = mock(WaitedResponseState.class);
         WaitedResponseState newState = mock(WaitedResponseState.class);
         when(stateHolderService.getState(TestUtils.CHAT_ID)).thenReturn(oldState);
-        MessageHandlingResult handlingResult = new MessageHandlingResult(botMessage, newState);
+        ActionResult handlingResult = new ActionResult(botMessage, newState);
         when(handlersService.getHandler(oldState)).thenReturn(messageHandler);
         when(messageHandler.handle(incomingMessage, oldState)).thenReturn(handlingResult);
         when(sendMessageService.create(TestUtils.CHAT_ID, TestUtils.LANGUAGE_CODE, botMessage))
@@ -65,7 +65,7 @@ class MessageHandlingServiceImplTest {
     }
 
     @Test
-    void shouldHandleCommand() throws UnexpectedMessageException {
+    void shouldHandleCommand() throws UnexpectedUserMessageException {
         //given
         Message incomingMessage = TestUtils.createTestMessage("/test");
         MessageHandler messageHandler = mock(MessageHandler.class);
@@ -73,7 +73,7 @@ class MessageHandlingServiceImplTest {
         WaitedResponseState newState = mock(WaitedResponseState.class);
         when(handlersService.getHandler(eq(oldState)))
             .thenReturn(messageHandler);
-        MessageHandlingResult handlingResult = new MessageHandlingResult(botMessage, newState);
+        ActionResult handlingResult = new ActionResult(botMessage, newState);
         when(messageHandler.handle(eq(incomingMessage), eq(oldState))).thenReturn(handlingResult);
         when(sendMessageService.create(eq(TestUtils.CHAT_ID), eq(TestUtils.LANGUAGE_CODE), any()))
             .thenReturn(resultMessage);
@@ -88,12 +88,12 @@ class MessageHandlingServiceImplTest {
     }
 
     @Test
-    void shouldHandleUnexpectedMessages() throws UnexpectedMessageException {
+    void shouldHandleUnexpectedMessages() throws UnexpectedUserMessageException {
         // given
         Message incomingMessage = TestUtils.createTestMessage("test");
         WaitedResponseState oldState = mock(WaitedResponseState.class);
         when(stateHolderService.getState(TestUtils.CHAT_ID)).thenReturn(oldState);
-        when(handlersService.getHandler(oldState)).thenThrow(new UnexpectedMessageException("test"));
+        when(handlersService.getHandler(oldState)).thenThrow(new UnexpectedUserMessageException("test"));
         when(sendMessageService.create(eq(TestUtils.CHAT_ID), eq(TestUtils.LANGUAGE_CODE), any()))
             .thenReturn(resultMessage);
 

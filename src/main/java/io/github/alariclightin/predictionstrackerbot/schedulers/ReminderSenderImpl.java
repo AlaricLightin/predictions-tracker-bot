@@ -8,7 +8,7 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 
 import io.github.alariclightin.predictionstrackerbot.bot.BotService;
 import io.github.alariclightin.predictionstrackerbot.botservice.SendMessageService;
-import io.github.alariclightin.predictionstrackerbot.commands.MessageHandlingResult;
+import io.github.alariclightin.predictionstrackerbot.commands.ActionResult;
 import io.github.alariclightin.predictionstrackerbot.commands.setresult.QuestionsData;
 import io.github.alariclightin.predictionstrackerbot.commands.setresult.SetResultsMessageCreator;
 import io.github.alariclightin.predictionstrackerbot.states.StateHolderService;
@@ -41,7 +41,7 @@ class ReminderSenderImpl implements ReminderSender {
             return Optional.empty();
         }
         
-        MessageHandlingResult actionResult = setResultsMessageCreator.createMessage(questionIds);
+        ActionResult actionResult = setResultsMessageCreator.createMessage(questionIds);
         if (actionResult == null) // No predictions to remind about
             return Optional.empty();
 

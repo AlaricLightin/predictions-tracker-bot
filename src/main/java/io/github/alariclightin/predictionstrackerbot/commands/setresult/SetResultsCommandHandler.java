@@ -7,9 +7,9 @@ import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.Message;
 
 import io.github.alariclightin.predictionstrackerbot.commands.MessageHandler;
-import io.github.alariclightin.predictionstrackerbot.commands.MessageHandlingResult;
+import io.github.alariclightin.predictionstrackerbot.commands.ActionResult;
 import io.github.alariclightin.predictionstrackerbot.data.predictions.PredictionsResultDbService;
-import io.github.alariclightin.predictionstrackerbot.exceptions.UnexpectedMessageException;
+import io.github.alariclightin.predictionstrackerbot.exceptions.UnexpectedUserMessageException;
 import io.github.alariclightin.predictionstrackerbot.states.WaitedResponseState;
 
 @Component
@@ -20,18 +20,18 @@ class SetResultsCommandHandler extends AbstractSetResultsHandler implements SetR
     }
 
     @Override
-    public MessageHandlingResult handle(Message message, WaitedResponseState state) throws UnexpectedMessageException {
+    public ActionResult handle(Message message, WaitedResponseState state) throws UnexpectedUserMessageException {
         long userId = message.getFrom().getId();
         ArrayList<Integer> waitingPredictionsIds = getWaitingQuestionsIdsFromDb(userId);
         QuestionsData questionsData = getHandlingResult(waitingPredictionsIds);
         if (questionsData.question() != null) {
-            return new MessageHandlingResult(
+            return new ActionResult(
                 getPromptForResult(questionsData.question()), 
                 new WaitedResponseState(COMMAND, SET_RESULT_PHASE, questionsData)
             );
         }
         else {
-            return new MessageHandlingResult(
+            return new ActionResult(
                 getNoPredictionsMessage(), 
                 null
             );
@@ -44,10 +44,10 @@ class SetResultsCommandHandler extends AbstractSetResultsHandler implements SetR
     }
 
     @Override
-    public MessageHandlingResult createMessage(List<Integer> questionIds) {
+    public ActionResult createMessage(List<Integer> questionIds) {
         QuestionsData questionsData = getHandlingResult(new ArrayList<>(questionIds));
         if (questionsData.question() != null) {
-            return new MessageHandlingResult(
+            return new ActionResult(
                 getPromptForResult(questionsData.question()), 
                 new WaitedResponseState(COMMAND, SET_RESULT_PHASE, questionsData)
             );

@@ -37,7 +37,6 @@ class ReminderSenderImpl implements ReminderSender {
     public Optional<Integer> sendOneReminderToUser(Long userId, List<Integer> questionIds) {
         WaitedResponseState state = stateHolderService.getState(userId);       
         if (state != null) {// User is doing something 
-            System.out.println("User is doing something");
             return Optional.empty();
         }
         

@@ -98,8 +98,6 @@ public class ReminderServiceIntegrationTest extends TestWithContainer {
             @BeforeEach
             void sendReminders() {
                 reminderService.sendReminders();
-                List<TestDbUtils.Reminder> reminders = TestDbUtils.getReminders(jdbcTemplate);
-                System.out.println(reminders);
             }
 
             @Test
@@ -112,11 +110,10 @@ public class ReminderServiceIntegrationTest extends TestWithContainer {
                     .isTrue();
 
                 List<TestDbUtils.Reminder> reminders = TestDbUtils.getReminders(jdbcTemplate);
-                System.out.println(reminders);
                 assertThat(reminders)
                     .hasSize(2)
                     .filteredOn(reminder -> reminder.isSent() == true)
-                    .hasSize(1);
+                    .hasSize(2);
             }
         }
     }

@@ -8,6 +8,7 @@ import org.telegram.telegrambots.meta.api.objects.Message;
 import io.github.alariclightin.predictionstrackerbot.commands.ActionResult;
 import io.github.alariclightin.predictionstrackerbot.data.predictions.PredictionsResultDbService;
 import io.github.alariclightin.predictionstrackerbot.data.predictions.Question;
+import io.github.alariclightin.predictionstrackerbot.data.predictions.ReminderDbService;
 import io.github.alariclightin.predictionstrackerbot.exceptions.UnexpectedUserMessageException;
 import io.github.alariclightin.predictionstrackerbot.messages.BotMessageList;
 import io.github.alariclightin.predictionstrackerbot.messages.BotTextMessage;
@@ -16,8 +17,11 @@ import io.github.alariclightin.predictionstrackerbot.states.WaitedResponseState;
 @Component
 class SetResultPhaseHandler extends AbstractSetResultsHandler {
 
-    SetResultPhaseHandler(PredictionsResultDbService predictionsResultDbService) {
-        super(predictionsResultDbService);
+    SetResultPhaseHandler(
+        PredictionsResultDbService predictionsResultDbService,
+        ReminderDbService reminderDbService) {
+
+        super(predictionsResultDbService, reminderDbService);
     }
 
     @Override
@@ -62,6 +66,7 @@ class SetResultPhaseHandler extends AbstractSetResultsHandler {
 
         questionsData = getHandlingResult(questionsData.waitingQuestionsIds());
         if (questionsData.question() != null) {
+            markReminderAsSent(questionsData.question().id());
             return new ActionResult(
                 new BotMessageList(
                     List.of(buttonResultMessage, getPromptForResult(questionsData.question()))

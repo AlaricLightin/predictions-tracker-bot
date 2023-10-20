@@ -6,14 +6,20 @@ import java.util.List;
 import io.github.alariclightin.predictionstrackerbot.commands.MessageHandler;
 import io.github.alariclightin.predictionstrackerbot.data.predictions.PredictionsResultDbService;
 import io.github.alariclightin.predictionstrackerbot.data.predictions.Question;
+import io.github.alariclightin.predictionstrackerbot.data.predictions.ReminderDbService;
 import io.github.alariclightin.predictionstrackerbot.messages.BotMessage;
 import io.github.alariclightin.predictionstrackerbot.messages.BotTextMessage;
 
 abstract class AbstractSetResultsHandler implements MessageHandler {
     private final PredictionsResultDbService predictionsResultDbService;
+    private final ReminderDbService reminderDbService;
 
-    AbstractSetResultsHandler(PredictionsResultDbService predictionsResultDbService) {
+    AbstractSetResultsHandler(
+        PredictionsResultDbService predictionsResultDbService,
+        ReminderDbService reminderDbService) {
+        
         this.predictionsResultDbService = predictionsResultDbService;
+        this.reminderDbService = reminderDbService;
     }
 
     protected static final String COMMAND = "setresults";
@@ -53,6 +59,11 @@ abstract class AbstractSetResultsHandler implements MessageHandler {
 
     protected BotMessage getNoPredictionsMessage() {
         return new BotTextMessage("bot.responses.setresults.no-questions-to-set-results");
+    }
+
+    // TODO maybe it's better to do this after sending the real message
+    protected void markReminderAsSent(int questionId) {
+        reminderDbService.markReminderAsSent(questionId);
     }
 
 }

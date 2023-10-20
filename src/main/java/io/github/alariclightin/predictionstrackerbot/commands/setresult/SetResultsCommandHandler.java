@@ -9,14 +9,18 @@ import org.telegram.telegrambots.meta.api.objects.Message;
 import io.github.alariclightin.predictionstrackerbot.commands.MessageHandler;
 import io.github.alariclightin.predictionstrackerbot.commands.ActionResult;
 import io.github.alariclightin.predictionstrackerbot.data.predictions.PredictionsResultDbService;
+import io.github.alariclightin.predictionstrackerbot.data.predictions.ReminderDbService;
 import io.github.alariclightin.predictionstrackerbot.exceptions.UnexpectedUserMessageException;
 import io.github.alariclightin.predictionstrackerbot.states.WaitedResponseState;
 
 @Component
 class SetResultsCommandHandler extends AbstractSetResultsHandler implements SetResultsMessageCreator {
     
-    SetResultsCommandHandler(PredictionsResultDbService predictionsResultDbService) {
-        super(predictionsResultDbService);
+    SetResultsCommandHandler(
+        PredictionsResultDbService predictionsResultDbService,
+        ReminderDbService reminderDbService) {
+        
+        super(predictionsResultDbService, reminderDbService);
     }
 
     @Override
@@ -25,6 +29,7 @@ class SetResultsCommandHandler extends AbstractSetResultsHandler implements SetR
         ArrayList<Integer> waitingPredictionsIds = getWaitingQuestionsIdsFromDb(userId);
         QuestionsData questionsData = getHandlingResult(waitingPredictionsIds);
         if (questionsData.question() != null) {
+            markReminderAsSent(questionsData.question().id());
             return new ActionResult(
                 getPromptForResult(questionsData.question()), 
                 new WaitedResponseState(COMMAND, SET_RESULT_PHASE, questionsData)
@@ -47,6 +52,7 @@ class SetResultsCommandHandler extends AbstractSetResultsHandler implements SetR
     public ActionResult createMessage(List<Integer> questionIds) {
         QuestionsData questionsData = getHandlingResult(new ArrayList<>(questionIds));
         if (questionsData.question() != null) {
+            markReminderAsSent(questionsData.question().id());
             return new ActionResult(
                 getPromptForResult(questionsData.question()), 
                 new WaitedResponseState(COMMAND, SET_RESULT_PHASE, questionsData)

@@ -28,7 +28,7 @@ class ReminderDbServiceImpl implements ReminderDbService {
 
     @Override
     @Transactional
-    public void markReminderAsSended(int questionId) {
+    public void markReminderAsSent(int questionId) {
         reminderDao.markReminderAsSended(questionId);
     }
     

@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 
 import io.github.alariclightin.predictionstrackerbot.commands.ActionResult;
 import io.github.alariclightin.predictionstrackerbot.data.predictions.PredictionsResultDbService;
+import io.github.alariclightin.predictionstrackerbot.data.predictions.ReminderDbService;
 import io.github.alariclightin.predictionstrackerbot.exceptions.UnexpectedUserMessageException;
 import io.github.alariclightin.predictionstrackerbot.messages.BotTextMessage;
 import io.github.alariclightin.predictionstrackerbot.testutils.TestUtils;
@@ -18,11 +19,13 @@ import io.github.alariclightin.predictionstrackerbot.testutils.TestUtils;
 class SetResultsCommandHandlerTest {
     private SetResultsCommandHandler setResultsCommandHandler;
     private PredictionsResultDbService predictionsResultDbService;
+    private ReminderDbService reminderDbService;
 
     @BeforeEach
     void setUp() {
         predictionsResultDbService = mock(PredictionsResultDbService.class);
-        setResultsCommandHandler = new SetResultsCommandHandler(predictionsResultDbService);
+        reminderDbService = mock(ReminderDbService.class);
+        setResultsCommandHandler = new SetResultsCommandHandler(predictionsResultDbService, reminderDbService);
     }
 
     @Test

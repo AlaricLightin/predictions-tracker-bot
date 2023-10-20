@@ -8,5 +8,5 @@ public interface ReminderDbService {
 
     Map<Long, List<Integer>> getNonSendedReminders();
 
-    void markReminderAsSended(int questionId);
+    void markReminderAsSent(int questionId);
 }

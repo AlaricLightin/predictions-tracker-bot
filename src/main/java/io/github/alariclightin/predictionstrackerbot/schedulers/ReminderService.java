@@ -31,10 +31,7 @@ class ReminderService {
     void sendReminders() {
         Map<Long, List<Integer>> questionIdsMap = reminderDbService.getNonSendedReminders();
         questionIdsMap.forEach((userId, questionIds) -> {
-            reminderSender
-                .sendOneReminderToUser(userId, questionIds)
-                .ifPresent(questionId -> 
-                    reminderDbService.markReminderAsSended(questionId));
+            reminderSender.sendOneReminderToUser(userId, questionIds);
         });
     }
 }

@@ -20,6 +20,7 @@ import org.telegram.telegrambots.meta.api.objects.Message;
 import io.github.alariclightin.predictionstrackerbot.commands.ActionResult;
 import io.github.alariclightin.predictionstrackerbot.data.predictions.PredictionsResultDbService;
 import io.github.alariclightin.predictionstrackerbot.data.predictions.Question;
+import io.github.alariclightin.predictionstrackerbot.data.predictions.ReminderDbService;
 import io.github.alariclightin.predictionstrackerbot.exceptions.UnexpectedUserMessageException;
 import io.github.alariclightin.predictionstrackerbot.messages.BotMessageList;
 import io.github.alariclightin.predictionstrackerbot.messages.BotTextMessage;
@@ -29,11 +30,13 @@ import io.github.alariclightin.predictionstrackerbot.testutils.TestUtils;
 class SetResultPhaseHandlerTest {
     private SetResultPhaseHandler setResultPhaseHandler;
     private PredictionsResultDbService predictionsResultDbService;
+    private ReminderDbService reminderDbService;
 
     @BeforeEach
     void setUp() {
         predictionsResultDbService = mock(PredictionsResultDbService.class);
-        setResultPhaseHandler = new SetResultPhaseHandler(predictionsResultDbService);
+        reminderDbService = mock(ReminderDbService.class);
+        setResultPhaseHandler = new SetResultPhaseHandler(predictionsResultDbService, reminderDbService);
     }
 
     @ParameterizedTest

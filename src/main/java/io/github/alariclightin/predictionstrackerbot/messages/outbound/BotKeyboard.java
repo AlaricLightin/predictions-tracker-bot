@@ -1,4 +1,4 @@
-package io.github.alariclightin.predictionstrackerbot.messages;
+package io.github.alariclightin.predictionstrackerbot.messages.outbound;
 
 import java.util.Arrays;
 import java.util.List;

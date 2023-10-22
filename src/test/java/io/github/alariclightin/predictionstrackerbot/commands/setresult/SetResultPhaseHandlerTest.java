@@ -15,17 +15,16 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.ArgumentCaptor;
-import org.telegram.telegrambots.meta.api.objects.Message;
-
 import io.github.alariclightin.predictionstrackerbot.commands.ActionResult;
 import io.github.alariclightin.predictionstrackerbot.data.predictions.PredictionsResultDbService;
 import io.github.alariclightin.predictionstrackerbot.data.predictions.Question;
 import io.github.alariclightin.predictionstrackerbot.data.predictions.ReminderDbService;
 import io.github.alariclightin.predictionstrackerbot.exceptions.UnexpectedUserMessageException;
-import io.github.alariclightin.predictionstrackerbot.messages.BotKeyboard;
-import io.github.alariclightin.predictionstrackerbot.messages.BotMessage;
-import io.github.alariclightin.predictionstrackerbot.messages.BotMessageList;
-import io.github.alariclightin.predictionstrackerbot.messages.BotTextMessage;
+import io.github.alariclightin.predictionstrackerbot.messages.incoming.UserMessage;
+import io.github.alariclightin.predictionstrackerbot.messages.outbound.BotKeyboard;
+import io.github.alariclightin.predictionstrackerbot.messages.outbound.BotMessage;
+import io.github.alariclightin.predictionstrackerbot.messages.outbound.BotMessageList;
+import io.github.alariclightin.predictionstrackerbot.messages.outbound.BotTextMessage;
 import io.github.alariclightin.predictionstrackerbot.states.WaitedResponseState;
 import io.github.alariclightin.predictionstrackerbot.testutils.TestUtils;
 
@@ -45,7 +44,7 @@ class SetResultPhaseHandlerTest {
     @ValueSource(strings = {"yes", "no"})
     void shouldHandleAddResultCommandWhenNoOtherQuestions(String command) throws UnexpectedUserMessageException {
         final int questionId = 11;
-        Message message = TestUtils.createTestMessage(command);
+        UserMessage message = TestUtils.createMessage(command);
         WaitedResponseState state = new WaitedResponseState(
             setResultPhaseHandler.getCommandName(), 
             setResultPhaseHandler.getPhaseName(),
@@ -75,7 +74,7 @@ class SetResultPhaseHandlerTest {
     @Test
     void shouldHandleSkipCommandWhenNoOtherQuestions() throws UnexpectedUserMessageException {
         final int questionId = 11;
-        Message message = TestUtils.createTestMessage("skip");
+        UserMessage message = TestUtils.createMessage("skip");
         WaitedResponseState state = new WaitedResponseState(
             setResultPhaseHandler.getCommandName(), 
             setResultPhaseHandler.getPhaseName(),
@@ -104,7 +103,7 @@ class SetResultPhaseHandlerTest {
         final int questionId = 11;
         final int nextQuestionId = 22;
         final int nextNextQuestionId = 2345;
-        Message message = TestUtils.createTestMessage(command);
+        UserMessage message = TestUtils.createMessage(command);
         WaitedResponseState state = new WaitedResponseState(
             setResultPhaseHandler.getCommandName(), 
             setResultPhaseHandler.getPhaseName(),
@@ -149,7 +148,7 @@ class SetResultPhaseHandlerTest {
 
     @Test
     void shouldHandleSkipAllCommand() throws UnexpectedUserMessageException {
-        Message message = TestUtils.createTestMessage("skip_all");
+        UserMessage message = TestUtils.createMessage("skip_all");
         WaitedResponseState state = new WaitedResponseState(
             setResultPhaseHandler.getCommandName(), 
             setResultPhaseHandler.getPhaseName(),
@@ -168,12 +167,13 @@ class SetResultPhaseHandlerTest {
 
     @Test
     void shouldHandleInvalidCommand() {
-        Message message = TestUtils.createTestMessage("invalid");
+        UserMessage message = TestUtils.createMessage("invalid");
         WaitedResponseState state = new WaitedResponseState(
             setResultPhaseHandler.getCommandName(), 
             setResultPhaseHandler.getPhaseName(),
             new QuestionsData(new ArrayList<>(), TestUtils.createQuestion(11, null)));
 
-        assertThrows(UnexpectedUserMessageException.class, () -> setResultPhaseHandler.handle(message, state));
+        assertThrows(UnexpectedUserMessageException.class, 
+            () -> setResultPhaseHandler.handle(message, state));
     }
 }

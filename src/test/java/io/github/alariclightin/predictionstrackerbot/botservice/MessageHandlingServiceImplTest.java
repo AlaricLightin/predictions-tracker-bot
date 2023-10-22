@@ -12,13 +12,12 @@ import static org.mockito.Mockito.when;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
-import org.telegram.telegrambots.meta.api.objects.Message;
-
 import io.github.alariclightin.predictionstrackerbot.commands.MessageHandler;
 import io.github.alariclightin.predictionstrackerbot.commands.HandlersSearchService;
 import io.github.alariclightin.predictionstrackerbot.commands.ActionResult;
 import io.github.alariclightin.predictionstrackerbot.exceptions.UnexpectedUserMessageException;
-import io.github.alariclightin.predictionstrackerbot.messages.BotMessage;
+import io.github.alariclightin.predictionstrackerbot.messages.incoming.UserTextMessage;
+import io.github.alariclightin.predictionstrackerbot.messages.outbound.BotMessage;
 import io.github.alariclightin.predictionstrackerbot.states.StateHolderService;
 import io.github.alariclightin.predictionstrackerbot.states.WaitedResponseState;
 import io.github.alariclightin.predictionstrackerbot.testutils.TestUtils;
@@ -45,7 +44,7 @@ class MessageHandlingServiceImplTest {
     @Test
     void shouldHandleMessage() throws UnexpectedUserMessageException {
         // given
-        Message incomingMessage = TestUtils.createTestMessage("test");
+        UserTextMessage incomingMessage = TestUtils.createTextMessage("test");
         MessageHandler messageHandler = mock(MessageHandler.class);
         WaitedResponseState oldState = mock(WaitedResponseState.class);
         WaitedResponseState newState = mock(WaitedResponseState.class);
@@ -68,7 +67,7 @@ class MessageHandlingServiceImplTest {
     @Test
     void shouldHandleCommand() throws UnexpectedUserMessageException {
         //given
-        Message incomingMessage = TestUtils.createTestMessage("/test");
+        UserTextMessage incomingMessage = TestUtils.createTextMessage("/test");
         MessageHandler messageHandler = mock(MessageHandler.class);
         WaitedResponseState oldState = new WaitedResponseState("test", MessageHandler.START_PHASE, null);
         WaitedResponseState newState = mock(WaitedResponseState.class);
@@ -91,7 +90,7 @@ class MessageHandlingServiceImplTest {
     @Test
     void shouldHandleUnexpectedMessages() throws UnexpectedUserMessageException {
         // given
-        Message incomingMessage = TestUtils.createTestMessage("test");
+        UserTextMessage incomingMessage = TestUtils.createTextMessage("test");
         WaitedResponseState oldState = mock(WaitedResponseState.class);
         when(stateHolderService.getState(TestUtils.CHAT_ID)).thenReturn(oldState);
         when(handlersService.getHandler(oldState)).thenThrow(new UnexpectedUserMessageException("test"));

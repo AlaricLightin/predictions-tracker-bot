@@ -9,10 +9,10 @@ import org.junit.jupiter.api.Test;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 
-import io.github.alariclightin.predictionstrackerbot.messages.BotKeyboard;
-import io.github.alariclightin.predictionstrackerbot.messages.BotMessageList;
-import io.github.alariclightin.predictionstrackerbot.messages.BotTextMessage;
-import io.github.alariclightin.predictionstrackerbot.messages.InlineButton;
+import io.github.alariclightin.predictionstrackerbot.messages.outbound.BotKeyboard;
+import io.github.alariclightin.predictionstrackerbot.messages.outbound.BotMessageList;
+import io.github.alariclightin.predictionstrackerbot.messages.outbound.BotTextMessage;
+import io.github.alariclightin.predictionstrackerbot.messages.outbound.InlineButton;
 
 class SendMessageServiceImplTest {
     private static ReloadableResourceBundleMessageSource messageSource;

@@ -13,9 +13,9 @@ import io.github.alariclightin.predictionstrackerbot.commands.ActionResult;
 import io.github.alariclightin.predictionstrackerbot.data.predictions.PredictionsResultDbService;
 import io.github.alariclightin.predictionstrackerbot.data.predictions.ReminderDbService;
 import io.github.alariclightin.predictionstrackerbot.exceptions.UnexpectedUserMessageException;
-import io.github.alariclightin.predictionstrackerbot.messages.BotKeyboard;
-import io.github.alariclightin.predictionstrackerbot.messages.BotMessageList;
-import io.github.alariclightin.predictionstrackerbot.messages.BotTextMessage;
+import io.github.alariclightin.predictionstrackerbot.messages.outbound.BotKeyboard;
+import io.github.alariclightin.predictionstrackerbot.messages.outbound.BotMessageList;
+import io.github.alariclightin.predictionstrackerbot.messages.outbound.BotTextMessage;
 import io.github.alariclightin.predictionstrackerbot.testutils.TestUtils;
 
 class SetResultsCommandHandlerTest {
@@ -34,7 +34,7 @@ class SetResultsCommandHandlerTest {
     void shouldHandleCommandIfNoWaitingQuestions() throws UnexpectedUserMessageException {
         when(predictionsResultDbService.getWaitingQuestionsIds(TestUtils.CHAT_ID)).thenReturn(List.of());
         ActionResult result = setResultsCommandHandler.handle(
-            TestUtils.createTestMessage("/setresults"), null);
+            TestUtils.createTextMessage("/setresults"), null);
 
         assertThat(result.botMessage())
             .isInstanceOf(BotTextMessage.class)
@@ -53,7 +53,7 @@ class SetResultsCommandHandlerTest {
         when(predictionsResultDbService.getQuestion(2))
             .thenReturn(TestUtils.createQuestion(2, null));
         ActionResult result = setResultsCommandHandler.handle(
-            TestUtils.createTestMessage("/setresults"), null);
+            TestUtils.createTextMessage("/setresults"), null);
 
         assertThat(result.botMessage())
             .isInstanceOf(BotMessageList.class)

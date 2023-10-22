@@ -1,10 +1,9 @@
 package io.github.alariclightin.predictionstrackerbot.commands;
 
 import java.util.function.BiFunction;
-import org.telegram.telegrambots.meta.api.objects.Message;
-
-import io.github.alariclightin.predictionstrackerbot.messages.BotMessage;
-import io.github.alariclightin.predictionstrackerbot.messages.BotTextMessage;
+import io.github.alariclightin.predictionstrackerbot.messages.incoming.UserMessage;
+import io.github.alariclightin.predictionstrackerbot.messages.outbound.BotMessage;
+import io.github.alariclightin.predictionstrackerbot.messages.outbound.BotTextMessage;
 
 /**
  * Builder for {@link MessageHandler} instances.
@@ -14,7 +13,7 @@ public class MessageHandlerBuilder<T> {
     private String commandName;
     private String phaseName = MessageHandler.START_PHASE;
     private String nextPhasePromptMessageId;
-    private BiFunction<Message, T, BotMessage> responseMessageFunc;
+    private BiFunction<UserMessage, T, BotMessage> responseMessageFunc;
     private StateUpdater<T> stateUpdater;
     private String nextPhase;
     private ResultAction<T> resultAction; 
@@ -47,7 +46,7 @@ public class MessageHandlerBuilder<T> {
         return this;
     }
 
-    public MessageHandlerBuilder<T> setResponseMessageFunc(BiFunction<Message, T, BotMessage> responseMessageFunc) {
+    public MessageHandlerBuilder<T> setResponseMessageFunc(BiFunction<UserMessage, T, BotMessage> responseMessageFunc) {
         this.responseMessageFunc = responseMessageFunc;
         return this;
     }
@@ -67,7 +66,7 @@ public class MessageHandlerBuilder<T> {
         if (this.nextPhasePromptMessageId == null && this.responseMessageFunc == null)
             throw new IllegalStateException("Prompt message id or function must be set");
 
-        BiFunction<Message, T, BotMessage> promptMessageIdFunc = this.responseMessageFunc != null
+        BiFunction<UserMessage, T, BotMessage> promptMessageIdFunc = this.responseMessageFunc != null
             ? this.responseMessageFunc
             : (message, data) -> new BotTextMessage(this.nextPhasePromptMessageId);    
 

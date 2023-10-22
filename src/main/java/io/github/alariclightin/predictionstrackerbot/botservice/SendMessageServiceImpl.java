@@ -10,10 +10,11 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboard;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
-import io.github.alariclightin.predictionstrackerbot.messages.BotKeyboard;
-import io.github.alariclightin.predictionstrackerbot.messages.BotMessage;
-import io.github.alariclightin.predictionstrackerbot.messages.BotMessageList;
-import io.github.alariclightin.predictionstrackerbot.messages.BotTextMessage;
+
+import io.github.alariclightin.predictionstrackerbot.messages.outbound.BotKeyboard;
+import io.github.alariclightin.predictionstrackerbot.messages.outbound.BotMessage;
+import io.github.alariclightin.predictionstrackerbot.messages.outbound.BotMessageList;
+import io.github.alariclightin.predictionstrackerbot.messages.outbound.BotTextMessage;
 
 @Service
 class SendMessageServiceImpl implements SendMessageService{

@@ -4,13 +4,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.stereotype.Component;
-import org.telegram.telegrambots.meta.api.objects.Message;
-
 import io.github.alariclightin.predictionstrackerbot.commands.MessageHandler;
 import io.github.alariclightin.predictionstrackerbot.commands.ActionResult;
 import io.github.alariclightin.predictionstrackerbot.data.predictions.PredictionsResultDbService;
 import io.github.alariclightin.predictionstrackerbot.data.predictions.ReminderDbService;
 import io.github.alariclightin.predictionstrackerbot.exceptions.UnexpectedUserMessageException;
+import io.github.alariclightin.predictionstrackerbot.messages.incoming.UserMessage;
 import io.github.alariclightin.predictionstrackerbot.states.WaitedResponseState;
 
 @Component
@@ -24,8 +23,8 @@ class SetResultsCommandHandler extends AbstractSetResultsHandler implements SetR
     }
 
     @Override
-    public ActionResult handle(Message message, WaitedResponseState state) throws UnexpectedUserMessageException {
-        long userId = message.getFrom().getId();
+    public ActionResult handle(UserMessage message, WaitedResponseState state) throws UnexpectedUserMessageException {
+        long userId = message.getUser().getId();
         ArrayList<Integer> waitingPredictionsIds = getWaitingQuestionsIdsFromDb(userId);
         QuestionsData questionsData = getHandlingResult(waitingPredictionsIds);
         if (questionsData.question() != null) {

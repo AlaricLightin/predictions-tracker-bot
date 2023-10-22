@@ -22,7 +22,7 @@ import io.github.alariclightin.predictionstrackerbot.botservice.SendMessageServi
 import io.github.alariclightin.predictionstrackerbot.commands.ActionResult;
 import io.github.alariclightin.predictionstrackerbot.commands.setresult.QuestionsData;
 import io.github.alariclightin.predictionstrackerbot.commands.setresult.SetResultsMessageCreator;
-import io.github.alariclightin.predictionstrackerbot.messages.BotMessage;
+import io.github.alariclightin.predictionstrackerbot.messages.outbound.BotMessage;
 import io.github.alariclightin.predictionstrackerbot.states.StateHolderService;
 import io.github.alariclightin.predictionstrackerbot.states.WaitedResponseState;
 import io.github.alariclightin.predictionstrackerbot.testutils.TestUtils;

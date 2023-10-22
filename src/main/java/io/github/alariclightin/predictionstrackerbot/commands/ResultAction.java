@@ -1,8 +1,8 @@
 package io.github.alariclightin.predictionstrackerbot.commands;
 
-import org.telegram.telegrambots.meta.api.objects.Message;
+import io.github.alariclightin.predictionstrackerbot.messages.incoming.UserMessage;
 
 @FunctionalInterface
 public interface ResultAction<T> {
-    void apply(Message message, T data);
+    void apply(UserMessage message, T data);
 }

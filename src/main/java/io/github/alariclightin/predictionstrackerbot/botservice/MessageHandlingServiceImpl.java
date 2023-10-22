@@ -2,15 +2,16 @@ package io.github.alariclightin.predictionstrackerbot.botservice;
 
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
-import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.User;
 
 import io.github.alariclightin.predictionstrackerbot.commands.MessageHandler;
 import io.github.alariclightin.predictionstrackerbot.commands.HandlersSearchService;
 import io.github.alariclightin.predictionstrackerbot.commands.ActionResult;
 import io.github.alariclightin.predictionstrackerbot.exceptions.UnexpectedUserMessageException;
-import io.github.alariclightin.predictionstrackerbot.messages.BotMessage;
-import io.github.alariclightin.predictionstrackerbot.messages.BotTextMessage;
+import io.github.alariclightin.predictionstrackerbot.messages.incoming.UserMessage;
+import io.github.alariclightin.predictionstrackerbot.messages.incoming.UserTextMessage;
+import io.github.alariclightin.predictionstrackerbot.messages.outbound.BotMessage;
+import io.github.alariclightin.predictionstrackerbot.messages.outbound.BotTextMessage;
 import io.github.alariclightin.predictionstrackerbot.states.StateHolderService;
 import io.github.alariclightin.predictionstrackerbot.states.WaitedResponseState;
 
@@ -31,8 +32,8 @@ class MessageHandlingServiceImpl implements MessageHandlingService {
     }
 
     @Override
-    public SendMessage handleMessage(Message message) {
-        User user = message.getFrom();
+    public SendMessage handleMessage(UserTextMessage message) {
+        User user = message.getUser();
         long userId = user.getId();
         
         WaitedResponseState state = message.isCommand() 
@@ -55,7 +56,7 @@ class MessageHandlingServiceImpl implements MessageHandlingService {
         return sendMessageService.create(user.getId(), user.getLanguageCode(), resultBotMessage);
     }
 
-    private String getCommandName(Message message) {
+    private String getCommandName(UserMessage message) {
         return message.getText().substring(1);
     }
 

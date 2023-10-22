@@ -1,6 +1,8 @@
-package io.github.alariclightin.predictionstrackerbot.messagehandlingintegration;
+package io.github.alariclightin.predictionstrackerbot.bot;
 
 import static org.assertj.core.api.Assertions.assertThat;
+
+import java.util.Optional;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -15,17 +17,14 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
-import org.telegram.telegrambots.meta.api.objects.Message;
+import org.telegram.telegrambots.meta.api.objects.Update;
 
-import io.github.alariclightin.predictionstrackerbot.bot.Bot;
-import io.github.alariclightin.predictionstrackerbot.botservice.MessageHandlingService;
 import io.github.alariclightin.predictionstrackerbot.data.predictions.Question;
 import io.github.alariclightin.predictionstrackerbot.testutils.TestWithContainer;
 import io.github.alariclightin.predictionstrackerbot.testutils.TestDbUtils;
-import io.github.alariclightin.predictionstrackerbot.testutils.TestUtils;
 
 @SpringBootTest
-class SetResultsCommandTest extends TestWithContainer {
+class SetResultsCommandIntegrationTest extends TestWithContainer {
     
     @Autowired
     private JdbcTemplate jdbcTemplate;
@@ -34,7 +33,7 @@ class SetResultsCommandTest extends TestWithContainer {
     private Bot bot;
     
     @Autowired
-    private MessageHandlingService messageHandlingService;
+    private UpdateHandlerService updateHandlerService;
 
     private static final int WAITINQ_QUESTION_ID_1 = 10;
 
@@ -45,10 +44,11 @@ class SetResultsCommandTest extends TestWithContainer {
 
     @Test
     void shouldRespondAboutAbsentWaitingQuestions() {
-        Message message = TestUtils.createTestMessage("/setresults");
-        SendMessage response = messageHandlingService.handleMessage(message);
+        Update update = BotTestUtils.createTextUpdate("/setresults");
+        Optional<SendMessage> response = updateHandlerService.handleUpdate(update);
 
         assertThat(response)
+            .get()
             .extracting(SendMessage::getText)
             .asString()
             .contains("no questions");
@@ -58,10 +58,11 @@ class SetResultsCommandTest extends TestWithContainer {
     @Sql(scripts = { "classpath:sql/waiting-question-ids.sql" }, 
         executionPhase = ExecutionPhase.BEFORE_TEST_METHOD)
     void shouldRespondToCommandIfWaitingQuestionsExist() {
-        Message message = TestUtils.createTestMessage("/setresults");
-        SendMessage response = messageHandlingService.handleMessage(message);
+        Update update = BotTestUtils.createTextUpdate("/setresults");
+        Optional<SendMessage> response = updateHandlerService.handleUpdate(update);
 
         assertThat(response)
+            .get()
             .extracting(SendMessage::getText)
             .asString()
             .contains("Question 1", "yes", "no");
@@ -74,16 +75,17 @@ class SetResultsCommandTest extends TestWithContainer {
         
         @BeforeEach
         void setUp() {
-            messageHandlingService.handleMessage(TestUtils.createTestMessage("/setresults"));
+            updateHandlerService.handleUpdate(BotTestUtils.createTextUpdate("/setresults"));
         }
 
         @ParameterizedTest
         @ValueSource(strings = { "yes", "no" })
         void shouldHandleSetResultCommand(String command) {
-            Message message = TestUtils.createTestMessage(command);
-            SendMessage response = messageHandlingService.handleMessage(message);
+            Update update = BotTestUtils.createTextUpdate(command);
+            Optional<SendMessage> response = updateHandlerService.handleUpdate(update);
 
             assertThat(response)
+                .get()
                 .extracting(SendMessage::getText)
                 .asString()
                 .contains("saved", "Question 2", "yes", "no");
@@ -95,10 +97,11 @@ class SetResultsCommandTest extends TestWithContainer {
 
         @Test
         void voidShouldHandleSkipCommand() {
-            Message message = TestUtils.createTestMessage("skip");
-            SendMessage response = messageHandlingService.handleMessage(message);
+            Update update = BotTestUtils.createTextUpdate("skip");
+            Optional<SendMessage> response = updateHandlerService.handleUpdate(update);
 
             assertThat(response)
+                .get()
                 .extracting(SendMessage::getText)
                 .asString()
                 .contains("You can add a result later", "Question 2", "yes", "no");
@@ -110,10 +113,11 @@ class SetResultsCommandTest extends TestWithContainer {
 
         @Test
         void shouldHandleSkipAllCommand() {
-            Message message = TestUtils.createTestMessage("skip_all");
-            SendMessage response = messageHandlingService.handleMessage(message);
+            Update update = BotTestUtils.createTextUpdate("skip_all");
+            Optional<SendMessage> response = updateHandlerService.handleUpdate(update);
 
             assertThat(response)
+                .get()
                 .extracting(SendMessage::getText)
                 .asString()
                 .contains("You can add results later");
@@ -125,10 +129,11 @@ class SetResultsCommandTest extends TestWithContainer {
 
         @Test
         void shouldHandleInvalidCommand() {
-            Message message = TestUtils.createTestMessage("invalid");
-            SendMessage response = messageHandlingService.handleMessage(message);
+            Update update = BotTestUtils.createTextUpdate("invalid");
+            Optional<SendMessage> response = updateHandlerService.handleUpdate(update);
 
             assertThat(response)
+                .get()
                 .extracting(SendMessage::getText)
                 .asString()
                 .contains("Please, answer \"yes\" or \"no\".");

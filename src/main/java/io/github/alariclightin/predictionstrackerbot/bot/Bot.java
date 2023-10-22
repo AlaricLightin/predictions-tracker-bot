@@ -6,39 +6,32 @@ import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.commands.SetMyCommands;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
-import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.commands.BotCommand;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import io.github.alariclightin.predictionstrackerbot.botservice.CommandManagementService;
-import io.github.alariclightin.predictionstrackerbot.botservice.MessageHandlingService;
 
 @Component
 public class Bot extends TelegramLongPollingBot implements BotService {
     private final TelegramBotConfig config;
-    private final MessageHandlingService messageHandlingService;
+    private final UpdateHandlerService updateHandlerService;
     private final CommandManagementService commandManagementService;
 
     public Bot(TelegramBotConfig config, 
-        MessageHandlingService service,
+        UpdateHandlerService updateHandlerService,
         CommandManagementService commandManagementService) {
         
         super(config.getToken());
         this.config = config;
-        this.messageHandlingService = service;
+        this.updateHandlerService = updateHandlerService;
         this.commandManagementService = commandManagementService;
     }
 
     @Override
     public void onUpdateReceived(Update update) {
-        Message incomingMessage = update.getMessage();
-        if (incomingMessage == null) {
-            return;
-        }
-        
-        SendMessage message = messageHandlingService.handleMessage(incomingMessage);
-        sendMessage(message);
+        updateHandlerService.handleUpdate(update)
+            .ifPresent(this::sendMessage);
     }
 
     @Override

@@ -103,7 +103,7 @@ public class ReminderServiceIntegrationTest extends TestWithContainer {
             @Test
             @Sql("classpath:sql/waiting-question-ids.sql")
             void shouldHandleYesCommand() {
-                messageHandlingService.handleMessage(TestUtils.createTestMessage("yes"));
+                messageHandlingService.handleMessage(TestUtils.createTextMessage("yes"));
 
                 Question savedQuestion = TestDbUtils.getQuestionById(jdbcTemplate, WAITINQ_QUESTION_ID_1);
                 assertThat(savedQuestion.result())

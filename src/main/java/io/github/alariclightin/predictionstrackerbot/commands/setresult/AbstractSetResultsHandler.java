@@ -7,11 +7,11 @@ import io.github.alariclightin.predictionstrackerbot.commands.MessageHandler;
 import io.github.alariclightin.predictionstrackerbot.data.predictions.PredictionsResultDbService;
 import io.github.alariclightin.predictionstrackerbot.data.predictions.Question;
 import io.github.alariclightin.predictionstrackerbot.data.predictions.ReminderDbService;
-import io.github.alariclightin.predictionstrackerbot.messages.BotKeyboard;
-import io.github.alariclightin.predictionstrackerbot.messages.BotMessage;
-import io.github.alariclightin.predictionstrackerbot.messages.BotMessageList;
-import io.github.alariclightin.predictionstrackerbot.messages.BotTextMessage;
-import io.github.alariclightin.predictionstrackerbot.messages.InlineButton;
+import io.github.alariclightin.predictionstrackerbot.messages.outbound.BotKeyboard;
+import io.github.alariclightin.predictionstrackerbot.messages.outbound.BotMessage;
+import io.github.alariclightin.predictionstrackerbot.messages.outbound.BotMessageList;
+import io.github.alariclightin.predictionstrackerbot.messages.outbound.BotTextMessage;
+import io.github.alariclightin.predictionstrackerbot.messages.outbound.InlineButton;
 
 abstract class AbstractSetResultsHandler implements MessageHandler {
     private final PredictionsResultDbService predictionsResultDbService;

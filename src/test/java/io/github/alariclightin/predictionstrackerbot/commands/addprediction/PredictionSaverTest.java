@@ -11,11 +11,10 @@ import java.time.ZoneOffset;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
-import org.telegram.telegrambots.meta.api.objects.Message;
-
 import io.github.alariclightin.predictionstrackerbot.data.predictions.Prediction;
 import io.github.alariclightin.predictionstrackerbot.data.predictions.PredictionDbService;
 import io.github.alariclightin.predictionstrackerbot.data.predictions.Question;
+import io.github.alariclightin.predictionstrackerbot.messages.incoming.UserMessage;
 import io.github.alariclightin.predictionstrackerbot.testutils.TestUtils;
 
 class PredictionSaverTest {
@@ -40,7 +39,7 @@ class PredictionSaverTest {
                 .addTime(deadlineTime)
                 .addProbability(probability);
         
-        Message message = TestUtils.createTestMessage("60");
+        UserMessage message = TestUtils.createMessage("60");
 
         predictionSaver.apply(message, data);
         

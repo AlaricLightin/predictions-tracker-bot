@@ -1,4 +1,4 @@
-package io.github.alariclightin.predictionstrackerbot.messages;
+package io.github.alariclightin.predictionstrackerbot.messages.outbound;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

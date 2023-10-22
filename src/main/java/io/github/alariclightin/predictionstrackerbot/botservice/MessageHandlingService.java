@@ -1,8 +1,8 @@
 package io.github.alariclightin.predictionstrackerbot.botservice;
 
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
-import org.telegram.telegrambots.meta.api.objects.Message;
+import io.github.alariclightin.predictionstrackerbot.messages.incoming.UserTextMessage;
 
 public interface MessageHandlingService {
-    SendMessage handleMessage(Message message);
+    SendMessage handleMessage(UserTextMessage message);
 }

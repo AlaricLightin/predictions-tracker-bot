@@ -1,15 +1,13 @@
 package io.github.alariclightin.predictionstrackerbot.commands.addprediction;
 
-import java.time.Instant;
 import java.time.ZoneOffset;
 
 import org.springframework.stereotype.Component;
-import org.telegram.telegrambots.meta.api.objects.Message;
-
 import io.github.alariclightin.predictionstrackerbot.commands.ResultAction;
 import io.github.alariclightin.predictionstrackerbot.data.predictions.Prediction;
 import io.github.alariclightin.predictionstrackerbot.data.predictions.PredictionDbService;
 import io.github.alariclightin.predictionstrackerbot.data.predictions.Question;
+import io.github.alariclightin.predictionstrackerbot.messages.incoming.UserMessage;
 
 @Component
 class PredictionSaver implements ResultAction<PredictionData> {
@@ -20,8 +18,8 @@ class PredictionSaver implements ResultAction<PredictionData> {
     }
 
     @Override
-    public void apply(Message message, PredictionData data) {
-        long userId = message.getFrom().getId();
+    public void apply(UserMessage message, PredictionData data) {
+        long userId = message.getUser().getId();
         Question question = new Question(
                 data.getText(),
                 // TODO: make timezone configurable
@@ -29,7 +27,7 @@ class PredictionSaver implements ResultAction<PredictionData> {
                 userId);
 
         Prediction prediction = new Prediction(question, userId,
-                Instant.ofEpochSecond(message.getDate()),
+                message.getDateTime(),
                 data.getProbability());
         predictionDbService.addPrediction(question, prediction);
     }

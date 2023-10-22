@@ -11,7 +11,7 @@ import org.springframework.context.annotation.Configuration;
 import io.github.alariclightin.predictionstrackerbot.commands.MessageHandler;
 import io.github.alariclightin.predictionstrackerbot.commands.MessageHandlerBuilder;
 import io.github.alariclightin.predictionstrackerbot.exceptions.UnexpectedUserMessageException;
-import io.github.alariclightin.predictionstrackerbot.messages.BotTextMessage;
+import io.github.alariclightin.predictionstrackerbot.messages.outbound.BotTextMessage;
 
 @Configuration
 class AddPredictionCommandConfig {

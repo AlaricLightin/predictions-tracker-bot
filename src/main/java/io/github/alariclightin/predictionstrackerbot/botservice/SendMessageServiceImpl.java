@@ -1,6 +1,5 @@
 package io.github.alariclightin.predictionstrackerbot.botservice;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
@@ -8,8 +7,10 @@ import java.util.stream.Collectors;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboard;
-
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
+import io.github.alariclightin.predictionstrackerbot.messages.BotKeyboard;
 import io.github.alariclightin.predictionstrackerbot.messages.BotMessage;
 import io.github.alariclightin.predictionstrackerbot.messages.BotMessageList;
 import io.github.alariclightin.predictionstrackerbot.messages.BotTextMessage;
@@ -24,30 +25,64 @@ class SendMessageServiceImpl implements SendMessageService{
 
     @Override
     public SendMessage create(long userId, String languageCode, BotMessage botMessage) {
+        return createMessage(userId, Locale.forLanguageTag(languageCode), botMessage);
+    }
+
+    private SendMessage createMessage(long userId, Locale locale, BotMessage botMessage) {
         if (botMessage instanceof BotMessageList botMessageList) {
-            return getResultForMessageList(userId, languageCode, botMessageList);
+            return getResultForMessageList(userId, locale, botMessageList);
         }
-        if (botMessage instanceof BotTextMessage botTextMessage) {
-            return getResultForTextMessage(userId, languageCode, botTextMessage);
+        else if (botMessage instanceof BotTextMessage botTextMessage) {
+            return getResultForTextMessage(userId, locale, botTextMessage);
+        }
+        else if (botMessage instanceof BotKeyboard botKeyboard) {
+            return SendMessage.builder()
+                .chatId(userId)
+                .text("")
+                .replyMarkup(getKeyboard(userId, locale, botKeyboard))
+                .build();
         }
         else
             throw new IllegalArgumentException("Unsupported message type: " + botMessage.getClass());
     }
 
-    private SendMessage getResultForMessageList(long userId, String languageCode, BotMessageList botMessageList) {
-        return Arrays.stream(botMessageList.botMessages())
-            .map(m -> create(userId, languageCode, m))
+    private SendMessage getResultForMessageList(long userId, Locale locale, BotMessageList botMessageList) {
+        return botMessageList.botMessages().stream()
+            .map(m -> createMessage(userId, locale, m))
             .collect(Collectors.collectingAndThen(Collectors.toList(), this::joinMessages));
     }
 
-    private SendMessage getResultForTextMessage(long userId, String languageCode, BotTextMessage botTextMessage) {
+    private SendMessage getResultForTextMessage(long userId, Locale locale, BotTextMessage botTextMessage) {
         String text = messageSource.getMessage(
-            botTextMessage.messageId(), botTextMessage.args(), Locale.forLanguageTag(languageCode));        
+            botTextMessage.messageId(), botTextMessage.args(), locale);        
         return SendMessage.builder()
             .chatId(userId)
             .text(text)
             .build();    
     }
+
+    private InlineKeyboardMarkup getKeyboard(long userId, Locale locale, BotKeyboard botKeyboard) {
+        InlineKeyboardMarkup keyboardMarkup = new InlineKeyboardMarkup();
+        keyboardMarkup.setKeyboard(
+            botKeyboard.buttons().stream() 
+            .map(row ->
+                row.stream()
+                    .map(button -> {
+                        String text = messageSource.getMessage(
+                            button.messageId(), null, locale);
+                        return InlineKeyboardButton.builder()
+                            .text(text)
+                            .callbackData(button.callbackString())
+                            .build();
+                    })
+                    .toList()
+            )
+            .toList()
+        );
+
+        return keyboardMarkup;
+    }
+
 
     private SendMessage joinMessages(List<SendMessage> messages) {
         if (messages.isEmpty())

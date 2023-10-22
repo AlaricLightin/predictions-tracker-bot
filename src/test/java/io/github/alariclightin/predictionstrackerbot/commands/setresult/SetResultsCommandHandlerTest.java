@@ -13,6 +13,8 @@ import io.github.alariclightin.predictionstrackerbot.commands.ActionResult;
 import io.github.alariclightin.predictionstrackerbot.data.predictions.PredictionsResultDbService;
 import io.github.alariclightin.predictionstrackerbot.data.predictions.ReminderDbService;
 import io.github.alariclightin.predictionstrackerbot.exceptions.UnexpectedUserMessageException;
+import io.github.alariclightin.predictionstrackerbot.messages.BotKeyboard;
+import io.github.alariclightin.predictionstrackerbot.messages.BotMessageList;
 import io.github.alariclightin.predictionstrackerbot.messages.BotTextMessage;
 import io.github.alariclightin.predictionstrackerbot.testutils.TestUtils;
 
@@ -54,9 +56,12 @@ class SetResultsCommandHandlerTest {
             TestUtils.createTestMessage("/setresults"), null);
 
         assertThat(result.botMessage())
-            .isInstanceOf(BotTextMessage.class)
-            .extracting(m -> ((BotTextMessage) m).messageId())
-            .isEqualTo("bot.responses.setresults.set-result");
+            .isInstanceOf(BotMessageList.class)
+            .extracting(m -> ((BotMessageList) m).botMessages())
+            .asList()
+            .anyMatch(m -> m instanceof BotTextMessage textMessage 
+                && textMessage.messageId().equals("bot.responses.setresults.set-result"))
+            .anyMatch(m -> m instanceof BotKeyboard);
 
         assertThat(result.newState().data())
             .isInstanceOf(QuestionsData.class)
@@ -74,9 +79,12 @@ class SetResultsCommandHandlerTest {
         ActionResult result = setResultsCommandHandler.createMessage(List.of(1, 2));
 
         assertThat(result.botMessage())
-            .isInstanceOf(BotTextMessage.class)
-            .extracting(m -> ((BotTextMessage) m).messageId())
-            .isEqualTo("bot.responses.setresults.set-result");
+            .isInstanceOf(BotMessageList.class)
+            .extracting(m -> ((BotMessageList) m).botMessages())
+            .asList()
+            .anyMatch(m -> m instanceof BotTextMessage textMessage 
+                && textMessage.messageId().equals("bot.responses.setresults.set-result"))
+            .anyMatch(m -> m instanceof BotKeyboard);
 
         assertThat(result.newState().data())
             .isInstanceOf(QuestionsData.class)

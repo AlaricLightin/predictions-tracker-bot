@@ -22,6 +22,8 @@ import io.github.alariclightin.predictionstrackerbot.data.predictions.Prediction
 import io.github.alariclightin.predictionstrackerbot.data.predictions.Question;
 import io.github.alariclightin.predictionstrackerbot.data.predictions.ReminderDbService;
 import io.github.alariclightin.predictionstrackerbot.exceptions.UnexpectedUserMessageException;
+import io.github.alariclightin.predictionstrackerbot.messages.BotKeyboard;
+import io.github.alariclightin.predictionstrackerbot.messages.BotMessage;
 import io.github.alariclightin.predictionstrackerbot.messages.BotMessageList;
 import io.github.alariclightin.predictionstrackerbot.messages.BotTextMessage;
 import io.github.alariclightin.predictionstrackerbot.states.WaitedResponseState;
@@ -118,13 +120,26 @@ class SetResultPhaseHandlerTest {
         ActionResult result = setResultPhaseHandler.handle(message, state);
         assertThat(result.botMessage())
             .isInstanceOf(BotMessageList.class);
-        
-        assertThat(((BotMessageList) result.botMessage()).botMessages())
+
+        List<BotMessage> botMessages = ((BotMessageList) result.botMessage()).botMessages();
+
+        assertThat(botMessages)
+            .hasSize(3)
+            .filteredOn(m -> m instanceof BotTextMessage)
+            .extracting(m -> ((BotTextMessage) m).messageId())
+            .containsExactly(firstExpectedMessageId, "bot.responses.setresults.set-result");
+
+        assertThat(botMessages)
+            .filteredOn(m -> m instanceof BotKeyboard)
+            .hasSize(1)
+            .element(0)
+            .extracting(m -> ((BotKeyboard) m).buttons())
+            .asList()
+            .hasSize(1)
+            .element(0)
+            .asList()
             .extracting("messageId")
-            .containsExactly(
-                firstExpectedMessageId, 
-                "bot.responses.setresults.set-result"
-            );
+            .containsExactly("bot.buttons.yes", "bot.buttons.no", "bot.buttons.skip", "bot.buttons.skip-all");
 
         assertThat(result.newState().data())
             .isInstanceOf(QuestionsData.class)

@@ -7,8 +7,11 @@ import io.github.alariclightin.predictionstrackerbot.commands.MessageHandler;
 import io.github.alariclightin.predictionstrackerbot.data.predictions.PredictionsResultDbService;
 import io.github.alariclightin.predictionstrackerbot.data.predictions.Question;
 import io.github.alariclightin.predictionstrackerbot.data.predictions.ReminderDbService;
+import io.github.alariclightin.predictionstrackerbot.messages.BotKeyboard;
 import io.github.alariclightin.predictionstrackerbot.messages.BotMessage;
+import io.github.alariclightin.predictionstrackerbot.messages.BotMessageList;
 import io.github.alariclightin.predictionstrackerbot.messages.BotTextMessage;
+import io.github.alariclightin.predictionstrackerbot.messages.InlineButton;
 
 abstract class AbstractSetResultsHandler implements MessageHandler {
     private final PredictionsResultDbService predictionsResultDbService;
@@ -24,6 +27,13 @@ abstract class AbstractSetResultsHandler implements MessageHandler {
 
     protected static final String COMMAND = "setresults";
     protected static final String SET_RESULT_PHASE = "set-result";
+
+    private static final BotKeyboard KEYBOARD = BotKeyboard.createOneRowKeyboard(
+        new InlineButton("bot.buttons.yes", "setresults.yes"),
+        new InlineButton("bot.buttons.no", "setresults.no"),
+        new InlineButton("bot.buttons.skip", "setresults.skip"),
+        new InlineButton("bot.buttons.skip-all", "setresults.skip-all")
+    );
 
     @Override
     public String getCommandName() {
@@ -53,8 +63,11 @@ abstract class AbstractSetResultsHandler implements MessageHandler {
     }
 
     protected BotMessage getPromptForResult(Question question) {
-        return new BotTextMessage("bot.responses.setresults.set-result", 
-            question.text(), question.deadline());
+        return new BotMessageList(
+            new BotTextMessage("bot.responses.setresults.set-result", 
+                question.text(), question.deadline()),
+            KEYBOARD
+        );
     }
 
     protected BotMessage getNoPredictionsMessage() {

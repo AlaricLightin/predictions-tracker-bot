@@ -1,11 +1,14 @@
 package io.github.alariclightin.predictionstrackerbot.botservice;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
 
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboard;
 
 import io.github.alariclightin.predictionstrackerbot.messages.BotMessage;
 import io.github.alariclightin.predictionstrackerbot.messages.BotMessageList;
@@ -28,32 +31,53 @@ class SendMessageServiceImpl implements SendMessageService{
             return getResultForTextMessage(userId, languageCode, botTextMessage);
         }
         else
-            throw new IllegalStateException("Unsupported message type: " + botMessage.getClass());
+            throw new IllegalArgumentException("Unsupported message type: " + botMessage.getClass());
     }
 
     private SendMessage getResultForMessageList(long userId, String languageCode, BotMessageList botMessageList) {
-        String text = botMessageList.botMessages().stream()
-            .filter(m -> m instanceof BotTextMessage)
-            .map(m -> getTextString(userId, languageCode, (BotTextMessage) m))
-            .collect(Collectors.joining("\n\n"));
-
-        return getResultForText(userId, text);
+        return Arrays.stream(botMessageList.botMessages())
+            .map(m -> create(userId, languageCode, m))
+            .collect(Collectors.collectingAndThen(Collectors.toList(), this::joinMessages));
     }
 
     private SendMessage getResultForTextMessage(long userId, String languageCode, BotTextMessage botTextMessage) {
-        String text = getTextString(userId, languageCode, botTextMessage);        
-        return getResultForText(userId, text);
-    }
-
-    private String getTextString(long userId, String languageCode, BotTextMessage botTextMessage) {
-        return messageSource.getMessage(
-            botTextMessage.messageId(), botTextMessage.args(), Locale.forLanguageTag(languageCode));
-    }
-
-    private SendMessage getResultForText(long userId, String text) {
+        String text = messageSource.getMessage(
+            botTextMessage.messageId(), botTextMessage.args(), Locale.forLanguageTag(languageCode));        
         return SendMessage.builder()
             .chatId(userId)
             .text(text)
+            .build();    
+    }
+
+    private SendMessage joinMessages(List<SendMessage> messages) {
+        if (messages.isEmpty())
+            throw new IllegalArgumentException("Empty messages list");
+        
+        if (messages.size() == 1)
+            return messages.get(0);
+        
+        StringBuilder text = new StringBuilder();
+        ReplyKeyboard replyKeyboard = null;
+        String chatId = messages.get(0).getChatId();
+
+        for (SendMessage message : messages) {
+            if (!message.getText().isEmpty()) {
+                if (text.length() > 0)
+                    text.append("\n\n");
+                text.append(message.getText());
+            }
+            
+            if (message.getReplyMarkup() != null) {
+                if (replyKeyboard != null)
+                    throw new IllegalArgumentException("Multiple reply keyboards");
+                replyKeyboard = message.getReplyMarkup();
+            }
+        }
+
+        return SendMessage.builder()
+            .chatId(chatId)
+            .text(text.toString())
+            .replyMarkup(replyKeyboard)
             .build();
     }
 

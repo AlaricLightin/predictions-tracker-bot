@@ -1,7 +1,5 @@
 package io.github.alariclightin.predictionstrackerbot.commands.setresult;
 
-import java.util.List;
-
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.Message;
 
@@ -29,11 +27,11 @@ class SetResultPhaseHandler extends AbstractSetResultsHandler {
         throws UnexpectedUserMessageException {
             
         if (!(state.data() instanceof QuestionsData questionsData)) 
-            throw new IllegalStateException("Unexpected state data type: " + state.data().getClass().getName());
+            throw new IllegalArgumentException("Unexpected state data type: " + state.data().getClass().getName());
 
         Question question = questionsData.question();
         if (question == null)
-            throw new IllegalStateException("Unexpected state data: question is null");
+            throw new IllegalArgumentException("Unexpected state data: question is null");
 
         // TODO Add internationalization
         ResultUserCommand command;
@@ -69,7 +67,7 @@ class SetResultPhaseHandler extends AbstractSetResultsHandler {
             markReminderAsSent(questionsData.question().id());
             return new ActionResult(
                 new BotMessageList(
-                    List.of(buttonResultMessage, getPromptForResult(questionsData.question()))
+                    buttonResultMessage, getPromptForResult(questionsData.question())
                 ), 
                 new WaitedResponseState(COMMAND, SET_RESULT_PHASE, questionsData)
             );

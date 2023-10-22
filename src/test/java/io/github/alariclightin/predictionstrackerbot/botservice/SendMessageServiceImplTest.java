@@ -2,8 +2,6 @@ package io.github.alariclightin.predictionstrackerbot.botservice;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.util.List;
-
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -43,11 +41,27 @@ class SendMessageServiceImplTest {
         BotTextMessage botTextMessage1 = new BotTextMessage("message.hello", "Name" );
         BotTextMessage botTextMessage2 = new BotTextMessage("message.test");
         var result = sendMessageService.create(1, "en", 
-            new BotMessageList(List.of(botTextMessage1, botTextMessage2)));
+            new BotMessageList(botTextMessage1, botTextMessage2));
 
         assertThat(result)
             .hasFieldOrPropertyWithValue("chatId", "1")
             .hasFieldOrPropertyWithValue("text", "Hello, Name!\n\nTest");
     }
 
+    @Test
+    void shouldCreateSendMessageForComplexMessageList() {
+        BotTextMessage botTextMessage1 = new BotTextMessage("message.hello", "Name" );
+        BotTextMessage botTextMessage2 = new BotTextMessage("message.test");
+        BotTextMessage botTextMessage3 = new BotTextMessage("message.hello", "Name 2" );
+        
+        var result = sendMessageService.create(1, "en",
+                new BotMessageList(
+                    new BotMessageList(botTextMessage1, botTextMessage2),
+                    botTextMessage3)
+        );
+
+        assertThat(result)
+            .hasFieldOrPropertyWithValue("chatId", "1")
+            .hasFieldOrPropertyWithValue("text", "Hello, Name!\n\nTest\n\nHello, Name 2!");
+    }
 }

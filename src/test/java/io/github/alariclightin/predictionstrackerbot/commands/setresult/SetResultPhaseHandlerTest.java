@@ -117,11 +117,14 @@ class SetResultPhaseHandlerTest {
 
         ActionResult result = setResultPhaseHandler.handle(message, state);
         assertThat(result.botMessage())
-            .isInstanceOf(BotMessageList.class)
-            .extracting(m -> ((BotMessageList) m).botMessages())
-            .asList()
-            .extracting(m -> ((BotTextMessage) m).messageId())
-            .containsExactly(firstExpectedMessageId, "bot.responses.setresults.set-result");
+            .isInstanceOf(BotMessageList.class);
+        
+        assertThat(((BotMessageList) result.botMessage()).botMessages())
+            .extracting("messageId")
+            .containsExactly(
+                firstExpectedMessageId, 
+                "bot.responses.setresults.set-result"
+            );
 
         assertThat(result.newState().data())
             .isInstanceOf(QuestionsData.class)

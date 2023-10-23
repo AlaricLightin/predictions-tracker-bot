@@ -15,7 +15,6 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.jdbc.DataJdbcTest;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations;
 import org.springframework.test.context.jdbc.Sql;
 import io.github.alariclightin.predictionstrackerbot.testutils.TestWithContainer;
@@ -25,8 +24,6 @@ import io.github.alariclightin.predictionstrackerbot.testutils.TestWithContainer
 class ReminderDaoImplTest extends TestWithContainer {
     @Autowired
     private NamedParameterJdbcOperations jdbc;
-    @Autowired
-    private JdbcTemplate jdbcTemplate;
 
     private ReminderDaoImpl reminderDao;
 
@@ -37,7 +34,7 @@ class ReminderDaoImplTest extends TestWithContainer {
 
     @AfterEach
     void deleteData() {
-        clearAllTables(jdbcTemplate);
+        clearAllTables();
     }
 
 

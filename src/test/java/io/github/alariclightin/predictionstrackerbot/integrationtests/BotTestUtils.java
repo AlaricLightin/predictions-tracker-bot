@@ -1,4 +1,4 @@
-package io.github.alariclightin.predictionstrackerbot.botservice;
+package io.github.alariclightin.predictionstrackerbot.integrationtests;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -11,8 +11,8 @@ import org.telegram.telegrambots.meta.api.objects.User;
 
 public class BotTestUtils {
 
-    static final Long CHAT_ID = 123L;
-    static final String LANGUAGE_CODE = "en"; 
+    public static final Long CHAT_ID = 123L;
+    public static final String LANGUAGE_CODE = "en"; 
         
     private static Message createTelegramMessage(String text) {
         var message = mock(Message.class);

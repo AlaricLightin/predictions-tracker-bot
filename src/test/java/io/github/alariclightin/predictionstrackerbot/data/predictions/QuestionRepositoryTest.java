@@ -8,7 +8,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.jdbc.DataJdbcTest;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
 
@@ -20,14 +19,11 @@ class QuestionRepositoryTest extends TestWithContainer {
     @Autowired
     private QuestionRepository questionRepository;
 
-    @Autowired
-    private JdbcTemplate jdbcTemplate;
-
     private static final Long USER_ID = 123L;
 
     @AfterEach
     void deleteData() {
-        clearAllTables(jdbcTemplate);
+        clearAllTables();
     }
 
     @Test

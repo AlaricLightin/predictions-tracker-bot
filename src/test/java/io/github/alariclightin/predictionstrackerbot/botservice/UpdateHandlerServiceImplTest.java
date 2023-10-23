@@ -13,6 +13,7 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
 import io.github.alariclightin.predictionstrackerbot.integration.OutcomingMessageGateway;
+import io.github.alariclightin.predictionstrackerbot.integrationtests.BotTestUtils;
 import io.github.alariclightin.predictionstrackerbot.messages.outbound.BotMessage;
 
 public class UpdateHandlerServiceImplTest {

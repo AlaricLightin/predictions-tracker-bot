@@ -1,5 +1,6 @@
 package io.github.alariclightin.predictionstrackerbot.testutils;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
@@ -12,6 +13,9 @@ public abstract class TestWithContainer {
         postgres.start();
     }
 
+    @Autowired
+    protected JdbcTemplate jdbcTemplate;
+
     @DynamicPropertySource
     static void configureProperties(DynamicPropertyRegistry registry) {
         registry.add("spring.datasource.url", postgres::getJdbcUrl);
@@ -19,7 +23,7 @@ public abstract class TestWithContainer {
         registry.add("spring.datasource.password", postgres::getPassword);
     }
 
-    protected static void clearAllTables(JdbcTemplate jdbcTemplate) {
+    protected void clearAllTables() {
         jdbcTemplate.execute("TRUNCATE TABLE predictions.questions, predictions.predictions, predictions.reminders");
     }
 }

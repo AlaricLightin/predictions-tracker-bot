@@ -1,7 +1,6 @@
 package io.github.alariclightin.predictionstrackerbot.botservice;
 
 import org.springframework.stereotype.Service;
-import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.User;
 
 import io.github.alariclightin.predictionstrackerbot.commands.MessageHandler;
@@ -19,20 +18,17 @@ import io.github.alariclightin.predictionstrackerbot.states.WaitedResponseState;
 class MessageHandlingServiceImpl implements MessageHandlingService {
     private final StateHolderService stateHolderService;
     private final HandlersSearchService handlersService;
-    private final SendMessageService sendMessageService;
 
     MessageHandlingServiceImpl(
         StateHolderService stateHolderService,
-        HandlersSearchService handlersService,
-        SendMessageService sendMessageService) {
+        HandlersSearchService handlersService) {
 
         this.stateHolderService = stateHolderService;
         this.handlersService = handlersService;
-        this.sendMessageService = sendMessageService;
     }
 
     @Override
-    public SendMessage handleMessage(UserTextMessage message) {
+    public BotMessage handleTextMessage(UserTextMessage message) {
         User user = message.getUser();
         long userId = user.getId();
         
@@ -53,7 +49,7 @@ class MessageHandlingServiceImpl implements MessageHandlingService {
             resultBotMessage = new BotTextMessage(e.getMessageId(), e.getParameters());
         }
 
-        return sendMessageService.create(user.getId(), user.getLanguageCode(), resultBotMessage);
+        return resultBotMessage;
     }
 
     private String getCommandName(UserMessage message) {

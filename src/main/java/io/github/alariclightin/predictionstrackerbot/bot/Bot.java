@@ -10,7 +10,9 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.commands.BotCommand;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
+import io.github.alariclightin.predictionstrackerbot.botservice.BotService;
 import io.github.alariclightin.predictionstrackerbot.botservice.CommandManagementService;
+import io.github.alariclightin.predictionstrackerbot.botservice.UpdateHandlerService;
 
 @Component
 public class Bot extends TelegramLongPollingBot implements BotService {

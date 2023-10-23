@@ -17,7 +17,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 
-import io.github.alariclightin.predictionstrackerbot.bot.BotService;
+import io.github.alariclightin.predictionstrackerbot.botservice.BotService;
 import io.github.alariclightin.predictionstrackerbot.botservice.SendMessageService;
 import io.github.alariclightin.predictionstrackerbot.commands.ActionResult;
 import io.github.alariclightin.predictionstrackerbot.commands.setresult.QuestionsData;

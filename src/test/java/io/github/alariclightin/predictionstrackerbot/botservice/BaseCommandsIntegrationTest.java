@@ -1,4 +1,4 @@
-package io.github.alariclightin.predictionstrackerbot.bot;
+package io.github.alariclightin.predictionstrackerbot.botservice;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -11,6 +11,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
+import io.github.alariclightin.predictionstrackerbot.bot.Bot;
 import io.github.alariclightin.predictionstrackerbot.testutils.TestUtils;
 import io.github.alariclightin.predictionstrackerbot.testutils.TestWithContainer;
 

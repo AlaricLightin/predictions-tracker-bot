@@ -1,4 +1,4 @@
-package io.github.alariclightin.predictionstrackerbot.bot;
+package io.github.alariclightin.predictionstrackerbot.botservice;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -19,6 +19,7 @@ import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
+import io.github.alariclightin.predictionstrackerbot.bot.Bot;
 import io.github.alariclightin.predictionstrackerbot.data.predictions.Question;
 import io.github.alariclightin.predictionstrackerbot.testutils.TestWithContainer;
 import io.github.alariclightin.predictionstrackerbot.testutils.TestDbUtils;

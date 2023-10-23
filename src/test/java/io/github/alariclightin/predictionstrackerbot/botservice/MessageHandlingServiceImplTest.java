@@ -11,7 +11,6 @@ import static org.mockito.Mockito.when;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import io.github.alariclightin.predictionstrackerbot.commands.MessageHandler;
 import io.github.alariclightin.predictionstrackerbot.commands.HandlersSearchService;
 import io.github.alariclightin.predictionstrackerbot.commands.ActionResult;
@@ -24,21 +23,17 @@ import io.github.alariclightin.predictionstrackerbot.testutils.TestUtils;
 
 class MessageHandlingServiceImplTest {
     private MessageHandlingServiceImpl messageHandlingService;
-    private SendMessageService sendMessageService;
     private StateHolderService stateHolderService;
     private HandlersSearchService handlersService;
 
     private BotMessage botMessage = mock(BotMessage.class);
-    private SendMessage resultMessage = mock(SendMessage.class);
-
 
     @BeforeEach
     void setUp() {
         stateHolderService = mock(StateHolderService.class);
         handlersService = mock(HandlersSearchService.class);
-        sendMessageService = mock(SendMessageService.class);
         messageHandlingService = new MessageHandlingServiceImpl(
-            stateHolderService, handlersService, sendMessageService);
+            stateHolderService, handlersService);
     }
 
     @Test
@@ -52,16 +47,14 @@ class MessageHandlingServiceImplTest {
         ActionResult handlingResult = new ActionResult(botMessage, newState);
         when(handlersService.getHandler(oldState)).thenReturn(messageHandler);
         when(messageHandler.handle(incomingMessage, oldState)).thenReturn(handlingResult);
-        when(sendMessageService.create(TestUtils.CHAT_ID, TestUtils.LANGUAGE_CODE, botMessage))
-            .thenReturn(resultMessage);
 
         // when
-        SendMessage result = messageHandlingService.handleMessage(incomingMessage);
+        BotMessage result = messageHandlingService.handleTextMessage(incomingMessage);
 
         // then
         verify(stateHolderService).saveState(TestUtils.CHAT_ID, newState);
 
-        assertThat(result).isEqualTo(resultMessage);
+        assertThat(result).isEqualTo(botMessage);
     }
 
     @Test
@@ -75,16 +68,14 @@ class MessageHandlingServiceImplTest {
             .thenReturn(messageHandler);
         ActionResult handlingResult = new ActionResult(botMessage, newState);
         when(messageHandler.handle(eq(incomingMessage), eq(oldState))).thenReturn(handlingResult);
-        when(sendMessageService.create(eq(TestUtils.CHAT_ID), eq(TestUtils.LANGUAGE_CODE), any()))
-            .thenReturn(resultMessage);
         
         // when
-        SendMessage result = messageHandlingService.handleMessage(incomingMessage);
+        BotMessage result = messageHandlingService.handleTextMessage(incomingMessage);
 
         // then
         verify(stateHolderService).saveState(TestUtils.CHAT_ID, newState);
 
-        assertThat(result).isEqualTo(resultMessage);
+        assertThat(result).isEqualTo(botMessage);
     }
 
     @Test
@@ -93,16 +84,17 @@ class MessageHandlingServiceImplTest {
         UserTextMessage incomingMessage = TestUtils.createTextMessage("test");
         WaitedResponseState oldState = mock(WaitedResponseState.class);
         when(stateHolderService.getState(TestUtils.CHAT_ID)).thenReturn(oldState);
-        when(handlersService.getHandler(oldState)).thenThrow(new UnexpectedUserMessageException("test"));
-        when(sendMessageService.create(eq(TestUtils.CHAT_ID), eq(TestUtils.LANGUAGE_CODE), any()))
-            .thenReturn(resultMessage);
+        when(handlersService.getHandler(oldState))
+            .thenThrow(new UnexpectedUserMessageException("test"));
 
         // when
-        SendMessage result = messageHandlingService.handleMessage(incomingMessage);
+        BotMessage result = messageHandlingService.handleTextMessage(incomingMessage);
 
         // then
         verify(stateHolderService, never()).saveState(anyLong(), any());
 
-        assertThat(result).isEqualTo(resultMessage);
+        assertThat(result)
+            .extracting("messageId")
+            .isEqualTo("test");
     }
 }

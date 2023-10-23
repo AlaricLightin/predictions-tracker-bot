@@ -19,7 +19,7 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.jdbc.Sql;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 
-import io.github.alariclightin.predictionstrackerbot.bot.BotService;
+import io.github.alariclightin.predictionstrackerbot.botservice.BotService;
 import io.github.alariclightin.predictionstrackerbot.botservice.MessageHandlingService;
 import io.github.alariclightin.predictionstrackerbot.data.predictions.Question;
 import io.github.alariclightin.predictionstrackerbot.testutils.TestDbUtils;
@@ -103,7 +103,7 @@ public class ReminderServiceIntegrationTest extends TestWithContainer {
             @Test
             @Sql("classpath:sql/waiting-question-ids.sql")
             void shouldHandleYesCommand() {
-                messageHandlingService.handleMessage(TestUtils.createTextMessage("yes"));
+                messageHandlingService.handleTextMessage(TestUtils.createTextMessage("yes"));
 
                 Question savedQuestion = TestDbUtils.getQuestionById(jdbcTemplate, WAITINQ_QUESTION_ID_1);
                 assertThat(savedQuestion.result())

@@ -1,4 +1,4 @@
-package io.github.alariclightin.predictionstrackerbot.bot;
+package io.github.alariclightin.predictionstrackerbot.botservice;
 
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 

@@ -9,9 +9,10 @@ import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.User;
 
-import io.github.alariclightin.predictionstrackerbot.testutils.TestUtils;
-
 class BotTestUtils {
+
+    static final Long CHAT_ID = 123L;
+    static final String LANGUAGE_CODE = "en"; 
         
     private static Message createTelegramMessage(String text) {
         var message = mock(Message.class);
@@ -19,10 +20,10 @@ class BotTestUtils {
         when(message.getText()).thenReturn(text);
 
         var user = mock(User.class);
-        when(user.getId()).thenReturn(TestUtils.CHAT_ID);
-        when(user.getLanguageCode()).thenReturn(TestUtils.LANGUAGE_CODE);
+        when(user.getId()).thenReturn(CHAT_ID);
+        when(user.getLanguageCode()).thenReturn(LANGUAGE_CODE);
         when(message.getFrom()).thenReturn(user);
-        when(message.getChatId()).thenReturn(TestUtils.CHAT_ID);
+        when(message.getChatId()).thenReturn(CHAT_ID);
         when(message.getDate()).thenReturn((int) Instant.now().getEpochSecond());
 
         return message;       

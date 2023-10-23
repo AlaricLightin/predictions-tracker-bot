@@ -18,6 +18,7 @@ class UpdateHandlerServiceImpl implements UpdateHandlerService {
     UpdateHandlerServiceImpl(
         MessageHandlingService messageHandlingService,
         SendMessageService sendMessageService) {
+            
         this.messageHandlingService = messageHandlingService;
         this.sendMessageService = sendMessageService;
     }

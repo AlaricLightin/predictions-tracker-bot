@@ -12,7 +12,6 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
 import io.github.alariclightin.predictionstrackerbot.bot.Bot;
-import io.github.alariclightin.predictionstrackerbot.testutils.TestUtils;
 import io.github.alariclightin.predictionstrackerbot.testutils.TestWithContainer;
 
 @SpringBootTest
@@ -29,7 +28,7 @@ class BaseCommandsIntegrationTest extends TestWithContainer {
         Optional<SendMessage> response = updateHandlerService.handleUpdate(update);
         assertThat(response)
             .get()
-            .hasFieldOrPropertyWithValue("chatId", TestUtils.CHAT_ID.toString())
+            .hasFieldOrPropertyWithValue("chatId", BotTestUtils.CHAT_ID.toString())
             .extracting(SendMessage::getText)
             .asString()
             .contains("Hello");
@@ -41,7 +40,7 @@ class BaseCommandsIntegrationTest extends TestWithContainer {
         Optional<SendMessage> response = updateHandlerService.handleUpdate(update);
         assertThat(response)
             .get()
-            .hasFieldOrPropertyWithValue("chatId", TestUtils.CHAT_ID.toString())
+            .hasFieldOrPropertyWithValue("chatId", BotTestUtils.CHAT_ID.toString())
             .extracting(SendMessage::getText)
             .asString()
             .contains("I don't understand you.");
@@ -53,7 +52,7 @@ class BaseCommandsIntegrationTest extends TestWithContainer {
         Optional<SendMessage> response = updateHandlerService.handleUpdate(update);
         assertThat(response)
             .get()
-            .hasFieldOrPropertyWithValue("chatId", TestUtils.CHAT_ID.toString())
+            .hasFieldOrPropertyWithValue("chatId", BotTestUtils.CHAT_ID.toString())
             .extracting(SendMessage::getText)
             .asString()
             .contains("invalid", "is not a valid command");

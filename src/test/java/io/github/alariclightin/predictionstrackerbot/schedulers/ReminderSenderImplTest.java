@@ -1,7 +1,5 @@
 package io.github.alariclightin.predictionstrackerbot.schedulers;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.mock;
@@ -11,17 +9,15 @@ import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 
-import io.github.alariclightin.predictionstrackerbot.botservice.BotService;
 import io.github.alariclightin.predictionstrackerbot.botservice.SendMessageService;
 import io.github.alariclightin.predictionstrackerbot.commands.ActionResult;
 import io.github.alariclightin.predictionstrackerbot.commands.setresult.QuestionsData;
 import io.github.alariclightin.predictionstrackerbot.commands.setresult.SetResultsMessageCreator;
+import io.github.alariclightin.predictionstrackerbot.integration.OutcomingMessageGateway;
 import io.github.alariclightin.predictionstrackerbot.messages.outbound.BotMessage;
 import io.github.alariclightin.predictionstrackerbot.states.StateHolderService;
 import io.github.alariclightin.predictionstrackerbot.states.WaitedResponseState;
@@ -32,7 +28,7 @@ class ReminderSenderImplTest {
     private SetResultsMessageCreator setResultsMessageCreator;
     private StateHolderService stateHolderService;
     private SendMessageService sendMessageService;
-    private BotService botService;
+    private OutcomingMessageGateway outcomingMessageGateway;
 
     private static final Long USER_ID = 345L;
     private static final List<Integer> QUESTION_IDS = List.of(100, 200);
@@ -42,12 +38,12 @@ class ReminderSenderImplTest {
         setResultsMessageCreator = mock(SetResultsMessageCreator.class);
         stateHolderService = mock(StateHolderService.class);
         sendMessageService = mock(SendMessageService.class);
-        botService = mock(BotService.class);
+        outcomingMessageGateway = mock(OutcomingMessageGateway.class);
         reminderSender = new ReminderSenderImpl(
             setResultsMessageCreator,
             stateHolderService,
             sendMessageService,
-            botService);
+            outcomingMessageGateway);
     }
 
     @Test
@@ -55,12 +51,10 @@ class ReminderSenderImplTest {
         WaitedResponseState state = mock(WaitedResponseState.class);
         when(stateHolderService.getState(USER_ID)).thenReturn(state);
 
-        Optional<Integer> result = reminderSender.sendOneReminderToUser(USER_ID, QUESTION_IDS);
-        assertThat(result)
-            .isEmpty();
+        reminderSender.sendOneReminderToUser(USER_ID, QUESTION_IDS);
 
         verify(stateHolderService, never()).saveState(anyLong(), any());
-        verify(botService, never()).sendMessage(any());
+        verify(outcomingMessageGateway, never()).sendMessage(any());
     }
 
     @Test
@@ -68,12 +62,10 @@ class ReminderSenderImplTest {
         when(stateHolderService.getState(USER_ID)).thenReturn(null);
         when(setResultsMessageCreator.createMessage(QUESTION_IDS)).thenReturn(null);
 
-        Optional<Integer> result = reminderSender.sendOneReminderToUser(USER_ID, QUESTION_IDS);
-        assertThat(result)
-            .isEmpty();
+        reminderSender.sendOneReminderToUser(USER_ID, QUESTION_IDS);
 
         verify(stateHolderService, never()).saveState(anyLong(), any());
-        verify(botService, never()).sendMessage(any());
+        verify(outcomingMessageGateway, never()).sendMessage(any());
     }
 
     @Test
@@ -91,11 +83,9 @@ class ReminderSenderImplTest {
         SendMessage sendMessage = mock(SendMessage.class);
         when(sendMessageService.create(USER_ID, resultMessage)).thenReturn(sendMessage);
 
-        Optional<Integer> result = reminderSender.sendOneReminderToUser(USER_ID, QUESTION_IDS);
-        assertThat(result)
-            .contains(QUESTION_IDS.get(0));
+        reminderSender.sendOneReminderToUser(USER_ID, QUESTION_IDS);
             
         verify(stateHolderService).saveState(USER_ID, newState);
-        verify(botService).sendMessage(sendMessage);
+        verify(outcomingMessageGateway).sendMessage(sendMessage);
     }
 }

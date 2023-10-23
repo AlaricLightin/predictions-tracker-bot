@@ -5,6 +5,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
+import org.springframework.integration.config.EnableIntegration;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.telegram.telegrambots.meta.TelegramBotsApi;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
@@ -17,6 +18,7 @@ import io.github.alariclightin.predictionstrackerbot.bot.TelegramBotConfig;
 @EnableJdbcRepositories
 @EnableConfigurationProperties(TelegramBotConfig.class)
 @EnableScheduling
+@EnableIntegration
 public class PredictionsTrackerBotApplication {
 
 	public static void main(String[] args) {

@@ -2,6 +2,7 @@ package io.github.alariclightin.predictionstrackerbot.bot;
 
 import java.util.List;
 
+import org.springframework.integration.annotation.ServiceActivator;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.commands.SetMyCommands;
@@ -10,30 +11,28 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.commands.BotCommand;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
-import io.github.alariclightin.predictionstrackerbot.botservice.BotService;
 import io.github.alariclightin.predictionstrackerbot.botservice.CommandManagementService;
-import io.github.alariclightin.predictionstrackerbot.botservice.UpdateHandlerService;
+import io.github.alariclightin.predictionstrackerbot.integration.IncomingMessageGateway;
 
 @Component
-public class Bot extends TelegramLongPollingBot implements BotService {
+public class Bot extends TelegramLongPollingBot {
     private final TelegramBotConfig config;
-    private final UpdateHandlerService updateHandlerService;
+    private final IncomingMessageGateway incomingMessageGateway;
     private final CommandManagementService commandManagementService;
 
     public Bot(TelegramBotConfig config, 
-        UpdateHandlerService updateHandlerService,
+        IncomingMessageGateway incomingMessageGateway,
         CommandManagementService commandManagementService) {
         
         super(config.getToken());
         this.config = config;
-        this.updateHandlerService = updateHandlerService;
+        this.incomingMessageGateway = incomingMessageGateway;
         this.commandManagementService = commandManagementService;
     }
 
     @Override
     public void onUpdateReceived(Update update) {
-        updateHandlerService.handleUpdate(update)
-            .ifPresent(this::sendMessage);
+        incomingMessageGateway.handleUpdate(update);
     }
 
     @Override
@@ -51,14 +50,12 @@ public class Bot extends TelegramLongPollingBot implements BotService {
         }
     }
 
-    @Override
+    @ServiceActivator(inputChannel = "outcomingMessagesChannel")
     public void sendMessage(SendMessage sendMessage) {
-        if (sendMessage != null) {
-            try {
-                execute(sendMessage);
-            } catch (TelegramApiException e) {
-                throw new RuntimeException(e);
-            }
+        try {
+            execute(sendMessage);
+        } catch (TelegramApiException e) {
+            throw new RuntimeException(e);
         }
     }
 }

@@ -9,7 +9,7 @@ import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.User;
 
-class BotTestUtils {
+public class BotTestUtils {
 
     static final Long CHAT_ID = 123L;
     static final String LANGUAGE_CODE = "en"; 
@@ -29,7 +29,7 @@ class BotTestUtils {
         return message;       
     }
 
-    static Update createTextUpdate(String text) {
+    public static Update createTextUpdate(String text) {
         var message = createTelegramMessage(text);
         var update = mock(Update.class);
         when(update.getMessage()).thenReturn(message);

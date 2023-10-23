@@ -1,8 +1,8 @@
 package io.github.alariclightin.predictionstrackerbot.botservice;
 
 import static org.assertj.core.api.Assertions.assertThat;
-
-import java.util.Optional;
+import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.verify;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -10,15 +10,19 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.jdbc.JdbcTestUtils;
+import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
-import io.github.alariclightin.predictionstrackerbot.bot.Bot;
+import io.github.alariclightin.predictionstrackerbot.integration.IncomingMessageGateway;
+import io.github.alariclightin.predictionstrackerbot.integration.OutcomingMessageGateway;
 import io.github.alariclightin.predictionstrackerbot.testutils.TestWithContainer;
 
 @SpringBootTest
@@ -28,10 +32,13 @@ class AddPredictionCommandIntegrationTest extends TestWithContainer {
     private JdbcTemplate jdbcTemplate;
 
     @MockBean
-    private Bot bot;
+    private TelegramLongPollingBot bot;
     
     @Autowired
-    private UpdateHandlerService updateHandlerService;
+    private IncomingMessageGateway incomingMessageGateway;
+
+    @SpyBean
+    private OutcomingMessageGateway outcomingMessageGateway;
 
     @AfterEach
     void clearAllTables() {
@@ -40,14 +47,10 @@ class AddPredictionCommandIntegrationTest extends TestWithContainer {
 
     @Test
     void shouldAddPrediction() {
-        Update update = BotTestUtils.createTextUpdate("/add");
-        Optional<SendMessage> response = updateHandlerService.handleUpdate(update);
-        assertThat(response)
-            .get()
-            .hasFieldOrPropertyWithValue("chatId", BotTestUtils.CHAT_ID.toString())
-            .extracting(SendMessage::getText)
-            .asString()
-            .contains("What is your prediction?");
+        Update update = BotTestUtils.createTextUpdate("/add");        
+        incomingMessageGateway.handleUpdate(update);
+
+        assertResponse("What is your prediction?");
     }
 
     @Nested
@@ -55,15 +58,15 @@ class AddPredictionCommandIntegrationTest extends TestWithContainer {
         @BeforeEach
         void setUp() {
             Update update = BotTestUtils.createTextUpdate("/add");
-            updateHandlerService.handleUpdate(update);
+            incomingMessageGateway.handleUpdate(update);
         }
 
         @Test
         void shouldHandlePredictionText() {
             Update update = BotTestUtils.createTextUpdate("test prediction");
-            Optional<SendMessage> response = updateHandlerService.handleUpdate(update);
-            assertThat(response.get().getText())
-                .contains("check the result");
+            incomingMessageGateway.handleUpdate(update);
+            
+            assertResponse("check the result");
         }
 
         @Nested
@@ -71,15 +74,15 @@ class AddPredictionCommandIntegrationTest extends TestWithContainer {
             @BeforeEach
             void setUp() {
                 Update update = BotTestUtils.createTextUpdate("test prediction");
-                updateHandlerService.handleUpdate(update);
+                incomingMessageGateway.handleUpdate(update);
             }
 
             @Test
             void shouldHandleCorrectDeadlineText() {
                 Update update = BotTestUtils.createTextUpdate("2021-01-01");
-                Optional<SendMessage> response = updateHandlerService.handleUpdate(update);
-                assertThat(response.get().getText())
-                    .contains("time");
+                incomingMessageGateway.handleUpdate(update);
+                
+                assertResponse("time");
 
                 assertThat(JdbcTestUtils.countRowsInTable(jdbcTemplate, "predictions.questions"))
                     .isZero();
@@ -92,15 +95,15 @@ class AddPredictionCommandIntegrationTest extends TestWithContainer {
                 @BeforeEach
                 void setUp() {
                     Update update = BotTestUtils.createTextUpdate("2021-01-01");
-                    updateHandlerService.handleUpdate(update);
+                    incomingMessageGateway.handleUpdate(update);
                 }
 
                 @Test
                 void shouldHandleCorrectDeadlineTimeText() {
                     Update update = BotTestUtils.createTextUpdate("12:00");
-                    Optional<SendMessage> response = updateHandlerService.handleUpdate(update);
-                    assertThat(response.get().getText())
-                        .contains("probability");
+                    incomingMessageGateway.handleUpdate(update);
+                    
+                    assertResponse("probability");
 
                     assertThat(JdbcTestUtils.countRowsInTable(jdbcTemplate, "predictions.questions"))
                         .isZero();
@@ -112,20 +115,15 @@ class AddPredictionCommandIntegrationTest extends TestWithContainer {
                 class WhenDeadLineTimeAdded {
                     @BeforeEach
                     void setUp() {
-                        updateHandlerService.handleUpdate(BotTestUtils.createTextUpdate("12:00"));
+                        incomingMessageGateway.handleUpdate(BotTestUtils.createTextUpdate("12:00"));
                     }
 
                     @Test
                     void shouldHandleProbabilityText() {
                         Update update = BotTestUtils.createTextUpdate("60");
-                        Optional<SendMessage> response = updateHandlerService.handleUpdate(update);
-                        assertThat(response)
-                                .get()
-                                .hasFieldOrPropertyWithValue("chatId", BotTestUtils.CHAT_ID.toString())
-                                .extracting(SendMessage::getText)
-                                .asString()
-                                .contains("Prediction added.", "test prediction", "60");
-
+                        incomingMessageGateway.handleUpdate(update);
+                        
+                        assertResponse("Prediction added.", "test prediction", "60");
                         assertThat(JdbcTestUtils.countRowsInTable(jdbcTemplate, "predictions.questions"))
                                 .isEqualTo(1);
                         assertThat(JdbcTestUtils.countRowsInTable(jdbcTemplate, "predictions.predictions"))
@@ -135,18 +133,18 @@ class AddPredictionCommandIntegrationTest extends TestWithContainer {
                     @Test
                     void shouldHandleWhenProbabilityIsNotANumber() {
                         Update update = BotTestUtils.createTextUpdate("not a number");
-                        Optional<SendMessage> response = updateHandlerService.handleUpdate(update);
-                        assertThat(response.get().getText())
-                                .contains("Probability must be a number");
+                        incomingMessageGateway.handleUpdate(update);
+                        
+                        assertResponse("Probability must be a number");
                     }
 
                     @ParameterizedTest
                     @ValueSource(strings = { "-1", "0", "100" })
                     void shouldHandleWhenProbabilityOutOfRange(String value) {
                         Update update = BotTestUtils.createTextUpdate(value);
-                        Optional<SendMessage> response = updateHandlerService.handleUpdate(update);
-                        assertThat(response.get().getText())
-                                .contains("Probability must be between 1 and 99");
+                        incomingMessageGateway.handleUpdate(update);
+
+                        assertResponse("Probability must be between 1 and 99");
                     }
 
                 }
@@ -154,21 +152,30 @@ class AddPredictionCommandIntegrationTest extends TestWithContainer {
                 @Test
                 void shouldHandleIncorrectDeadlineTimeText() {
                     Update update = BotTestUtils.createTextUpdate("incorrect time");
-                    Optional<SendMessage> response = updateHandlerService.handleUpdate(update);
-                    assertThat(response.get().getText())
-                        .contains("Wrong time format");
+                    incomingMessageGateway.handleUpdate(update);
+                    
+                    assertResponse("Wrong time format");
                 }
             }
 
             @Test
             void shouldHandleIncorrectDeadlineText() {
                 Update update = BotTestUtils.createTextUpdate("incorrect deadline");
-                Optional<SendMessage> response = updateHandlerService.handleUpdate(update);
-                assertThat(response.get().getText())
-                    .contains("Wrong date");
+                incomingMessageGateway.handleUpdate(update);
+                
+                assertResponse("Wrong date format");
             }
 
         }
     }
 
+    private void assertResponse(CharSequence... expectedFragments) {
+                ArgumentCaptor<SendMessage> response = ArgumentCaptor.forClass(SendMessage.class);
+        verify(outcomingMessageGateway, atLeastOnce()).sendMessage(response.capture());
+        assertThat(response.getValue())
+            .hasFieldOrPropertyWithValue("chatId", BotTestUtils.CHAT_ID.toString())
+            .extracting(SendMessage::getText)
+            .asString()
+            .contains(expectedFragments);
+    }
 }

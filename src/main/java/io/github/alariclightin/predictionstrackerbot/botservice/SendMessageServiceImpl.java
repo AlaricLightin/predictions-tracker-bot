@@ -5,6 +5,9 @@ import java.util.Locale;
 import java.util.stream.Collectors;
 
 import org.springframework.context.MessageSource;
+import org.springframework.integration.annotation.ServiceActivator;
+import org.springframework.messaging.handler.annotation.Header;
+import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.methods.AnswerCallbackQuery;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
@@ -12,22 +15,28 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMa
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboard;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 
+import io.github.alariclightin.predictionstrackerbot.messages.outbound.BotCallbackAnswer;
 import io.github.alariclightin.predictionstrackerbot.messages.outbound.BotKeyboard;
 import io.github.alariclightin.predictionstrackerbot.messages.outbound.BotMessage;
 import io.github.alariclightin.predictionstrackerbot.messages.outbound.BotMessageList;
 import io.github.alariclightin.predictionstrackerbot.messages.outbound.BotTextMessage;
 
 @Service
-class SendMessageServiceImpl implements SendMessageService{
+class SendMessageServiceImpl {
     private final MessageSource messageSource;
 
     SendMessageServiceImpl(MessageSource messageSource) {
         this.messageSource = messageSource;
     }
 
-    @Override
-    public SendMessage create(long userId, String languageCode, BotMessage botMessage) {
-        return createMessage(userId, Locale.forLanguageTag(languageCode), botMessage);
+    @ServiceActivator(inputChannel = "botMessageChannel", outputChannel = "outcomingMessagesChannel")
+    public SendMessage create(
+        @Header("chatId") long chatId, 
+        // TODO store language code in user settings
+        @Header(name = "languageCode", required = false, defaultValue = "en") String languageCode, 
+        @Payload BotMessage botMessage) {
+
+        return createMessage(chatId, Locale.forLanguageTag(languageCode), botMessage);
     }
 
     private SendMessage createMessage(long userId, Locale locale, BotMessage botMessage) {
@@ -118,16 +127,13 @@ class SendMessageServiceImpl implements SendMessageService{
             .build();
     }
 
-    @Override
-    public SendMessage create(long userId, BotMessage botMessage) {
-        // TODO store language code in user settings
-        return create(userId, "en", botMessage);
-    }
-
-    @Override
+    @ServiceActivator(inputChannel = "botCallbackAnswerChannel", outputChannel = "outcomingMessagesChannel")
     public AnswerCallbackQuery createAnswerCallbackQuery(
-        String callbackQueryId, String languageCode, String textId) {
+        @Header("callbackId") String callbackQueryId, 
+        @Header("languageCode") String languageCode, 
+        @Payload BotCallbackAnswer botCallbackAnswer) {
 
+        String textId = botCallbackAnswer.messageId();
         String text = textId != null && !textId.isEmpty()
             ? messageSource.getMessage(textId, null, Locale.forLanguageTag(languageCode))
             : "";

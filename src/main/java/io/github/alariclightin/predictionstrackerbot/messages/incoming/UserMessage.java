@@ -8,5 +8,4 @@ public interface UserMessage {
     User getUser();
     String getText();
     Instant getDateTime();
-    long getChatId();
 }

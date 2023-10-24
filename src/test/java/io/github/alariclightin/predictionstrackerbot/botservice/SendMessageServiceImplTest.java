@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 
+import io.github.alariclightin.predictionstrackerbot.messages.outbound.BotCallbackAnswer;
 import io.github.alariclightin.predictionstrackerbot.messages.outbound.BotKeyboard;
 import io.github.alariclightin.predictionstrackerbot.messages.outbound.BotMessageList;
 import io.github.alariclightin.predictionstrackerbot.messages.outbound.BotTextMessage;
@@ -97,5 +98,30 @@ class SendMessageServiceImplTest {
                 tuple("No", "button-no")
             );
             
+    }
+
+    @Test
+    void shouldCreateAnswerCallbackForEmptyMessage() {
+        String callbackQueryId = "callback-query-id";
+        var botCallbackAnswer = new BotCallbackAnswer("");
+        var result = sendMessageService.createAnswerCallbackQuery(
+            callbackQueryId, "en", botCallbackAnswer);
+
+        assertThat(result)
+            .hasFieldOrPropertyWithValue("callbackQueryId", callbackQueryId)
+            .hasFieldOrPropertyWithValue("text", "");
+    }
+
+    @Test
+    void shouldCreateAnswerCallbackForNonEmptyMessage() {
+        String callbackQueryId = "callback-query-id";
+        String messageId = "message.test";
+        var botCallbackAnswer = new BotCallbackAnswer(messageId);
+        var result = sendMessageService.createAnswerCallbackQuery(
+            callbackQueryId, "en", botCallbackAnswer);
+
+        assertThat(result)
+            .hasFieldOrPropertyWithValue("callbackQueryId", callbackQueryId)
+            .hasFieldOrPropertyWithValue("text", "Test");
     }
 }

@@ -11,13 +11,9 @@ import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
-
-import io.github.alariclightin.predictionstrackerbot.botservice.SendMessageService;
 import io.github.alariclightin.predictionstrackerbot.commands.ActionResult;
 import io.github.alariclightin.predictionstrackerbot.commands.setresult.QuestionsData;
 import io.github.alariclightin.predictionstrackerbot.commands.setresult.SetResultsMessageCreator;
-import io.github.alariclightin.predictionstrackerbot.integration.OutcomingMessageGateway;
 import io.github.alariclightin.predictionstrackerbot.messages.outbound.BotMessage;
 import io.github.alariclightin.predictionstrackerbot.states.StateHolderService;
 import io.github.alariclightin.predictionstrackerbot.states.WaitedResponseState;
@@ -27,8 +23,7 @@ class ReminderSenderImplTest {
     private ReminderSenderImpl reminderSender;
     private SetResultsMessageCreator setResultsMessageCreator;
     private StateHolderService stateHolderService;
-    private SendMessageService sendMessageService;
-    private OutcomingMessageGateway outcomingMessageGateway;
+    private ReminderGateway reminderGateway;
 
     private static final Long USER_ID = 345L;
     private static final List<Integer> QUESTION_IDS = List.of(100, 200);
@@ -37,13 +32,11 @@ class ReminderSenderImplTest {
     void setUp() {
         setResultsMessageCreator = mock(SetResultsMessageCreator.class);
         stateHolderService = mock(StateHolderService.class);
-        sendMessageService = mock(SendMessageService.class);
-        outcomingMessageGateway = mock(OutcomingMessageGateway.class);
+        reminderGateway = mock(ReminderGateway.class);
         reminderSender = new ReminderSenderImpl(
             setResultsMessageCreator,
             stateHolderService,
-            sendMessageService,
-            outcomingMessageGateway);
+            reminderGateway);
     }
 
     @Test
@@ -54,7 +47,7 @@ class ReminderSenderImplTest {
         reminderSender.sendOneReminderToUser(USER_ID, QUESTION_IDS);
 
         verify(stateHolderService, never()).saveState(anyLong(), any());
-        verify(outcomingMessageGateway, never()).sendMessage(any());
+        verify(reminderGateway, never()).sendBotMessage(anyLong(), any());
     }
 
     @Test
@@ -65,7 +58,7 @@ class ReminderSenderImplTest {
         reminderSender.sendOneReminderToUser(USER_ID, QUESTION_IDS);
 
         verify(stateHolderService, never()).saveState(anyLong(), any());
-        verify(outcomingMessageGateway, never()).sendMessage(any());
+        verify(reminderGateway, never()).sendBotMessage(anyLong(), any());
     }
 
     @Test
@@ -80,12 +73,9 @@ class ReminderSenderImplTest {
         ActionResult actionResult = new ActionResult(resultMessage, newState);
         when(setResultsMessageCreator.createMessage(QUESTION_IDS)).thenReturn(actionResult);
 
-        SendMessage sendMessage = mock(SendMessage.class);
-        when(sendMessageService.create(USER_ID, resultMessage)).thenReturn(sendMessage);
-
         reminderSender.sendOneReminderToUser(USER_ID, QUESTION_IDS);
             
         verify(stateHolderService).saveState(USER_ID, newState);
-        verify(outcomingMessageGateway).sendMessage(sendMessage);
+        verify(reminderGateway).sendBotMessage(USER_ID, resultMessage);
     }
 }

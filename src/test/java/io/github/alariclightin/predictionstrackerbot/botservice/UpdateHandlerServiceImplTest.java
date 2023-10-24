@@ -1,30 +1,27 @@
 package io.github.alariclightin.predictionstrackerbot.botservice;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
-import io.github.alariclightin.predictionstrackerbot.integration.OutcomingMessageGateway;
+
+import io.github.alariclightin.predictionstrackerbot.exceptions.UnexpectedButtonCallbackQueryException;
+import io.github.alariclightin.predictionstrackerbot.messages.incoming.ButtonCallbackQuery;
 import io.github.alariclightin.predictionstrackerbot.messages.incoming.UserTextMessage;
+import io.github.alariclightin.predictionstrackerbot.messages.outbound.BotCallbackAnswer;
 import io.github.alariclightin.predictionstrackerbot.messages.outbound.BotMessage;
 import io.github.alariclightin.predictionstrackerbot.testutils.TestUtils;
 
 public class UpdateHandlerServiceImplTest {
     private UpdateHandlerService updateHandlerService;
     private MessageHandlingService messageHandlingService;
-    private SendMessageService sendMessageService;
-    private OutcomingMessageGateway outcomingMessageGateway;
 
     @BeforeEach
     void setUp() {
         messageHandlingService = mock(MessageHandlingService.class);
-        sendMessageService = mock(SendMessageService.class);
-        outcomingMessageGateway = mock(OutcomingMessageGateway.class);
-        updateHandlerService = new UpdateHandlerService(
-            messageHandlingService, sendMessageService, outcomingMessageGateway);
+        updateHandlerService = new UpdateHandlerService(messageHandlingService);
     }
 
     @Test
@@ -32,12 +29,37 @@ public class UpdateHandlerServiceImplTest {
         UserTextMessage incomingMessage = TestUtils.createTextMessage("test");
         BotMessage botMessage = mock(BotMessage.class);
         when(messageHandlingService.handleTextMessage(incomingMessage)).thenReturn(botMessage);
-        SendMessage resultMessage = mock(SendMessage.class);
-        when(sendMessageService.create(TestUtils.CHAT_ID, TestUtils.LANGUAGE_CODE, botMessage))
-            .thenReturn(resultMessage);
 
-        updateHandlerService.handleTextMessage(incomingMessage);
-        verify(outcomingMessageGateway).sendMessage(resultMessage);
+        var result = updateHandlerService.handleTextMessage(incomingMessage);
+        assertThat(result)
+            .isEqualTo(botMessage);
     }
 
+    @Test
+    void shouldHandleValidCallvackQuery() throws UnexpectedButtonCallbackQueryException {
+        ButtonCallbackQuery incomingCallbackQuery = mock(ButtonCallbackQuery.class);
+        var botMessage = mock(BotMessage.class);
+        when(messageHandlingService.handleCallback(incomingCallbackQuery)).thenReturn(botMessage);
+
+        var result = updateHandlerService.handleCallback(incomingCallbackQuery);
+        
+        assertThat(result)
+            .hasSize(2)
+            .usingDefaultComparator()
+            .containsExactly(botMessage, new BotCallbackAnswer(""));
+    }
+
+    @Test
+    void shouldHandleIncorrectCallbackQuery() throws UnexpectedButtonCallbackQueryException {
+        ButtonCallbackQuery incomingCallbackQuery = mock(ButtonCallbackQuery.class);
+        when(messageHandlingService.handleCallback(incomingCallbackQuery))
+            .thenThrow(UnexpectedButtonCallbackQueryException.class);
+
+        var result = updateHandlerService.handleCallback(incomingCallbackQuery);
+        assertThat(result.size())
+            .isEqualTo(1);
+
+        assertThat(result.get(0))
+            .isEqualTo(new BotCallbackAnswer("bot.callback.button-error"));
+    }
 }

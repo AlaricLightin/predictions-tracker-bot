@@ -1,16 +1,29 @@
 package io.github.alariclightin.predictionstrackerbot.integration;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.convert.converter.Converter;
+import org.springframework.expression.Expression;
+import org.springframework.expression.spel.standard.SpelExpressionParser;
+import org.springframework.integration.annotation.ServiceActivator;
+import org.springframework.integration.annotation.Transformer;
 import org.springframework.integration.channel.PublishSubscribeChannel;
 import org.springframework.integration.config.IntegrationConverter;
 import org.springframework.integration.dsl.IntegrationFlow;
 import org.springframework.integration.dsl.MessageChannels;
+import org.springframework.integration.router.PayloadTypeRouter;
+import org.springframework.integration.transformer.HeaderEnricher;
+import org.springframework.integration.transformer.support.ExpressionEvaluatingHeaderValueMessageProcessor;
+import org.springframework.integration.transformer.support.HeaderValueMessageProcessor;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
 import io.github.alariclightin.predictionstrackerbot.messages.incoming.ButtonCallbackQuery;
 import io.github.alariclightin.predictionstrackerbot.messages.incoming.UserTextMessage;
+import io.github.alariclightin.predictionstrackerbot.messages.outbound.BotCallbackAnswer;
+import io.github.alariclightin.predictionstrackerbot.messages.outbound.BotMessage;
 
 @Configuration
 class IntegrationConfig {
@@ -39,15 +52,73 @@ class IntegrationConfig {
         return IntegrationFlow.from("incomingUpdatesChannel")
             .route(Update.class, update -> {
                 if (update.getMessage() != null) {
-                    return "incomingUserMessageChannel";
+                    return "incomingUpdateWithMessagesChannel";
                 }
                 // TODO add additional checks?
                 else if (update.getCallbackQuery() != null) {
-                    return "incomingCallbackQueryChannel";
+                    return "incomingUpdateWithCallbackQueryChannel";
                 }
                 else return "nullChannel";
             })
             .get();
+    }
+
+    @Bean
+    PublishSubscribeChannel afterHandlingChannel() {
+        PublishSubscribeChannel result = MessageChannels.publishSubscribe().getObject();
+        result.setDatatypes(BotMessage.class, BotCallbackAnswer.class);
+        return result;
+    }
+
+    @ServiceActivator(inputChannel = "afterHandlingChannel")
+    @Bean
+    PayloadTypeRouter afterHandlingRouter() {
+        var result = new PayloadTypeRouter();
+        result.setChannelMapping(BotMessage.class.getName(), "botMessageChannel");
+        result.setChannelMapping(BotCallbackAnswer.class.getName(), "botCallbackAnswerChannel");
+        return result;
+    }
+
+    @Bean
+    @Transformer(inputChannel = "incomingUpdateWithMessagesChannel", outputChannel = "incomingUserMessageChannel")
+    HeaderEnricher updateWithMessagHeaderEnricher() {
+        Map<String, HeaderValueMessageProcessor<?>> headersToAdd = new HashMap<>();
+
+        Expression chatIdExpression = new SpelExpressionParser().parseExpression(
+            "payload.getMessage().getChatId()");
+        headersToAdd.put("chatId", 
+            new ExpressionEvaluatingHeaderValueMessageProcessor<>(chatIdExpression, String.class));
+
+        Expression languageCodeExpression = new SpelExpressionParser().parseExpression(
+            "payload.getMessage().getFrom().getLanguageCode()");
+        headersToAdd.put("languageCode",
+            new ExpressionEvaluatingHeaderValueMessageProcessor<>(languageCodeExpression, String.class));
+
+        return new HeaderEnricher(headersToAdd);
+    }
+
+    @Bean
+    @Transformer(
+        inputChannel = "incomingUpdateWithCallbackQueryChannel", outputChannel = "incomingCallbackQueryChannel")
+    HeaderEnricher updateWithCallbackQueryHeaderEnricher() {
+        Map<String, HeaderValueMessageProcessor<?>> headersToAdd = new HashMap<>();
+
+        Expression callbackIdExpression = new SpelExpressionParser().parseExpression(
+            "payload.getCallbackQuery().getId()");
+        headersToAdd.put("callbackId", 
+            new ExpressionEvaluatingHeaderValueMessageProcessor<>(callbackIdExpression, String.class));
+
+        Expression chatIdExpression = new SpelExpressionParser().parseExpression(
+            "payload.getCallbackQuery().getFrom().getId()");
+        headersToAdd.put("chatId", 
+            new ExpressionEvaluatingHeaderValueMessageProcessor<>(chatIdExpression, String.class));
+
+        Expression languageCodeExpression = new SpelExpressionParser().parseExpression(
+            "payload.getCallbackQuery().getFrom().getLanguageCode()");
+        headersToAdd.put("languageCode",
+            new ExpressionEvaluatingHeaderValueMessageProcessor<>(languageCodeExpression, String.class));
+
+        return new HeaderEnricher(headersToAdd);
     }
 
     @Bean

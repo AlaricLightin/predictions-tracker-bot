@@ -43,7 +43,6 @@ public class TestUtils {
         when(user.getLanguageCode()).thenReturn(LANGUAGE_CODE);
         when(message.getUser()).thenReturn(user);
         when(message.getDateTime()).thenReturn(Instant.now());
-        when(message.getChatId()).thenReturn(CHAT_ID);
 
         return message;       
     }

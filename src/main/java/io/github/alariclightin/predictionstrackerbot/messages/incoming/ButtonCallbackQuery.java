@@ -29,10 +29,6 @@ public class ButtonCallbackQuery implements UserMessage {
         this.buttonId = data[2];
     }
 
-    public String getId() {
-        return callbackQuery.getId();
-    }
-
     @Override
     public User getUser() {
         return callbackQuery.getFrom();
@@ -47,12 +43,6 @@ public class ButtonCallbackQuery implements UserMessage {
     @Override
     public Instant getDateTime() {
         return null;
-    }
-
-    @Override
-    // Now we working only with users privately
-    public long getChatId() {
-        return callbackQuery.getFrom().getId();
     }
 
     public String getCommand() {

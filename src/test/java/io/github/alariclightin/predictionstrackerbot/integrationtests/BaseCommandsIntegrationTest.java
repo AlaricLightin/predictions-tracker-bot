@@ -41,7 +41,7 @@ class BaseCommandsIntegrationTest extends AbstractGatewayTest {
         Update update = mock(Update.class);
         incomingMessageGateway.handleUpdate(update);
 
-        verify(outcomingMessageGateway, never()).sendMessage(any());
+        verify(mockedOutcomingGateway, never()).sendMessage(any());
     }
 
     @Test
@@ -49,7 +49,7 @@ class BaseCommandsIntegrationTest extends AbstractGatewayTest {
         sendCallbackQueryUpdate("setresults", "set-result", "YES");
 
         ArgumentCaptor<AnswerCallbackQuery> response = ArgumentCaptor.forClass(AnswerCallbackQuery.class);
-        verify(outcomingMessageGateway).sendAnswerCallback(response.capture());
+        verify(mockedOutcomingGateway).sendAnswerCallback(response.capture());
         assertThat(response.getValue().getText())
             .isNotEmpty();
     }

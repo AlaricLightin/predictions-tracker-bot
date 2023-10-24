@@ -9,6 +9,6 @@ interface ReminderSender {
      * @param userId id of user to send reminder
      * @param questionIds ids of questions waiting for result
      */
-    void sendOneReminderToUser(Long userId, List<Integer> questionIds);
+    void sendOneReminderToUser(long userId, List<Integer> questionIds);
 
 }

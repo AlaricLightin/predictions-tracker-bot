@@ -60,7 +60,7 @@ public class ReminderServiceIntegrationTest extends AbstractGatewayTest {
             reminderService.sendReminders();
 
             ArgumentCaptor<SendMessage> captor = ArgumentCaptor.forClass(SendMessage.class);
-            verify(outcomingMessageGateway, times(2)).sendMessage(captor.capture());
+            verify(mockedOutcomingGateway, times(2)).sendMessage(captor.capture());
 
             List<SendMessage> capturedMessages = captor.getAllValues();
             assertThat(capturedMessages)

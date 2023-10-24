@@ -39,10 +39,11 @@ public class TestUtils {
         when(message.getText()).thenReturn(text);
 
         var user = mock(User.class);
-        when(user.getId()).thenReturn(TestUtils.CHAT_ID);
-        when(user.getLanguageCode()).thenReturn(TestUtils.LANGUAGE_CODE);
+        when(user.getId()).thenReturn(CHAT_ID);
+        when(user.getLanguageCode()).thenReturn(LANGUAGE_CODE);
         when(message.getUser()).thenReturn(user);
         when(message.getDateTime()).thenReturn(Instant.now());
+        when(message.getChatId()).thenReturn(CHAT_ID);
 
         return message;       
     }

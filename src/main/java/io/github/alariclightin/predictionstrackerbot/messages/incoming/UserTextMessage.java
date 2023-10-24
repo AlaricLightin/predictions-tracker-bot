@@ -30,5 +30,9 @@ public class UserTextMessage implements UserMessage {
     public boolean isCommand() {
         return message.isCommand();
     }
+
+    public long getChatId() {
+        return message.getChatId();
+    }
     
 }

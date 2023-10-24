@@ -9,6 +9,7 @@ import org.springframework.integration.dsl.IntegrationFlow;
 import org.springframework.integration.dsl.MessageChannels;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
+import io.github.alariclightin.predictionstrackerbot.messages.incoming.ButtonCallbackQuery;
 import io.github.alariclightin.predictionstrackerbot.messages.incoming.UserTextMessage;
 
 @Configuration
@@ -27,11 +28,22 @@ class IntegrationConfig {
     }
 
     @Bean
+    PublishSubscribeChannel incomingCallbackQueryChannel() {
+        PublishSubscribeChannel result = MessageChannels.publishSubscribe().getObject();
+        result.setDatatypes(ButtonCallbackQuery.class);
+        return result;
+    }
+
+    @Bean
     IntegrationFlow telegramUpdateRouterFlow() {
         return IntegrationFlow.from("incomingUpdatesChannel")
             .route(Update.class, update -> {
                 if (update.getMessage() != null) {
                     return "incomingUserMessageChannel";
+                }
+                // TODO add additional checks?
+                else if (update.getCallbackQuery() != null) {
+                    return "incomingCallbackQueryChannel";
                 }
                 else return "nullChannel";
             })
@@ -49,5 +61,18 @@ class IntegrationConfig {
         public UserTextMessage convert(Update update) {
             return new UserTextMessage(update.getMessage());
         }
-    } 
+    }
+
+    @Bean
+    @IntegrationConverter
+    IncomingButtonCallbackConverter incomingButtonCallbackConverter() {
+        return new IncomingButtonCallbackConverter();
+    }
+
+    private static class IncomingButtonCallbackConverter implements Converter<Update, ButtonCallbackQuery> {
+        @Override
+        public ButtonCallbackQuery convert(Update update) {
+            return new ButtonCallbackQuery(update.getCallbackQuery());
+        }
+    }
 }

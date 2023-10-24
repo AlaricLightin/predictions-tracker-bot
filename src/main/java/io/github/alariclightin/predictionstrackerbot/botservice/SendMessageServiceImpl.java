@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
+import org.telegram.telegrambots.meta.api.methods.AnswerCallbackQuery;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboard;
@@ -121,6 +122,20 @@ class SendMessageServiceImpl implements SendMessageService{
     public SendMessage create(long userId, BotMessage botMessage) {
         // TODO store language code in user settings
         return create(userId, "en", botMessage);
+    }
+
+    @Override
+    public AnswerCallbackQuery createAnswerCallbackQuery(
+        String callbackQueryId, String languageCode, String textId) {
+
+        String text = textId != null && !textId.isEmpty()
+            ? messageSource.getMessage(textId, null, Locale.forLanguageTag(languageCode))
+            : "";
+
+        return AnswerCallbackQuery.builder()
+            .callbackQueryId(callbackQueryId)
+            .text(text)
+            .build();
     }
     
 }

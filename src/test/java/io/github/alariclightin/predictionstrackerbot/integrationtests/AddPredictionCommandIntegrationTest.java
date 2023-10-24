@@ -22,7 +22,7 @@ class AddPredictionCommandIntegrationTest extends AbstractGatewayTest {
     void shouldAddPrediction() {
         sendTextUpdate("/add");        
 
-        assertResponse("What is your prediction?");
+        assertResponseTextContainsFragments("What is your prediction?");
     }
 
     @Nested
@@ -36,7 +36,7 @@ class AddPredictionCommandIntegrationTest extends AbstractGatewayTest {
         void shouldHandlePredictionText() {
             sendTextUpdate("test prediction");
             
-            assertResponse("check the result");
+            assertResponseTextContainsFragments("check the result");
         }
 
         @Nested
@@ -50,7 +50,7 @@ class AddPredictionCommandIntegrationTest extends AbstractGatewayTest {
             void shouldHandleCorrectDeadlineText() {
                 sendTextUpdate("2021-01-01");
                 
-                assertResponse("time");
+                assertResponseTextContainsFragments("time");
 
                 assertThat(JdbcTestUtils.countRowsInTable(jdbcTemplate, "predictions.questions"))
                     .isZero();
@@ -69,7 +69,7 @@ class AddPredictionCommandIntegrationTest extends AbstractGatewayTest {
                 void shouldHandleCorrectDeadlineTimeText() {
                     sendTextUpdate("12:00");
                     
-                    assertResponse("probability");
+                    assertResponseTextContainsFragments("probability");
 
                     assertThat(JdbcTestUtils.countRowsInTable(jdbcTemplate, "predictions.questions"))
                         .isZero();
@@ -88,7 +88,7 @@ class AddPredictionCommandIntegrationTest extends AbstractGatewayTest {
                     void shouldHandleProbabilityText() {
                         sendTextUpdate("60");
                         
-                        assertResponse("Prediction added.", "test prediction", "60");
+                        assertResponseTextContainsFragments("Prediction added.", "test prediction", "60");
                         assertThat(JdbcTestUtils.countRowsInTable(jdbcTemplate, "predictions.questions"))
                                 .isEqualTo(1);
                         assertThat(JdbcTestUtils.countRowsInTable(jdbcTemplate, "predictions.predictions"))
@@ -99,7 +99,7 @@ class AddPredictionCommandIntegrationTest extends AbstractGatewayTest {
                     void shouldHandleWhenProbabilityIsNotANumber() {
                         sendTextUpdate("not a number");
                         
-                        assertResponse("Probability must be a number");
+                        assertResponseTextContainsFragments("Probability must be a number");
                     }
 
                     @ParameterizedTest
@@ -107,7 +107,7 @@ class AddPredictionCommandIntegrationTest extends AbstractGatewayTest {
                     void shouldHandleWhenProbabilityOutOfRange(String value) {
                         sendTextUpdate(value);
 
-                        assertResponse("Probability must be between 1 and 99");
+                        assertResponseTextContainsFragments("Probability must be between 1 and 99");
                     }
 
                 }
@@ -116,7 +116,7 @@ class AddPredictionCommandIntegrationTest extends AbstractGatewayTest {
                 void shouldHandleIncorrectDeadlineTimeText() {
                     sendTextUpdate("incorrect time");
                     
-                    assertResponse("Wrong time format");
+                    assertResponseTextContainsFragments("Wrong time format");
                 }
             }
 
@@ -124,7 +124,7 @@ class AddPredictionCommandIntegrationTest extends AbstractGatewayTest {
             void shouldHandleIncorrectDeadlineText() {
                 sendTextUpdate("incorrect deadline");
                 
-                assertResponse("Wrong date format");
+                assertResponseTextContainsFragments("Wrong date format");
             }
 
         }

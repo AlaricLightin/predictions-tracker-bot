@@ -1,12 +1,15 @@
 package io.github.alariclightin.predictionstrackerbot.integrationtests;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.telegram.telegrambots.meta.api.methods.AnswerCallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
 @SpringBootTest
@@ -16,21 +19,21 @@ class BaseCommandsIntegrationTest extends AbstractGatewayTest {
     void shouldHandleStartCommand() {
         sendTextUpdate("/start");
         
-        assertResponse("Hello");
+        assertResponseTextContainsFragments("Hello");
     }
 
     @Test
     void shouldHandleUnpredictedTextMessage() {
         sendTextUpdate("test message");
 
-        assertResponse("I don't understand you.");
+        assertResponseTextContainsFragments("I don't understand you.");
     }
 
     @Test
     void shouldHandleInvalidCommand() {
         sendTextUpdate("/invalid");
         
-        assertResponse("invalid", "is not a valid command");
+        assertResponseTextContainsFragments("invalid", "is not a valid command");
     }
 
     @Test
@@ -39,6 +42,16 @@ class BaseCommandsIntegrationTest extends AbstractGatewayTest {
         incomingMessageGateway.handleUpdate(update);
 
         verify(outcomingMessageGateway, never()).sendMessage(any());
+    }
+
+    @Test
+    void shouldHandleUnexpectedButtonCallback() {
+        sendCallbackQueryUpdate("setresults", "set-result", "YES");
+
+        ArgumentCaptor<AnswerCallbackQuery> response = ArgumentCaptor.forClass(AnswerCallbackQuery.class);
+        verify(outcomingMessageGateway).sendAnswerCallback(response.capture());
+        assertThat(response.getValue().getText())
+            .isNotEmpty();
     }
 
 }

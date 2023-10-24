@@ -5,8 +5,8 @@ import java.util.List;
 import org.springframework.integration.annotation.ServiceActivator;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
+import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.commands.SetMyCommands;
-import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.commands.BotCommand;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
@@ -51,9 +51,9 @@ public class Bot extends TelegramLongPollingBot {
     }
 
     @ServiceActivator(inputChannel = "outcomingMessagesChannel")
-    public void sendMessage(SendMessage sendMessage) {
+    public void sendMessage(BotApiMethod<?> method) {
         try {
-            execute(sendMessage);
+            execute(method);
         } catch (TelegramApiException e) {
             throw new RuntimeException(e);
         }

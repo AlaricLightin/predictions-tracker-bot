@@ -6,7 +6,9 @@ import org.telegram.telegrambots.meta.api.objects.User;
 import io.github.alariclightin.predictionstrackerbot.commands.MessageHandler;
 import io.github.alariclightin.predictionstrackerbot.commands.HandlersSearchService;
 import io.github.alariclightin.predictionstrackerbot.commands.ActionResult;
+import io.github.alariclightin.predictionstrackerbot.exceptions.UnexpectedButtonCallbackQueryException;
 import io.github.alariclightin.predictionstrackerbot.exceptions.UnexpectedUserMessageException;
+import io.github.alariclightin.predictionstrackerbot.messages.incoming.ButtonCallbackQuery;
 import io.github.alariclightin.predictionstrackerbot.messages.incoming.UserMessage;
 import io.github.alariclightin.predictionstrackerbot.messages.incoming.UserTextMessage;
 import io.github.alariclightin.predictionstrackerbot.messages.outbound.BotMessage;
@@ -39,21 +41,40 @@ class MessageHandlingServiceImpl implements MessageHandlingService {
                 null) 
             : stateHolderService.getState(userId);
 
-        BotMessage resultBotMessage;
-        try {
-            MessageHandler handler = handlersService.getHandler(state);
-            ActionResult result = handler.handle(message, state);
-            stateHolderService.saveState(userId, result.newState());
-            resultBotMessage = result.botMessage();
-        } catch (UnexpectedUserMessageException e) {
-            resultBotMessage = new BotTextMessage(e.getMessageId(), e.getParameters());
-        }
-
-        return resultBotMessage;
+        return createBotMessageResultAndSaveNewState(state, message);
     }
 
     private String getCommandName(UserMessage message) {
         return message.getText().substring(1);
+    }
+
+    @Override
+    public BotMessage handleCallback(ButtonCallbackQuery userCallbackQuery) 
+        throws UnexpectedButtonCallbackQueryException {
+        
+        User user = userCallbackQuery.getUser();
+        long userId = user.getId();
+
+        WaitedResponseState state = stateHolderService.getState(userId);
+        if (state == null || 
+                !state.commandName().equals(userCallbackQuery.getCommand()) ||
+                !state.phase().equals(userCallbackQuery.getPhase())) {
+                
+            throw new UnexpectedButtonCallbackQueryException();
+        }
+
+        return createBotMessageResultAndSaveNewState(state, userCallbackQuery);
+    }
+
+    private BotMessage createBotMessageResultAndSaveNewState(WaitedResponseState state, UserMessage message) {
+        try {
+            MessageHandler handler = handlersService.getHandler(state);
+            ActionResult result = handler.handle(message, state);
+            stateHolderService.saveState(message.getUser().getId(), result.newState());
+            return result.botMessage();
+        } catch (UnexpectedUserMessageException e) {
+            return new BotTextMessage(e.getMessageId(), e.getParameters());
+        }
     }
 
 }

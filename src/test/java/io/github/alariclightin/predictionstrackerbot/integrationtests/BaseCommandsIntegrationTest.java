@@ -1,7 +1,13 @@
 package io.github.alariclightin.predictionstrackerbot.integrationtests;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.telegram.telegrambots.meta.api.objects.Update;
 
 @SpringBootTest
 class BaseCommandsIntegrationTest extends AbstractGatewayTest {
@@ -25,6 +31,14 @@ class BaseCommandsIntegrationTest extends AbstractGatewayTest {
         sendTextUpdate("/invalid");
         
         assertResponse("invalid", "is not a valid command");
+    }
+
+    @Test
+    void shouldNotHandleOthersUpdates() {
+        Update update = mock(Update.class);
+        incomingMessageGateway.handleUpdate(update);
+
+        verify(outcomingMessageGateway, never()).sendMessage(any());
     }
 
 }

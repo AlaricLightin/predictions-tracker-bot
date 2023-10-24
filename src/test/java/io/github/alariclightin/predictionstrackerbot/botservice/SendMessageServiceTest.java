@@ -15,9 +15,9 @@ import io.github.alariclightin.predictionstrackerbot.messages.outbound.BotMessag
 import io.github.alariclightin.predictionstrackerbot.messages.outbound.BotTextMessage;
 import io.github.alariclightin.predictionstrackerbot.messages.outbound.InlineButton;
 
-class SendMessageServiceImplTest {
+class SendMessageServiceTest {
     private static ReloadableResourceBundleMessageSource messageSource;
-    private SendMessageServiceImpl sendMessageService;
+    private SendMessageService sendMessageService;
 
     @BeforeAll
     static void messageSourceSetUp() {
@@ -28,7 +28,7 @@ class SendMessageServiceImplTest {
 
     @BeforeEach
     void setUp() {
-        sendMessageService = new SendMessageServiceImpl(messageSource);
+        sendMessageService = new SendMessageService(messageSource);
     }
 
     @Test

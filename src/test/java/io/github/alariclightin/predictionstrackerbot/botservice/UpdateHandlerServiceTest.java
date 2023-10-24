@@ -14,7 +14,7 @@ import io.github.alariclightin.predictionstrackerbot.messages.outbound.BotCallba
 import io.github.alariclightin.predictionstrackerbot.messages.outbound.BotMessage;
 import io.github.alariclightin.predictionstrackerbot.testutils.TestUtils;
 
-public class UpdateHandlerServiceImplTest {
+public class UpdateHandlerServiceTest {
     private UpdateHandlerService updateHandlerService;
     private MessageHandlingService messageHandlingService;
 

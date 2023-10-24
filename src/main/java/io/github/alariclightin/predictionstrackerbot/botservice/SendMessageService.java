@@ -22,10 +22,10 @@ import io.github.alariclightin.predictionstrackerbot.messages.outbound.BotMessag
 import io.github.alariclightin.predictionstrackerbot.messages.outbound.BotTextMessage;
 
 @Service
-class SendMessageServiceImpl {
+class SendMessageService {
     private final MessageSource messageSource;
 
-    SendMessageServiceImpl(MessageSource messageSource) {
+    SendMessageService(MessageSource messageSource) {
         this.messageSource = messageSource;
     }
 

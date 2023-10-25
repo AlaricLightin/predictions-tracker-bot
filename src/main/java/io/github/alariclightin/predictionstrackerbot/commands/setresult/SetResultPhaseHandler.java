@@ -33,9 +33,9 @@ class SetResultPhaseHandler extends AbstractSetResultsHandler {
             throw new IllegalArgumentException("Unexpected state data: question is null");
 
         // TODO Add internationalization
-        ResultUserCommand command;
+        ResultUserAction command;
         try {
-            command = ResultUserCommand.valueOf(message.getText().toUpperCase());
+            command = ResultUserAction.valueOf(message.getText().toUpperCase());
         }
         catch (IllegalArgumentException e) {
             throw new UnexpectedUserMessageException("bot.responses.error.wrong-result-command");
@@ -44,7 +44,7 @@ class SetResultPhaseHandler extends AbstractSetResultsHandler {
         BotTextMessage buttonResultMessage = null;
         switch (command) {
             case YES, NO -> {
-                addResultToDb(question, command == ResultUserCommand.YES);
+                addResultToDb(question, command == ResultUserAction.YES);
                 buttonResultMessage = new BotTextMessage("bot.responses.result-saved");
             }
             

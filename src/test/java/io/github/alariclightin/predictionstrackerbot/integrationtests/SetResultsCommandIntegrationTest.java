@@ -19,7 +19,6 @@ import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 
 import io.github.alariclightin.predictionstrackerbot.data.predictions.Question;
-import io.github.alariclightin.predictionstrackerbot.messages.outbound.InlineButton;
 import io.github.alariclightin.predictionstrackerbot.testutils.TestDbUtils;
 
 @SpringBootTest
@@ -49,10 +48,10 @@ class SetResultsCommandIntegrationTest extends AbstractGatewayTest {
         verify(mockedOutcomingGateway, atLeastOnce()).sendMessage(response.capture());
         assertSendMessageContainsFragments(response.getValue(), "Question 1");
         assertSendMessageContainsButtons(response.getValue(), List.of(
-            new InlineButton("Yes", "setresults::set-result::YES"),
-            new InlineButton("No", "setresults::set-result::NO"),
-            new InlineButton("Skip", "setresults::set-result::SKIP"),
-            new InlineButton("Skip all", "setresults::set-result::SKIP_ALL")            
+            new ButtonData("Yes", "button::setresults::set-result::YES"),
+            new ButtonData("No", "button::setresults::set-result::NO"),
+            new ButtonData("Skip", "button::setresults::set-result::SKIP"),
+            new ButtonData("Skip all", "button::setresults::set-result::SKIP_ALL")            
         ));
     }
 
@@ -81,7 +80,7 @@ class SetResultsCommandIntegrationTest extends AbstractGatewayTest {
         @ParameterizedTest
         @ValueSource(strings = { "YES", "NO" })
         void shouldHandleButtonCallbackQueryForResultValue(String buttonId) {
-            sendCallbackQueryUpdate("setresults", "set-result", buttonId);
+            sendButtonCallbackQueryUpdate("setresults", "set-result", buttonId);
 
             assertResponseTextContainsFragments("saved", "Question 2");
             Question savedQuestion = TestDbUtils.getQuestionById(jdbcTemplate, WAITINQ_QUESTION_ID_1);
@@ -104,7 +103,7 @@ class SetResultsCommandIntegrationTest extends AbstractGatewayTest {
 
         @Test
         void shouldHandleCallbackForSkipButton() {
-            sendCallbackQueryUpdate("setresults", "set-result", "SKIP");
+            sendButtonCallbackQueryUpdate("setresults", "set-result", "SKIP");
 
             assertResponseTextContainsFragments("You can add a result later", "Question 2");
 
@@ -128,7 +127,7 @@ class SetResultsCommandIntegrationTest extends AbstractGatewayTest {
 
         @Test
         void shouldHandleCallbackForSkipAllButton() {
-            sendCallbackQueryUpdate("setresults", "set-result", "SKIP_ALL");
+            sendButtonCallbackQueryUpdate("setresults", "set-result", "SKIP_ALL");
 
             assertResponseTextContainsFragments("You can add results later");
 

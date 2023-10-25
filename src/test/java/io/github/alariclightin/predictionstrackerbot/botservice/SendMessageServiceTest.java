@@ -75,8 +75,8 @@ class SendMessageServiceTest {
         BotMessageList botMessage = new BotMessageList(
             new BotTextMessage("message.hello", "Name" ),
             BotKeyboard.createOneRowKeyboard(
-                new InlineButton("button.yes", "button-yes"),
-                new InlineButton("button.no", "button-no")
+                new InlineButton("button.yes", "command", "phase", "button-yes"),
+                new InlineButton("button.no", "command", "phase", "button-no")
             )
         );
 
@@ -94,8 +94,8 @@ class SendMessageServiceTest {
             .asList()
             .extracting("text", "callbackData")
             .containsExactly(
-                tuple("Yes", "button-yes"),
-                tuple("No", "button-no")
+                tuple("Yes", "button::command::phase::button-yes"),
+                tuple("No", "button::command::phase::button-no")
             );
             
     }

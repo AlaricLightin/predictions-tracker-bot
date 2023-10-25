@@ -7,7 +7,6 @@ import io.github.alariclightin.predictionstrackerbot.commands.MessageHandler;
 import io.github.alariclightin.predictionstrackerbot.data.predictions.PredictionsResultDbService;
 import io.github.alariclightin.predictionstrackerbot.data.predictions.Question;
 import io.github.alariclightin.predictionstrackerbot.data.predictions.ReminderDbService;
-import io.github.alariclightin.predictionstrackerbot.messages.ButtonsConsts;
 import io.github.alariclightin.predictionstrackerbot.messages.outbound.BotKeyboard;
 import io.github.alariclightin.predictionstrackerbot.messages.outbound.BotMessage;
 import io.github.alariclightin.predictionstrackerbot.messages.outbound.BotMessageList;
@@ -30,15 +29,14 @@ abstract class AbstractSetResultsHandler implements MessageHandler {
     protected static final String SET_RESULT_PHASE = "set-result";
 
     private static final BotKeyboard KEYBOARD = BotKeyboard.createOneRowKeyboard(
-        new InlineButton("bot.buttons.yes", createButtonCallbackString(ResultUserCommand.YES)),
-        new InlineButton("bot.buttons.no", createButtonCallbackString(ResultUserCommand.NO)),
-        new InlineButton("bot.buttons.skip", createButtonCallbackString(ResultUserCommand.SKIP)),
-        new InlineButton("bot.buttons.skip-all", createButtonCallbackString(ResultUserCommand.SKIP_ALL))
+        createButton("bot.buttons.yes", ResultUserAction.YES),
+        createButton("bot.buttons.no", ResultUserAction.NO),
+        createButton("bot.buttons.skip", ResultUserAction.SKIP),
+        createButton("bot.buttons.skip-all", ResultUserAction.SKIP_ALL)
     );
 
-    private static String createButtonCallbackString(ResultUserCommand command) {
-        return String.join(ButtonsConsts.ID_DELIMITER, 
-            COMMAND, SET_RESULT_PHASE, command.toString());
+    private static InlineButton createButton(String messageId, ResultUserAction action) {
+        return new InlineButton(messageId, COMMAND, SET_RESULT_PHASE, action.toString());
     }
 
     @Override

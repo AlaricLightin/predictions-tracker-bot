@@ -13,6 +13,15 @@ public class ButtonCallbackQuery implements UserMessage {
     private final String phase;
     private final String buttonId;
 
+    public static boolean isButtonCallbackQuery(CallbackQuery callbackQuery) {
+        String data = callbackQuery.getData();
+        if (data == null) return 
+            false;
+
+        String[] dataParts = data.split(ButtonsConsts.ID_DELIMITER);
+        return dataParts.length >= 4 && dataParts[0].equals(ButtonsConsts.BUTTON_PREFIX);
+    }
+
     public ButtonCallbackQuery(CallbackQuery callbackQuery) {
         this.callbackQuery = callbackQuery;
 
@@ -21,12 +30,12 @@ public class ButtonCallbackQuery implements UserMessage {
         }
         
         String[] data = callbackQuery.getData().split(ButtonsConsts.ID_DELIMITER);
-        if (data.length < 3)
+        if (data.length < 4)
             throw new IllegalArgumentException("Callback query data is invalid");
 
-        this.command = data[0];
-        this.phase = data[1];
-        this.buttonId = data[2];
+        this.command = data[1];
+        this.phase = data[2];
+        this.buttonId = data[3];
     }
 
     @Override

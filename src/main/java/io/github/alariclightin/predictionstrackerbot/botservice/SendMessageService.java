@@ -83,7 +83,7 @@ class SendMessageService {
                             button.messageId(), null, locale);
                         return InlineKeyboardButton.builder()
                             .text(text)
-                            .callbackData(button.callbackString())
+                            .callbackData(button.getCallbackData())
                             .build();
                     })
                     .toList()

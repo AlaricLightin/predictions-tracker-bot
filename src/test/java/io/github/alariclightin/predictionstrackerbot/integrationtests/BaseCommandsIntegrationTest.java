@@ -9,10 +9,13 @@ import static org.mockito.Mockito.verify;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.DirtiesContext;
 import org.telegram.telegrambots.meta.api.methods.AnswerCallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
 @SpringBootTest
+// TODO remove when state will be saved in db
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_CLASS)
 class BaseCommandsIntegrationTest extends AbstractGatewayTest {
 
     @Test
@@ -46,7 +49,7 @@ class BaseCommandsIntegrationTest extends AbstractGatewayTest {
 
     @Test
     void shouldHandleUnexpectedButtonCallback() {
-        sendCallbackQueryUpdate("setresults", "set-result", "YES");
+        sendButtonCallbackQueryUpdate("setresults", "set-result", "YES");
 
         ArgumentCaptor<AnswerCallbackQuery> response = ArgumentCaptor.forClass(AnswerCallbackQuery.class);
         verify(mockedOutcomingGateway).sendAnswerCallback(response.capture());

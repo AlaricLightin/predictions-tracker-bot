@@ -1,5 +1,5 @@
 package io.github.alariclightin.predictionstrackerbot.commands.setresult;
 
-enum ResultUserCommand {
+enum ResultUserAction {
     YES, NO, SKIP, SKIP_ALL
 }

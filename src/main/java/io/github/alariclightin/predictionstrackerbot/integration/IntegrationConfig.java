@@ -54,8 +54,9 @@ class IntegrationConfig {
                 if (update.getMessage() != null) {
                     return "incomingUpdateWithMessagesChannel";
                 }
-                // TODO add additional checks?
-                else if (update.getCallbackQuery() != null) {
+                else if (update.getCallbackQuery() != null 
+                    && ButtonCallbackQuery.isButtonCallbackQuery(update.getCallbackQuery())) {
+                    
                     return "incomingUpdateWithCallbackQueryChannel";
                 }
                 else return "nullChannel";

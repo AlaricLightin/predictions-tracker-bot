@@ -22,7 +22,7 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMa
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 
 import io.github.alariclightin.predictionstrackerbot.integration.IncomingMessageGateway;
-import io.github.alariclightin.predictionstrackerbot.messages.outbound.InlineButton;
+import io.github.alariclightin.predictionstrackerbot.messages.ButtonsConsts;
 import io.github.alariclightin.predictionstrackerbot.testutils.TestWithContainer;
 
 public abstract class AbstractGatewayTest extends TestWithContainer {
@@ -58,9 +58,10 @@ public abstract class AbstractGatewayTest extends TestWithContainer {
         incomingMessageGateway.handleUpdate(BotTestUtils.createTextUpdate(text));
     }
 
-    protected void sendCallbackQueryUpdate(String command, String phase, String data) {
+    protected void sendButtonCallbackQueryUpdate(String command, String phase, String data) {
         incomingMessageGateway.handleUpdate(BotTestUtils.createCallbackQueryUpdate(
-            String.join("::", command, phase, data)
+            String.join(ButtonsConsts.ID_DELIMITER, 
+                ButtonsConsts.BUTTON_PREFIX, command, phase, data)
         ));
     }
 
@@ -77,7 +78,7 @@ public abstract class AbstractGatewayTest extends TestWithContainer {
             .contains(expectedFragments);
     }
 
-    protected void assertSendMessageContainsButtons(SendMessage message, List<InlineButton> expectedButtons) {
+    protected void assertSendMessageContainsButtons(SendMessage message, List<ButtonData> expectedButtons) {
         assertThat(message)
             .extracting(SendMessage::getReplyMarkup)
             .isNotNull()
@@ -91,9 +92,12 @@ public abstract class AbstractGatewayTest extends TestWithContainer {
             .extracting(InlineKeyboardButton::getText, InlineKeyboardButton::getCallbackData)
             .containsExactlyElementsOf(
                 expectedButtons.stream()
-                    .map(button -> Tuple.tuple(button.messageId(), button.callbackString()))
+                    .map(button -> Tuple.tuple(button.text(), button.callbackData()))
                     .toList()
             );
+    }
+
+    protected static record ButtonData(String text, String callbackData) {
     }
 
     protected void assertAnswerCallbackQueryTextIsEmpty() {

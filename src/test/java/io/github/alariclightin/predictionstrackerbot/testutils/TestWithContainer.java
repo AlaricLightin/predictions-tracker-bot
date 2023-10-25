@@ -24,6 +24,14 @@ public abstract class TestWithContainer {
     }
 
     protected void clearAllTables() {
-        jdbcTemplate.execute("TRUNCATE TABLE predictions.questions, predictions.predictions, predictions.reminders");
+        jdbcTemplate.execute(
+            """
+                TRUNCATE TABLE 
+                    predictions.questions, 
+                    predictions.predictions, 
+                    predictions.reminders,
+                    
+                    users.user_settings
+            """);
     }
 }

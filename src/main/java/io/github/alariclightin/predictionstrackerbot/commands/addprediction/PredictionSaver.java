@@ -1,20 +1,24 @@
 package io.github.alariclightin.predictionstrackerbot.commands.addprediction;
 
-import java.time.ZoneOffset;
-
 import org.springframework.stereotype.Component;
 import io.github.alariclightin.predictionstrackerbot.commands.ResultAction;
 import io.github.alariclightin.predictionstrackerbot.data.predictions.Prediction;
 import io.github.alariclightin.predictionstrackerbot.data.predictions.PredictionDbService;
 import io.github.alariclightin.predictionstrackerbot.data.predictions.Question;
+import io.github.alariclightin.predictionstrackerbot.data.settings.UserTimezoneService;
 import io.github.alariclightin.predictionstrackerbot.messages.incoming.UserMessage;
 
 @Component
 class PredictionSaver implements ResultAction<PredictionData> {
     private final PredictionDbService predictionDbService;
+    private final UserTimezoneService userTimezoneService;
 
-    PredictionSaver(PredictionDbService predictionDbService) {
+    PredictionSaver(
+            PredictionDbService predictionDbService,
+            UserTimezoneService userTimezoneService) {
+
         this.predictionDbService = predictionDbService;
+        this.userTimezoneService = userTimezoneService;
     }
 
     @Override
@@ -22,8 +26,10 @@ class PredictionSaver implements ResultAction<PredictionData> {
         long userId = message.getUser().getId();
         Question question = new Question(
                 data.getText(),
-                // TODO: make timezone configurable
-                data.getDate().atTime(data.getTime()).toInstant(ZoneOffset.UTC),
+                data.getDate()
+                    .atTime(data.getTime())
+                    .atZone(userTimezoneService.getTimezone(userId))
+                    .toInstant(),
                 userId);
 
         Prediction prediction = new Prediction(question, userId,

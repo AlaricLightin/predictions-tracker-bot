@@ -24,3 +24,11 @@ CREATE TABLE IF NOT EXISTS predictions.reminders (
 
     FOREIGN KEY (question_id) REFERENCES predictions.questions(id)
 );
+
+CREATE SCHEMA IF NOT EXISTS users;
+
+CREATE TABLE IF NOT EXISTS users.user_settings (
+    user_id BIGINT NOT NULL PRIMARY KEY,
+    timezone VARCHAR(31),
+    language_code VARCHAR(10)
+)

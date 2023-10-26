@@ -2,16 +2,19 @@ telegram-bot:
     token: ${TELEGRAM_BOT_TOKEN}
     username: ${TELEGRAM_BOT_USERNAME}
 
+default-user-setttings:
+    timezone: UTC
+
 spring:
-  datasource:
-    url: jdbc:postgresql://${POSTGRES_HOST:localhost}:${POSTGRES_PORT:5432}/${DATABASE_NAME}
-    driver-class-name: org.postgresql.Driver
-    username: ${POSTGRES_USER}
-    password: ${POSTGRES_PASSWORD}
+    datasource:
+        url: jdbc:postgresql://${POSTGRES_HOST:localhost}:${POSTGRES_PORT:5432}/${DATABASE_NAME}
+        driver-class-name: org.postgresql.Driver
+        username: ${POSTGRES_USER}
+        password: ${POSTGRES_PASSWORD}
 
-    hikari:
-      data-source-properties: 
-        stringtype: unspecified
+        hikari:
+            data-source-properties: 
+                stringtype: unspecified
 
-  liquibase:
-    enabled: true
+    liquibase:
+        enabled: true

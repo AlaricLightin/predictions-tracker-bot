@@ -7,9 +7,14 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 class UserSettingsServiceImpl implements UserTimezoneService {
     private final UserSettingsRepository userSettingsRepository;
+    private final DefaultUserSettings defaultUserSettings;
 
-    UserSettingsServiceImpl(UserSettingsRepository userSettingsRepository) {
+    UserSettingsServiceImpl(
+        UserSettingsRepository userSettingsRepository,
+        DefaultUserSettings defaultUserSettings) {
+
         this.userSettingsRepository = userSettingsRepository;
+        this.defaultUserSettings = defaultUserSettings;
     }
 
     @Override
@@ -18,7 +23,7 @@ class UserSettingsServiceImpl implements UserTimezoneService {
         return userSettingsRepository
             .getTimezoneByUserId(userId)
             .map(ZoneId::of)
-            .orElse(ZoneId.of("UTC"));
+            .orElseGet(() -> ZoneId.of(defaultUserSettings.getTimezone()));
     }
 
     @Override

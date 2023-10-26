@@ -2,9 +2,6 @@ telegram-bot:
     token: ${TELEGRAM_BOT_TOKEN}
     username: ${TELEGRAM_BOT_USERNAME}
 
-default-user-setttings:
-    timezone: UTC
-
 spring:
     datasource:
         url: jdbc:postgresql://${POSTGRES_HOST:localhost}:${POSTGRES_PORT:5432}/${DATABASE_NAME}

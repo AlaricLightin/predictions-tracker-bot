@@ -38,7 +38,7 @@ class UserSettingsServiceImplTest {
         final String timezone = "Europe/London";
         final long userId = 123L;
         when(userSettingsRepository.getTimezoneByUserId(userId)).thenReturn(Optional.empty());
-        when(defaultUserSettings.getTimezone()).thenReturn(timezone);
+        when(defaultUserSettings.timezone()).thenReturn(timezone);
 
         var result = userSettingsService.getTimezone(userId);
         assertThat(result)

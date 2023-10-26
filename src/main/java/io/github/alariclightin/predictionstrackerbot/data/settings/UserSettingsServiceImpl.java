@@ -23,7 +23,7 @@ class UserSettingsServiceImpl implements UserTimezoneService {
         return userSettingsRepository
             .getTimezoneByUserId(userId)
             .map(ZoneId::of)
-            .orElseGet(() -> ZoneId.of(defaultUserSettings.getTimezone()));
+            .orElseGet(() -> ZoneId.of(defaultUserSettings.timezone()));
     }
 
     @Override

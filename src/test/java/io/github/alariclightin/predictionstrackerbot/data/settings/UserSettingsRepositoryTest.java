@@ -2,7 +2,6 @@ package io.github.alariclightin.predictionstrackerbot.data.settings;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.jdbc.DataJdbcTest;
@@ -18,11 +17,6 @@ class UserSettingsRepositoryTest extends TestWithContainer {
     
     @Autowired
     private UserSettingsRepository userSettingsRepository;
-
-    @AfterEach
-    void deleteData() {
-        clearAllTables();
-    }
 
     private static final Long USER_ID = 345L;
     private static final String TIMEZONE = "Europe/Paris";

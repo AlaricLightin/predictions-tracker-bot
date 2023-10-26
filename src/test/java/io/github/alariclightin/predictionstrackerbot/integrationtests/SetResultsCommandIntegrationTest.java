@@ -6,7 +6,6 @@ import static org.mockito.Mockito.verify;
 
 import java.util.List;
 
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -25,11 +24,6 @@ import io.github.alariclightin.predictionstrackerbot.testutils.TestDbUtils;
 class SetResultsCommandIntegrationTest extends AbstractGatewayTest {
     
     private static final int WAITINQ_QUESTION_ID_1 = 10;
-
-    @AfterEach
-    void clearTables() {
-        clearAllTables();
-    }
 
     @Test
     void shouldRespondAboutAbsentWaitingQuestions() {

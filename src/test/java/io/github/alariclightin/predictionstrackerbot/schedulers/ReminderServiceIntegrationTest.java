@@ -6,7 +6,6 @@ import static org.mockito.Mockito.verify;
 
 import java.util.List;
 
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -30,11 +29,6 @@ public class ReminderServiceIntegrationTest extends AbstractGatewayTest {
     private ReminderService reminderService;
 
     private static final int WAITINQ_QUESTION_ID_1 = 10;
-
-    @AfterEach
-    void clearTables() {
-        clearAllTables();
-    }
 
     @Test
     @Sql("classpath:sql/waiting-question-ids.sql")

@@ -1,7 +1,6 @@
 package io.github.alariclightin.predictionstrackerbot.integrationtests;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -12,11 +11,6 @@ import org.springframework.test.jdbc.JdbcTestUtils;
 
 @SpringBootTest
 class AddPredictionCommandIntegrationTest extends AbstractGatewayTest {
-
-    @AfterEach
-    void clearTables() {
-        clearAllTables();
-    }
 
     @Test
     void shouldAddPrediction() {

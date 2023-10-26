@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -31,12 +30,6 @@ class ReminderDaoImplTest extends TestWithContainer {
     void setUp() {
         reminderDao = new ReminderDaoImpl(jdbc);
     }
-
-    @AfterEach
-    void deleteData() {
-        clearAllTables();
-    }
-
 
     @Test
     @Sql(scripts = {"classpath:sql/waiting-question-ids.sql", "classpath:sql/reminders.sql"})

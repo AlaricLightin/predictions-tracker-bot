@@ -3,7 +3,6 @@ package io.github.alariclightin.predictionstrackerbot.data.predictions;
 import static org.assertj.core.api.Assertions.assertThat;
 import java.util.List;
 
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.jdbc.DataJdbcTest;
@@ -20,11 +19,6 @@ class QuestionRepositoryTest extends TestWithContainer {
     private QuestionRepository questionRepository;
 
     private static final Long USER_ID = 123L;
-
-    @AfterEach
-    void deleteData() {
-        clearAllTables();
-    }
 
     @Test
     @Sql(scripts = { "classpath:sql/waiting-question-ids.sql" }, 

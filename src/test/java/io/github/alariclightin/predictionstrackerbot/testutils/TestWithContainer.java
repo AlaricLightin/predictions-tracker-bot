@@ -1,5 +1,6 @@
 package io.github.alariclightin.predictionstrackerbot.testutils;
 
+import org.junit.jupiter.api.AfterEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.DynamicPropertyRegistry;
@@ -23,7 +24,12 @@ public abstract class TestWithContainer {
         registry.add("spring.datasource.password", postgres::getPassword);
     }
 
-    protected void clearAllTables() {
+    @AfterEach
+    void deleteData() {
+        clearAllTables();
+    }
+
+    private void clearAllTables() {
         jdbcTemplate.execute(
             """
                 TRUNCATE TABLE 

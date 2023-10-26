@@ -2,6 +2,11 @@ package io.github.alariclightin.predictionstrackerbot.botservice;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+import java.time.Instant;
+import java.time.ZoneId;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -9,6 +14,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 
+import io.github.alariclightin.predictionstrackerbot.data.settings.UserTimezoneService;
 import io.github.alariclightin.predictionstrackerbot.messages.outbound.BotCallbackAnswer;
 import io.github.alariclightin.predictionstrackerbot.messages.outbound.BotKeyboard;
 import io.github.alariclightin.predictionstrackerbot.messages.outbound.BotMessageList;
@@ -18,6 +24,7 @@ import io.github.alariclightin.predictionstrackerbot.messages.outbound.InlineBut
 class SendMessageServiceTest {
     private static ReloadableResourceBundleMessageSource messageSource;
     private SendMessageService sendMessageService;
+    private UserTimezoneService userTimezoneService;
 
     @BeforeAll
     static void messageSourceSetUp() {
@@ -28,7 +35,8 @@ class SendMessageServiceTest {
 
     @BeforeEach
     void setUp() {
-        sendMessageService = new SendMessageService(messageSource);
+        userTimezoneService = mock(UserTimezoneService.class);
+        sendMessageService = new SendMessageService(messageSource, userTimezoneService);
     }
 
     @Test
@@ -98,6 +106,21 @@ class SendMessageServiceTest {
                 tuple("No", "button::command::phase::button-no")
             );
             
+    }
+
+    @Test
+    void shouldCreateMessageWithDateTime() {
+        var botTextMessage = new BotTextMessage(
+            "message.date",
+            Instant.parse("2021-01-01T00:00:00Z"));
+            
+        when(userTimezoneService.getTimezone(1)).thenReturn(ZoneId.of("Europe/Moscow"));
+
+        var result = sendMessageService.create(1, "en", botTextMessage);
+
+        assertThat(result)
+            .hasFieldOrPropertyWithValue("chatId", "1")
+            .hasFieldOrPropertyWithValue("text", "Date: 2021-01-01T03:00");
     }
 
     @Test

@@ -1,5 +1,7 @@
 package io.github.alariclightin.predictionstrackerbot.botservice;
 
+import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
@@ -15,6 +17,7 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMa
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboard;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 
+import io.github.alariclightin.predictionstrackerbot.data.settings.UserTimezoneService;
 import io.github.alariclightin.predictionstrackerbot.messages.outbound.BotCallbackAnswer;
 import io.github.alariclightin.predictionstrackerbot.messages.outbound.BotKeyboard;
 import io.github.alariclightin.predictionstrackerbot.messages.outbound.BotMessage;
@@ -24,9 +27,14 @@ import io.github.alariclightin.predictionstrackerbot.messages.outbound.BotTextMe
 @Service
 class SendMessageService {
     private final MessageSource messageSource;
+    private final UserTimezoneService userTimezoneService;
 
-    SendMessageService(MessageSource messageSource) {
+    SendMessageService(
+        MessageSource messageSource,
+        UserTimezoneService userTimezoneService) {
+        
         this.messageSource = messageSource;
+        this.userTimezoneService = userTimezoneService;
     }
 
     @ServiceActivator(inputChannel = "botMessageChannel", outputChannel = "outcomingMessagesChannel")
@@ -65,11 +73,27 @@ class SendMessageService {
 
     private SendMessage getResultForTextMessage(long userId, Locale locale, BotTextMessage botTextMessage) {
         String text = messageSource.getMessage(
-            botTextMessage.messageId(), botTextMessage.args(), locale);        
+            botTextMessage.messageId(), 
+            convertMessageArguments(userId, botTextMessage.args()), 
+            locale);
+
         return SendMessage.builder()
             .chatId(userId)
             .text(text)
             .build();    
+    }
+
+    private Object[] convertMessageArguments(long userId, Object[] args) {
+        Object[] result = new Object[args.length];
+        for (int idx = 0; idx < result.length; idx++) {
+            Object object = args[idx];
+            if (object instanceof Instant instant) {
+                result[idx] = LocalDateTime.ofInstant(instant, userTimezoneService.getTimezone(userId)); 
+            }
+            else
+                result[idx] = object;
+        }
+        return result;
     }
 
     private InlineKeyboardMarkup getKeyboard(long userId, Locale locale, BotKeyboard botKeyboard) {

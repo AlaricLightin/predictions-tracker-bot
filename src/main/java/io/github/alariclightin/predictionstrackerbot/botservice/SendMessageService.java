@@ -2,6 +2,7 @@ package io.github.alariclightin.predictionstrackerbot.botservice;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
@@ -83,12 +84,16 @@ class SendMessageService {
             .build();    
     }
 
+    private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+
     private Object[] convertMessageArguments(long userId, Object[] args) {
         Object[] result = new Object[args.length];
         for (int idx = 0; idx < result.length; idx++) {
             Object object = args[idx];
             if (object instanceof Instant instant) {
-                result[idx] = LocalDateTime.ofInstant(instant, userTimezoneService.getTimezone(userId)); 
+                result[idx] = LocalDateTime
+                    .ofInstant(instant, userTimezoneService.getTimezone(userId))
+                    .format(DATE_TIME_FORMATTER); 
             }
             else
                 result[idx] = object;

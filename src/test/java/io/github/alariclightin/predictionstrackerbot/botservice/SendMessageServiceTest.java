@@ -120,7 +120,7 @@ class SendMessageServiceTest {
 
         assertThat(result)
             .hasFieldOrPropertyWithValue("chatId", "1")
-            .hasFieldOrPropertyWithValue("text", "Date: 2021-01-01T03:00");
+            .hasFieldOrPropertyWithValue("text", "Date: 2021-01-01 03:00");
     }
 
     @Test

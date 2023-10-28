@@ -114,7 +114,7 @@ class AddPredictionCommandIntegrationTest extends AbstractGatewayTest {
                     void shouldHandleProbabilityText() {
                         sendTextUpdate("60");
                         
-                        assertResponseTextContainsFragments("Prediction added.", "test prediction", "60");
+                        assertResponseTextContainsFragments("Prediction was added.", "test prediction", "60");
 
                         assertThat(TestDbUtils.getQuestions(jdbcTemplate))
                             .hasSize(1)
@@ -176,7 +176,7 @@ class AddPredictionCommandIntegrationTest extends AbstractGatewayTest {
                 void shouldHandleCorrectProbabilityText() {
                     sendTextUpdate("60");
                     
-                    assertResponseTextContainsFragments("Prediction added.", "test prediction", "60");
+                    assertResponseTextContainsFragments("Prediction was added.", "test prediction", "60");
                         assertThat(TestDbUtils.getQuestions(jdbcTemplate))
                             .hasSize(1)
                             .first()

@@ -17,7 +17,6 @@ import io.github.alariclightin.predictionstrackerbot.messages.outbound.BotTextMe
 import io.github.alariclightin.predictionstrackerbot.states.WaitedResponseState;
 
 @Component
-// TODO add tests
 class AddPredictionTimePhase implements MessageHandler {
     private final Clock clock;
     private final UserTimezoneService timezoneService;

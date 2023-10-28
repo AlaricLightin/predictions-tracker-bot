@@ -44,7 +44,6 @@ class SetTimezoneCommandConfig {
 
             .setResponseMessageFunc((message, input) -> 
                 new BotTextMessage("bot.responses.settimezone.timezone-is-set", input))
-            // TODO
 
             .setResultAction((message, input) -> 
                 timezoneService.setTimezone(message.getUser().getId(), input)

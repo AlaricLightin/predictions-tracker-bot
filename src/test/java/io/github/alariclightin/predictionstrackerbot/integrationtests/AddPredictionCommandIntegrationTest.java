@@ -1,16 +1,48 @@
 package io.github.alariclightin.predictionstrackerbot.integrationtests;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.when;
+
+import java.time.Clock;
+import java.time.Instant;
+import java.time.ZoneId;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.jdbc.JdbcTestUtils;
+
+import io.github.alariclightin.predictionstrackerbot.data.settings.UserTimezoneService;
+import io.github.alariclightin.predictionstrackerbot.testutils.TestDbUtils;
 
 @SpringBootTest
 class AddPredictionCommandIntegrationTest extends AbstractGatewayTest {
+    
+    @MockBean
+    private Clock clock;
+
+    @MockBean
+    private UserTimezoneService userTimezoneService;
+
+    private static final Instant CURRENT_INSTANT = Instant.parse("2020-01-01T00:00:00Z");;
+    private static final String PREDICTION_TEXT = "test prediction";
+    private static final String DEADLINE_DATE = "2021-01-01";
+    private static final String DEADLINE_TIME = "12:00";
+    private static final Instant DEADLINE_INSTANT = Instant.parse("2021-01-01T10:00:00Z");
+
+    @BeforeEach
+    void setUpClock() {
+        when(clock.instant()).thenReturn(CURRENT_INSTANT);
+    }
+
+    @BeforeEach
+    void setUpUserTimezoneService() {
+        when(userTimezoneService.getTimezone(BotTestUtils.CHAT_ID)).thenReturn(ZoneId.of("Israel"));
+    }
 
     @Test
     void shouldAddPrediction() {
@@ -28,7 +60,7 @@ class AddPredictionCommandIntegrationTest extends AbstractGatewayTest {
 
         @Test
         void shouldHandlePredictionText() {
-            sendTextUpdate("test prediction");
+            sendTextUpdate(PREDICTION_TEXT);
             
             assertResponseTextContainsFragments("check the result");
         }
@@ -37,12 +69,12 @@ class AddPredictionCommandIntegrationTest extends AbstractGatewayTest {
         class WhenPredictionTextAdded {
             @BeforeEach
             void setUp() {
-                sendTextUpdate("test prediction");
+                sendTextUpdate(PREDICTION_TEXT);
             }
 
             @Test
-            void shouldHandleCorrectDeadlineText() {
-                sendTextUpdate("2021-01-01");
+            void shouldHandleCorrectDateText() {
+                sendTextUpdate(DEADLINE_DATE);
                 
                 assertResponseTextContainsFragments("time");
 
@@ -56,12 +88,12 @@ class AddPredictionCommandIntegrationTest extends AbstractGatewayTest {
             class WhenDeadlineTextAdded {
                 @BeforeEach
                 void setUp() {
-                    sendTextUpdate("2021-01-01");
+                    sendTextUpdate(DEADLINE_DATE);
                 }
 
                 @Test
                 void shouldHandleCorrectDeadlineTimeText() {
-                    sendTextUpdate("12:00");
+                    sendTextUpdate(DEADLINE_TIME);
                     
                     assertResponseTextContainsFragments("probability");
 
@@ -75,7 +107,7 @@ class AddPredictionCommandIntegrationTest extends AbstractGatewayTest {
                 class WhenDeadLineTimeAdded {
                     @BeforeEach
                     void setUp() {
-                        sendTextUpdate("12:00");
+                        sendTextUpdate(DEADLINE_TIME);
                     }
 
                     @Test
@@ -83,8 +115,13 @@ class AddPredictionCommandIntegrationTest extends AbstractGatewayTest {
                         sendTextUpdate("60");
                         
                         assertResponseTextContainsFragments("Prediction added.", "test prediction", "60");
-                        assertThat(JdbcTestUtils.countRowsInTable(jdbcTemplate, "predictions.questions"))
-                                .isEqualTo(1);
+
+                        assertThat(TestDbUtils.getQuestions(jdbcTemplate))
+                            .hasSize(1)
+                            .first()
+                            .hasFieldOrPropertyWithValue("text", PREDICTION_TEXT)
+                            .hasFieldOrPropertyWithValue("deadline", DEADLINE_INSTANT);
+
                         assertThat(JdbcTestUtils.countRowsInTable(jdbcTemplate, "predictions.predictions"))
                                 .isEqualTo(1);
                     }
@@ -115,10 +152,55 @@ class AddPredictionCommandIntegrationTest extends AbstractGatewayTest {
             }
 
             @Test
+            void shouldHandleCorrectDateTimeText() {
+                sendTextUpdate(DEADLINE_DATE + " " + DEADLINE_TIME);
+                
+                assertResponseTextContainsFragments("probability");
+            }
+
+            @Test
+            void shouldHandleCallbackFromButton() {
+                sendButtonCallbackQueryUpdate("add", "date", "ONE_HOUR");
+
+                assertResponseTextContainsFragments("probability");
+            }
+
+            @Nested
+            class WhenDeadlineDateTimeAdded {
+                @BeforeEach
+                void setUp() {
+                    sendButtonCallbackQueryUpdate("add", "date", "ONE_HOUR");
+                }
+
+                @Test
+                void shouldHandleCorrectProbabilityText() {
+                    sendTextUpdate("60");
+                    
+                    assertResponseTextContainsFragments("Prediction added.", "test prediction", "60");
+                        assertThat(TestDbUtils.getQuestions(jdbcTemplate))
+                            .hasSize(1)
+                            .first()
+                            .hasFieldOrPropertyWithValue("text", PREDICTION_TEXT)
+                            .hasFieldOrPropertyWithValue("deadline", CURRENT_INSTANT.plusSeconds(3600));
+
+                    assertThat(JdbcTestUtils.countRowsInTable(jdbcTemplate, "predictions.predictions"))
+                        .isEqualTo(1);
+                }
+
+            }
+
+            @Test
             void shouldHandleIncorrectDeadlineText() {
                 sendTextUpdate("incorrect deadline");
                 
-                assertResponseTextContainsFragments("Wrong date format");
+                assertResponseTextContainsFragments("Wrong date-time format");
+            }
+
+            @Test 
+            void shouldHandleDeadlineInThePast() {
+                sendTextUpdate("2019-01-01");
+                
+                assertResponseTextContainsFragments("You can't set a time to check the result in the past");
             }
 
         }

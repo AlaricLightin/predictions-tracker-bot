@@ -1,9 +1,6 @@
 package io.github.alariclightin.predictionstrackerbot.commands.addprediction;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.time.format.DateTimeParseException;
+import java.util.List;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -11,7 +8,10 @@ import org.springframework.context.annotation.Configuration;
 import io.github.alariclightin.predictionstrackerbot.commands.MessageHandler;
 import io.github.alariclightin.predictionstrackerbot.commands.MessageHandlerBuilder;
 import io.github.alariclightin.predictionstrackerbot.exceptions.UnexpectedUserMessageException;
+import io.github.alariclightin.predictionstrackerbot.messages.outbound.BotKeyboard;
+import io.github.alariclightin.predictionstrackerbot.messages.outbound.BotMessageList;
 import io.github.alariclightin.predictionstrackerbot.messages.outbound.BotTextMessage;
+import io.github.alariclightin.predictionstrackerbot.messages.outbound.InlineButton;
 
 @Configuration
 class AddPredictionCommandConfig {
@@ -27,52 +27,49 @@ class AddPredictionCommandConfig {
     }
 
     @Bean
-    MessageHandler addPredictionTextPhase() {
+    MessageHandler addPredictionTextPhase(DeadlinePromptService deadlinePromptService) {
         return new MessageHandlerBuilder<PredictionData>()
             .setCommandName(AddPredictionConsts.COMMAND_NAME)
             .setPhaseName(AddPredictionConsts.TEXT_PHASE)
-            .setNextPhasePromptMessageId("bot.responses.ask-deadline")
+            .setResponseMessageFunc((message, data) -> 
+                    deadlinePromptService.getDeadlinePromptMessage())
             .setNextPhase(AddPredictionConsts.DATE_PHASE)
             .setStateUpdater((text, data) -> data.addText(text))
             .build();
     }
 
-    @Bean
-    MessageHandler addPredictionDatePhase() {
-        return new MessageHandlerBuilder<PredictionData>()
-            .setCommandName(AddPredictionConsts.COMMAND_NAME)
-            .setPhaseName(AddPredictionConsts.DATE_PHASE)
-            .setNextPhasePromptMessageId("bot.responses.ask-deadline-time")
-            .setNextPhase(AddPredictionConsts.TIME_PHASE)
-            .setStateUpdater((text, data) -> {
-                try {
-                    LocalDate date = LocalDate.parse(text);
-                    return data.addDate(date);
-                }
-                catch (DateTimeParseException e) {
-                    throw new UnexpectedUserMessageException("bot.responses.error.wrong-date-format");
-                }
-            })
-            .build();
+    private static InlineButton createButton(
+        String messageId,
+        DateTimeAction action) {
+
+        return new InlineButton(messageId, 
+            AddPredictionConsts.COMMAND_NAME, AddPredictionConsts.DATE_PHASE, action.toString());
     }
 
+    private static final BotKeyboard DATE_TIME_KEYBOARD = new BotKeyboard(
+        List.of(
+            List.of(
+                // TODO show first button only for debug
+                createButton("bot.buttons.one-minute", DateTimeAction.ONE_MINUTE),
+                createButton("bot.buttons.one-hour", DateTimeAction.ONE_HOUR)
+            ),
+            List.of(
+                createButton("bot.buttons.today", DateTimeAction.TODAY),
+                createButton("bot.buttons.tomorrow", DateTimeAction.TOMORROW)
+            ),
+            List.of(
+                createButton("bot.buttons.next-month", DateTimeAction.NEXT_MONTH),
+                createButton("bot.buttons.next-year", DateTimeAction.NEXT_YEAR)
+            )
+        )
+    );
+
     @Bean
-    MessageHandler addPredictionTimePhase() {
-        return new MessageHandlerBuilder<PredictionData>()
-            .setCommandName(AddPredictionConsts.COMMAND_NAME)
-            .setPhaseName(AddPredictionConsts.TIME_PHASE)
-            .setNextPhasePromptMessageId("bot.responses.ask-probability")
-            .setNextPhase(AddPredictionConsts.PROBABILITY_PHASE)
-            .setStateUpdater((text, data) -> {
-                try {
-                    LocalTime time = LocalTime.parse(text);
-                    return data.addTime(time);
-                }
-                catch (DateTimeParseException e) {
-                    throw new UnexpectedUserMessageException("bot.responses.error.wrong-time-format");
-                }
-            })
-            .build();
+    DeadlinePromptService deadlinePromptService() {
+        return () -> new BotMessageList(
+            new BotTextMessage("bot.responses.ask-deadline"),
+            DATE_TIME_KEYBOARD
+        );
     }
 
     @Bean
@@ -97,10 +94,9 @@ class AddPredictionCommandConfig {
             })
             
             .setResponseMessageFunc((message, data) -> {
-                LocalDateTime datetime = LocalDateTime.of(data.getDate(), data.getTime());
                 return new BotTextMessage(
                     "bot.responses.prediction-added",
-                    data.getText(), datetime, data.getProbability());
+                    data.getText(), data.getInstant(), data.getProbability());
             })
             
             .setResultAction(predictionSaver)

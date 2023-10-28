@@ -1,12 +1,12 @@
 package io.github.alariclightin.predictionstrackerbot.commands.addprediction;
 
+import java.time.Instant;
 import java.time.LocalDate;
-import java.time.LocalTime;
 
 class PredictionData {
     private String text;
     private LocalDate date;
-    private LocalTime time;
+    private Instant instant;
     private int probability;
     
     String getText() {
@@ -17,8 +17,8 @@ class PredictionData {
         return date;
     }
 
-    LocalTime getTime() {
-        return time;
+    Instant getInstant() {
+        return instant;
     }
     
     int getProbability() {
@@ -35,8 +35,8 @@ class PredictionData {
         return this;
     }
 
-    PredictionData addTime(LocalTime time) {
-        this.time = time;
+    PredictionData addInstant(Instant instant) {
+        this.instant = instant;
         return this;
     }
 

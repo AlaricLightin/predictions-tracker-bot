@@ -17,6 +17,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.jdbc.JdbcTestUtils;
 
 import io.github.alariclightin.predictionstrackerbot.data.settings.UserTimezoneService;
+import io.github.alariclightin.predictionstrackerbot.testutils.TestConsts;
 import io.github.alariclightin.predictionstrackerbot.testutils.TestDbUtils;
 
 @SpringBootTest
@@ -46,7 +47,7 @@ class AddPredictionCommandIntegrationTest extends AbstractGatewayTest {
 
     @Test
     void shouldAddPrediction() {
-        sendTextUpdate("/add");        
+        sendTextUpdate("/" + TestConsts.ADD_PREDICTION_COMMAMD);        
 
         assertResponseTextContainsFragments("What is your prediction?");
     }
@@ -55,7 +56,7 @@ class AddPredictionCommandIntegrationTest extends AbstractGatewayTest {
     class WhenAddPredictionStarted {
         @BeforeEach
         void setUp() {
-            sendTextUpdate("/add");
+            sendTextUpdate("/" + TestConsts.ADD_PREDICTION_COMMAMD);
         }
 
         @Test
@@ -160,7 +161,8 @@ class AddPredictionCommandIntegrationTest extends AbstractGatewayTest {
 
             @Test
             void shouldHandleCallbackFromButton() {
-                sendButtonCallbackQueryUpdate("add", "date", "ONE_HOUR");
+                sendButtonCallbackQueryUpdate(
+                    TestConsts.ADD_PREDICTION_COMMAMD, "date", "ONE_HOUR");
 
                 assertResponseTextContainsFragments("probability");
             }
@@ -169,7 +171,8 @@ class AddPredictionCommandIntegrationTest extends AbstractGatewayTest {
             class WhenDeadlineDateTimeAdded {
                 @BeforeEach
                 void setUp() {
-                    sendButtonCallbackQueryUpdate("add", "date", "ONE_HOUR");
+                    sendButtonCallbackQueryUpdate(
+                        TestConsts.ADD_PREDICTION_COMMAMD, "date", "ONE_HOUR");
                 }
 
                 @Test

@@ -13,6 +13,8 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.telegram.telegrambots.meta.api.methods.AnswerCallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
+import io.github.alariclightin.predictionstrackerbot.testutils.TestConsts;
+
 @SpringBootTest
 // TODO remove when state will be saved in db
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_CLASS)
@@ -20,7 +22,7 @@ class BaseCommandsIntegrationTest extends AbstractGatewayTest {
 
     @Test
     void shouldHandleStartCommand() {
-        sendTextUpdate("/start");
+        sendTextUpdate("/" + TestConsts.START_COMMAND);
         
         assertResponseTextContainsFragments("Hello");
     }
@@ -49,7 +51,7 @@ class BaseCommandsIntegrationTest extends AbstractGatewayTest {
 
     @Test
     void shouldHandleUnexpectedButtonCallback() {
-        sendButtonCallbackQueryUpdate("setresults", "set-result", "YES");
+        sendButtonCallbackQueryUpdate(TestConsts.SET_RESULTS_COMMAND, "set-result", "YES");
 
         ArgumentCaptor<AnswerCallbackQuery> response = ArgumentCaptor.forClass(AnswerCallbackQuery.class);
         verify(mockedOutcomingGateway).sendAnswerCallback(response.capture());

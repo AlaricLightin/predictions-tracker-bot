@@ -18,6 +18,7 @@ import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 
 import io.github.alariclightin.predictionstrackerbot.data.predictions.Question;
+import io.github.alariclightin.predictionstrackerbot.testutils.TestConsts;
 import io.github.alariclightin.predictionstrackerbot.testutils.TestDbUtils;
 
 @SpringBootTest
@@ -27,7 +28,7 @@ class SetResultsCommandIntegrationTest extends AbstractGatewayTest {
 
     @Test
     void shouldRespondAboutAbsentWaitingQuestions() {
-        sendTextUpdate("/setresults");
+        sendTextUpdate("/" + TestConsts.SET_RESULTS_COMMAND);
 
         assertResponseTextContainsFragments("no questions");
     }
@@ -36,7 +37,7 @@ class SetResultsCommandIntegrationTest extends AbstractGatewayTest {
     @Sql(scripts = { "classpath:sql/waiting-question-ids.sql" }, 
         executionPhase = ExecutionPhase.BEFORE_TEST_METHOD)
     void shouldRespondToCommandIfWaitingQuestionsExist() {
-        sendTextUpdate("/setresults");
+        sendTextUpdate("/" + TestConsts.SET_RESULTS_COMMAND);
 
         ArgumentCaptor<SendMessage> response = ArgumentCaptor.forClass(SendMessage.class);
         verify(mockedOutcomingGateway, atLeastOnce()).sendMessage(response.capture());
@@ -56,7 +57,7 @@ class SetResultsCommandIntegrationTest extends AbstractGatewayTest {
         
         @BeforeEach
         void setUp() {
-            sendTextUpdate("/setresults");
+            sendTextUpdate("/" + TestConsts.SET_RESULTS_COMMAND);
         }
 
         @ParameterizedTest
@@ -74,7 +75,7 @@ class SetResultsCommandIntegrationTest extends AbstractGatewayTest {
         @ParameterizedTest
         @ValueSource(strings = { "YES", "NO" })
         void shouldHandleButtonCallbackQueryForResultValue(String buttonId) {
-            sendButtonCallbackQueryUpdate("setresults", "set-result", buttonId);
+            sendButtonCallbackQueryUpdate(TestConsts.SET_RESULTS_COMMAND, "set-result", buttonId);
 
             assertResponseTextContainsFragments("saved", "Question 2");
             Question savedQuestion = TestDbUtils.getQuestionById(jdbcTemplate, WAITINQ_QUESTION_ID_1);
@@ -97,7 +98,7 @@ class SetResultsCommandIntegrationTest extends AbstractGatewayTest {
 
         @Test
         void shouldHandleCallbackForSkipButton() {
-            sendButtonCallbackQueryUpdate("setresults", "set-result", "SKIP");
+            sendButtonCallbackQueryUpdate(TestConsts.SET_RESULTS_COMMAND, "set-result", "SKIP");
 
             assertResponseTextContainsFragments("You can add a result later", "Question 2");
 
@@ -121,7 +122,7 @@ class SetResultsCommandIntegrationTest extends AbstractGatewayTest {
 
         @Test
         void shouldHandleCallbackForSkipAllButton() {
-            sendButtonCallbackQueryUpdate("setresults", "set-result", "SKIP_ALL");
+            sendButtonCallbackQueryUpdate(TestConsts.SET_RESULTS_COMMAND, "set-result", "SKIP_ALL");
 
             assertResponseTextContainsFragments("You can add results later");
 

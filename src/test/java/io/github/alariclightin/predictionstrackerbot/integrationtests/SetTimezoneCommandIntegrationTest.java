@@ -8,12 +8,14 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.jdbc.JdbcTestUtils;
 
+import io.github.alariclightin.predictionstrackerbot.testutils.TestConsts;
+
 @SpringBootTest
 class SetTimezoneCommandIntegrationTest extends AbstractGatewayTest {
     
     @Test
     void shouldAddPrediction() {
-        sendTextUpdate("/settimezone");        
+        sendTextUpdate("/" + TestConsts.SET_TIMEZONE_COMMAND);        
 
         assertResponseTextContainsFragments("timezone");
     }
@@ -23,7 +25,7 @@ class SetTimezoneCommandIntegrationTest extends AbstractGatewayTest {
         
         @BeforeEach
         void setUp() {
-            sendTextUpdate("/settimezone");
+            sendTextUpdate("/" + TestConsts.SET_TIMEZONE_COMMAND);
         }
 
         @Test

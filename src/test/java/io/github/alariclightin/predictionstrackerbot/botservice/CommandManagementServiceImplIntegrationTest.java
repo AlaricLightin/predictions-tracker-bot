@@ -18,12 +18,12 @@ class CommandManagementServiceImplIntegrationTest extends TestWithContainer {
     void shouldCorrectGetBotCommandList() {
         assertThat(commandManagementService.getBotCommands())
             .extracting("command")
-            .containsExactlyInAnyOrder(
-                TestConsts.START_COMMAND, 
-                TestConsts.ADD_PREDICTION_COMMAMD, 
+            .containsExactly(
+                TestConsts.ADD_PREDICTION_COMMAMD,
+                TestConsts.CANCEL_COMMAND,
                 TestConsts.SET_RESULTS_COMMAND,
                 TestConsts.SET_TIMEZONE_COMMAND,
-                TestConsts.CANCEL_COMMAND
+                TestConsts.START_COMMAND 
             );
     }
 }

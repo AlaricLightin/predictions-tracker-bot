@@ -206,6 +206,17 @@ class AddPredictionCommandIntegrationTest extends AbstractGatewayTest {
                 assertResponseTextContainsFragments("You can't set a time to check the result in the past");
             }
 
+            @Test
+            void shouldHandleCancelCommand() {
+                sendTextUpdate("/" + TestConsts.CANCEL_COMMAND);
+                
+                assertResponseTextContainsFragments("cancelled");
+
+                sendButtonCallbackQueryUpdate(TestConsts.ADD_PREDICTION_COMMAMD, "date", "ONE_HOUR");
+
+                assertAnswerCallbackQueryContainsFragments("old button");
+            }
+
         }
     }
 

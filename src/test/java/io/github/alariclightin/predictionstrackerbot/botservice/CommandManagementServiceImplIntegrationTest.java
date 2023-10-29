@@ -22,7 +22,8 @@ class CommandManagementServiceImplIntegrationTest extends TestWithContainer {
                 TestConsts.START_COMMAND, 
                 TestConsts.ADD_PREDICTION_COMMAMD, 
                 TestConsts.SET_RESULTS_COMMAND,
-                TestConsts.SET_TIMEZONE_COMMAND
+                TestConsts.SET_TIMEZONE_COMMAND,
+                TestConsts.CANCEL_COMMAND
             );
     }
 }

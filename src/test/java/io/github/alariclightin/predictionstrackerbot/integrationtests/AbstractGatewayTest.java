@@ -107,4 +107,10 @@ public abstract class AbstractGatewayTest extends TestWithContainer {
             .isEmpty();
     }
 
+    protected void assertAnswerCallbackQueryContainsFragments(CharSequence... expectedFragments) {
+        ArgumentCaptor<AnswerCallbackQuery> response = ArgumentCaptor.forClass(AnswerCallbackQuery.class);
+        verify(mockedOutcomingGateway, atLeastOnce()).sendAnswerCallback(response.capture());
+        assertThat(response.getValue().getText())
+            .contains(expectedFragments);
+    }
 }

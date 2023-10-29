@@ -9,7 +9,6 @@ import io.github.alariclightin.predictionstrackerbot.data.predictions.Prediction
 import io.github.alariclightin.predictionstrackerbot.data.predictions.ReminderDbService;
 import io.github.alariclightin.predictionstrackerbot.exceptions.UnexpectedUserMessageException;
 import io.github.alariclightin.predictionstrackerbot.messagehandlers.ActionResult;
-import io.github.alariclightin.predictionstrackerbot.messagehandlers.MessageHandler;
 import io.github.alariclightin.predictionstrackerbot.messages.incoming.UserMessage;
 import io.github.alariclightin.predictionstrackerbot.states.WaitedResponseState;
 
@@ -36,16 +35,8 @@ class SetResultsCommandHandler extends AbstractSetResultsHandler implements SetR
             );
         }
         else {
-            return new ActionResult(
-                getNoPredictionsMessage(), 
-                null
-            );
+            return new ActionResult(getNoPredictionsMessage());
         }
-    }
-
-    @Override
-    public String getPhaseName() {
-        return MessageHandler.START_PHASE;
     }
 
     @Override

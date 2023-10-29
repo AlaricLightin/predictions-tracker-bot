@@ -37,8 +37,7 @@ class MessageHandlingServiceImpl implements MessageHandlingService {
         WaitedResponseState state = message.isCommand() 
             ? new WaitedResponseState(
                 getCommandName(message), 
-                MessageHandler.START_PHASE, 
-                null) 
+                MessageHandler.START_PHASE) 
             : stateHolderService.getState(userId);
 
         return createBotMessageResultAndSaveNewState(state, message);

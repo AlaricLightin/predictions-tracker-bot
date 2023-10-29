@@ -52,17 +52,17 @@ class HandlersSearchServiceImplTest {
     private static Stream<Arguments> dataForGetHandlerTest() {
         return Stream.of(
             Arguments.of(
-                new WaitedResponseState("firstCommand", MessageHandler.START_PHASE, null),
+                new WaitedResponseState("firstCommand", MessageHandler.START_PHASE),
                 firstCommandHandler
             ),
 
             Arguments.of(
-                new WaitedResponseState("secondCommand", MessageHandler.START_PHASE, null),
+                new WaitedResponseState("secondCommand", MessageHandler.START_PHASE),
                 secondCommandHandler
             ),
 
             Arguments.of(
-                new WaitedResponseState("firstCommand", END_PHASE, null),
+                new WaitedResponseState("firstCommand", END_PHASE),
                 endPhaseOfFirstCommandHandler
             )
         );
@@ -72,7 +72,7 @@ class HandlersSearchServiceImplTest {
     void shouldHandleUnexpectedCommand() {
         assertThrows(UnexpectedUserMessageException.class, 
             () -> handlersSearchService.getHandler(
-                new WaitedResponseState("unexpectedCommand", MessageHandler.START_PHASE, null)
+                new WaitedResponseState("unexpectedCommand", MessageHandler.START_PHASE)
             ));
     }
 

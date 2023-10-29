@@ -55,8 +55,7 @@ class SetResultPhaseHandler extends AbstractSetResultsHandler {
 
             case SKIP_ALL -> {
                 return new ActionResult(
-                    new BotTextMessage("bot.responses.result-skipped-all"), 
-                    null);
+                    new BotTextMessage("bot.responses.result-skipped-all"));
             }
 
             default -> throw new UnexpectedUserMessageException("bot.responses.error.wrong-result-command");
@@ -73,10 +72,7 @@ class SetResultPhaseHandler extends AbstractSetResultsHandler {
             );
         }
         else {
-            return new ActionResult(
-                buttonResultMessage, 
-                null
-            );
+            return new ActionResult(buttonResultMessage);
         }
     }
 

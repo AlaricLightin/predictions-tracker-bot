@@ -27,7 +27,7 @@ public class CancelCommandTest {
     @Test
     void shouldReturnCorrectMessageWhenStateExists() throws UnexpectedUserMessageException {
         WaitedResponseState state = new WaitedResponseState(
-            "commandName", "phaseName", null);
+            "commandName", "phaseName");
         when(stateHolderService.getState(TestUtils.CHAT_ID)).thenReturn(state);
 
         ActionResult result = cancelCommand.handle(
@@ -36,8 +36,7 @@ public class CancelCommandTest {
         assertThat(result)
             .usingRecursiveComparison()
             .isEqualTo(new ActionResult(
-                new BotTextMessage("bot.responses.cancelled", "commandName"),
-                null
+                new BotTextMessage("bot.responses.cancelled", "commandName")
             ));
     }
 
@@ -51,8 +50,7 @@ public class CancelCommandTest {
         assertThat(result)
             .usingRecursiveComparison()
             .isEqualTo(new ActionResult(
-                new BotTextMessage("bot.responses.nothing_to_cancel"),
-                null
+                new BotTextMessage("bot.responses.nothing_to_cancel")
             ));
     }
 }

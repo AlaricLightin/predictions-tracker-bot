@@ -11,5 +11,7 @@ public interface MessageHandler {
     
     String getCommandName();
 
-    String getPhaseName();
+    default String getPhaseName() {
+        return START_PHASE;
+    }
 }

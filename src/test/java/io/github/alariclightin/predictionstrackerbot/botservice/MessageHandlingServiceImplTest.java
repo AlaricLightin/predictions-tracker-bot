@@ -63,7 +63,7 @@ class MessageHandlingServiceImplTest {
         //given
         UserTextMessage incomingMessage = TestUtils.createTextMessage("/test");
         MessageHandler messageHandler = mock(MessageHandler.class);
-        WaitedResponseState oldState = new WaitedResponseState("test", MessageHandler.START_PHASE, null);
+        WaitedResponseState oldState = new WaitedResponseState("test", MessageHandler.START_PHASE);
         WaitedResponseState newState = mock(WaitedResponseState.class);
         when(handlersService.getHandler(eq(oldState)))
             .thenReturn(messageHandler);

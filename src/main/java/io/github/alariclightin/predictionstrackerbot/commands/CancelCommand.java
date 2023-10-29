@@ -23,14 +23,10 @@ class CancelCommand implements MessageHandler {
         WaitedResponseState oldState = stateHolderService.getState(message.getUser().getId());
         if (oldState != null)
             return new ActionResult(
-                new BotTextMessage("bot.responses.cancelled", oldState.commandName()),
-                null
-            );
+                new BotTextMessage("bot.responses.cancelled", oldState.commandName())            );
         else
             return new ActionResult(
-                new BotTextMessage("bot.responses.nothing_to_cancel"),
-                null
-            );
+                new BotTextMessage("bot.responses.nothing_to_cancel"));
     }
 
     @Override
@@ -38,9 +34,4 @@ class CancelCommand implements MessageHandler {
         return "cancel";
     }
 
-    @Override
-    public String getPhaseName() {
-        return MessageHandler.START_PHASE;
-    }
-    
 }

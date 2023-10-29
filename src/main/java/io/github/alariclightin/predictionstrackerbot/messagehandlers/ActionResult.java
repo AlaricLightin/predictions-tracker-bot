@@ -8,4 +8,7 @@ public record ActionResult(
     WaitedResponseState newState
 ) {
     
+    public ActionResult(BotMessage botMessage) {
+        this(botMessage, null);
+    }
 }

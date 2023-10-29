@@ -11,9 +11,10 @@ import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import io.github.alariclightin.predictionstrackerbot.commands.ActionResult;
+
 import io.github.alariclightin.predictionstrackerbot.commands.setresult.QuestionsData;
 import io.github.alariclightin.predictionstrackerbot.commands.setresult.SetResultsMessageCreator;
+import io.github.alariclightin.predictionstrackerbot.messagehandlers.ActionResult;
 import io.github.alariclightin.predictionstrackerbot.messages.outbound.BotMessage;
 import io.github.alariclightin.predictionstrackerbot.states.StateHolderService;
 import io.github.alariclightin.predictionstrackerbot.states.WaitedResponseState;

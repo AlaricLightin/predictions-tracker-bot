@@ -10,7 +10,7 @@ import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import io.github.alariclightin.predictionstrackerbot.commands.MessageHandler;
+import io.github.alariclightin.predictionstrackerbot.messagehandlers.MessageHandler;
 
 class CommandManagementServiceImplTest {
     private CommandManagementServiceImpl commandManagementService;

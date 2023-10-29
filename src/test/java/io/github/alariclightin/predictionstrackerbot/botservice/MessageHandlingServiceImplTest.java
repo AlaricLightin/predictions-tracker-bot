@@ -11,10 +11,11 @@ import static org.mockito.Mockito.when;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import io.github.alariclightin.predictionstrackerbot.commands.MessageHandler;
-import io.github.alariclightin.predictionstrackerbot.commands.HandlersSearchService;
-import io.github.alariclightin.predictionstrackerbot.commands.ActionResult;
+
 import io.github.alariclightin.predictionstrackerbot.exceptions.UnexpectedUserMessageException;
+import io.github.alariclightin.predictionstrackerbot.messagehandlers.ActionResult;
+import io.github.alariclightin.predictionstrackerbot.messagehandlers.HandlersSearchService;
+import io.github.alariclightin.predictionstrackerbot.messagehandlers.MessageHandler;
 import io.github.alariclightin.predictionstrackerbot.messages.incoming.UserTextMessage;
 import io.github.alariclightin.predictionstrackerbot.messages.outbound.BotMessage;
 import io.github.alariclightin.predictionstrackerbot.states.StateHolderService;

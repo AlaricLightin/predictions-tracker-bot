@@ -7,6 +7,8 @@ import java.util.Map;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import io.github.alariclightin.predictionstrackerbot.messagehandlers.MessageHandler;
+import io.github.alariclightin.predictionstrackerbot.messagehandlers.MessageHandlerBuilder;
 import io.github.alariclightin.predictionstrackerbot.messages.outbound.BotTextMessage;
 
 @Configuration

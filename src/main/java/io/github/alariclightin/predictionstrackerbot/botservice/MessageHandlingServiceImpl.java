@@ -3,11 +3,11 @@ package io.github.alariclightin.predictionstrackerbot.botservice;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.objects.User;
 
-import io.github.alariclightin.predictionstrackerbot.commands.MessageHandler;
-import io.github.alariclightin.predictionstrackerbot.commands.HandlersSearchService;
-import io.github.alariclightin.predictionstrackerbot.commands.ActionResult;
 import io.github.alariclightin.predictionstrackerbot.exceptions.UnexpectedButtonCallbackQueryException;
 import io.github.alariclightin.predictionstrackerbot.exceptions.UnexpectedUserMessageException;
+import io.github.alariclightin.predictionstrackerbot.messagehandlers.ActionResult;
+import io.github.alariclightin.predictionstrackerbot.messagehandlers.HandlersSearchService;
+import io.github.alariclightin.predictionstrackerbot.messagehandlers.MessageHandler;
 import io.github.alariclightin.predictionstrackerbot.messages.incoming.ButtonCallbackQuery;
 import io.github.alariclightin.predictionstrackerbot.messages.incoming.UserMessage;
 import io.github.alariclightin.predictionstrackerbot.messages.incoming.UserTextMessage;

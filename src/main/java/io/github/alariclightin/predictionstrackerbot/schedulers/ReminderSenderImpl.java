@@ -2,9 +2,10 @@ package io.github.alariclightin.predictionstrackerbot.schedulers;
 
 import java.util.List;
 import org.springframework.stereotype.Service;
-import io.github.alariclightin.predictionstrackerbot.commands.ActionResult;
+
 import io.github.alariclightin.predictionstrackerbot.commands.setresult.QuestionsData;
 import io.github.alariclightin.predictionstrackerbot.commands.setresult.SetResultsMessageCreator;
+import io.github.alariclightin.predictionstrackerbot.messagehandlers.ActionResult;
 import io.github.alariclightin.predictionstrackerbot.states.StateHolderService;
 import io.github.alariclightin.predictionstrackerbot.states.WaitedResponseState;
 

@@ -1,4 +1,4 @@
-package io.github.alariclightin.predictionstrackerbot.commands;
+package io.github.alariclightin.predictionstrackerbot.messagehandlers;
 
 import io.github.alariclightin.predictionstrackerbot.messages.outbound.BotMessage;
 import io.github.alariclightin.predictionstrackerbot.states.WaitedResponseState;

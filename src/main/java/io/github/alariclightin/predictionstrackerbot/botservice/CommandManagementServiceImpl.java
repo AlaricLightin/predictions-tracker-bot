@@ -7,7 +7,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.objects.commands.BotCommand;
 
-import io.github.alariclightin.predictionstrackerbot.commands.MessageHandler;
+import io.github.alariclightin.predictionstrackerbot.messagehandlers.MessageHandler;
 
 @Service
 class CommandManagementServiceImpl implements CommandManagementService {

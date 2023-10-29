@@ -1,4 +1,4 @@
-package io.github.alariclightin.predictionstrackerbot.commands;
+package io.github.alariclightin.predictionstrackerbot.messagehandlers;
 
 import java.util.function.BiFunction;
 import io.github.alariclightin.predictionstrackerbot.exceptions.UnexpectedUserMessageException;

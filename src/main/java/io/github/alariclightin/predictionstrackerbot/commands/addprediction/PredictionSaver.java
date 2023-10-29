@@ -1,10 +1,11 @@
 package io.github.alariclightin.predictionstrackerbot.commands.addprediction;
 
 import org.springframework.stereotype.Component;
-import io.github.alariclightin.predictionstrackerbot.commands.ResultAction;
+
 import io.github.alariclightin.predictionstrackerbot.data.predictions.Prediction;
 import io.github.alariclightin.predictionstrackerbot.data.predictions.PredictionDbService;
 import io.github.alariclightin.predictionstrackerbot.data.predictions.Question;
+import io.github.alariclightin.predictionstrackerbot.messagehandlers.ResultAction;
 import io.github.alariclightin.predictionstrackerbot.messages.incoming.UserMessage;
 
 @Component

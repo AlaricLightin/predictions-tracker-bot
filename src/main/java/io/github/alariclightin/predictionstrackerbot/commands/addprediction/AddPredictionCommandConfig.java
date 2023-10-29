@@ -5,9 +5,9 @@ import java.util.List;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import io.github.alariclightin.predictionstrackerbot.commands.MessageHandler;
-import io.github.alariclightin.predictionstrackerbot.commands.MessageHandlerBuilder;
 import io.github.alariclightin.predictionstrackerbot.exceptions.UnexpectedUserMessageException;
+import io.github.alariclightin.predictionstrackerbot.messagehandlers.MessageHandler;
+import io.github.alariclightin.predictionstrackerbot.messagehandlers.MessageHandlerBuilder;
 import io.github.alariclightin.predictionstrackerbot.messages.outbound.BotKeyboard;
 import io.github.alariclightin.predictionstrackerbot.messages.outbound.BotMessageList;
 import io.github.alariclightin.predictionstrackerbot.messages.outbound.BotTextMessage;

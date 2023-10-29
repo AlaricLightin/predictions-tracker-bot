@@ -20,10 +20,13 @@ public record Question(
     @Column("author_id")
     long authorId,
 
+    @Column("created_at")
+    Instant createdAt,
+
     @Column("result")
     Boolean result
 ) {
-    public Question(String text, Instant deadline, long authorId) {
-        this(0, text, deadline, authorId, null);
+    public Question(String text, Instant deadline, long authorId, Instant createdAt) {
+        this(0, text, deadline, authorId, createdAt, null);
     }
 }

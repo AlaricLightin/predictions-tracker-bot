@@ -22,7 +22,8 @@ class PredictionSaver implements ResultAction<PredictionData> {
         Question question = new Question(
                 data.getText(),
                 data.getInstant(),
-                userId);
+                userId,
+                message.getDateTime());
 
         Prediction prediction = new Prediction(question, userId,
                 message.getDateTime(),

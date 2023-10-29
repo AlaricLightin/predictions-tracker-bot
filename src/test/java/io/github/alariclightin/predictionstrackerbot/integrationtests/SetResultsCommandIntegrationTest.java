@@ -41,7 +41,9 @@ class SetResultsCommandIntegrationTest extends AbstractGatewayTest {
 
         ArgumentCaptor<SendMessage> response = ArgumentCaptor.forClass(SendMessage.class);
         verify(mockedOutcomingGateway, atLeastOnce()).sendMessage(response.capture());
-        assertSendMessageContainsFragments(response.getValue(), "Question 1");
+        assertSendMessageContainsFragments(response.getValue(), 
+            "Question 1",
+            "2021-01-01 00:00");
         assertSendMessageContainsButtons(response.getValue(), List.of(
             new ButtonData("Yes", "button::setresults::set-result::YES"),
             new ButtonData("No", "button::setresults::set-result::NO"),

@@ -69,7 +69,7 @@ abstract class AbstractSetResultsHandler implements MessageHandler {
     protected BotMessage getPromptForResult(Question question) {
         return new BotMessageList(
             new BotTextMessage("bot.responses.setresults.set-result", 
-                question.text(), question.deadline()),
+                question.createdAt(), question.text(), question.deadline()),
             KEYBOARD
         );
     }

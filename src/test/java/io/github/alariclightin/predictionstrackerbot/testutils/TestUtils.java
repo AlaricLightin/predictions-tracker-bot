@@ -15,6 +15,7 @@ import io.github.alariclightin.predictionstrackerbot.messages.outbound.BotTextMe
 public class TestUtils {
     public static final Long CHAT_ID = 123L;
     public static final String LANGUAGE_CODE = "en";
+    public static final Instant MESSAGE_INSTANT = Instant.parse("2021-01-01T00:00:00.00Z");
 
     public static BotTextMessage createTestResponseMessage(String responseId) {
         return new BotTextMessage(responseId);
@@ -28,7 +29,7 @@ public class TestUtils {
         when(user.getId()).thenReturn(TestUtils.CHAT_ID);
         when(user.getLanguageCode()).thenReturn(TestUtils.LANGUAGE_CODE);
         when(message.getUser()).thenReturn(user);
-        when(message.getDateTime()).thenReturn(Instant.now());
+        when(message.getDateTime()).thenReturn(MESSAGE_INSTANT);
 
         return message;       
     }
@@ -48,7 +49,13 @@ public class TestUtils {
     }
 
     public static Question createQuestion(int id, Boolean result) {
-        return new Question(id, "test", Instant.now(), TestUtils.CHAT_ID, result);
+        return new Question(
+            id, 
+            "test", 
+            MESSAGE_INSTANT.plusSeconds(3600), 
+            TestUtils.CHAT_ID,
+            MESSAGE_INSTANT, 
+            result);
     }
 
 }

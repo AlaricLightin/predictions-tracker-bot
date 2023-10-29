@@ -27,6 +27,7 @@ public class TestDbUtils {
         rs.getString("text"),
         rs.getTimestamp("deadline").toInstant(),
         rs.getLong("author_id"),
+        rs.getTimestamp("created_at").toInstant(),
         rs.getString("result") == null ? null : rs.getBoolean("result")
     );
 

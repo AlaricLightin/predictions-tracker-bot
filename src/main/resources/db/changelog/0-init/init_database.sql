@@ -5,6 +5,7 @@ CREATE TABLE IF NOT EXISTS predictions.questions (
     text VARCHAR(255) NOT NULL,
     deadline TIMESTAMP WITHOUT TIME ZONE NOT NULL,
     author_id BIGINT NOT NULL,
+    created_at TIMESTAMP WITHOUT TIME ZONE NOT NULL,
     result BOOLEAN
 );
 

@@ -93,8 +93,8 @@ class ReminderDaoImplTest extends TestWithContainer {
     private void saveQuestionWithReminder(QuestionWithReminder questionInfo) {
         jdbc.update(
             """
-                INSERT INTO predictions.questions (id, text, deadline, author_id) 
-                VALUES (:id, 'text', CURRENT_TIMESTAMP, :userId)
+                INSERT INTO predictions.questions (id, text, deadline, created_at, author_id) 
+                VALUES (:id, 'text', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, :userId)
             """,
             Map.of(
                 "id", questionInfo.id(),

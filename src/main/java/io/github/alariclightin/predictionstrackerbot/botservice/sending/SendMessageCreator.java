@@ -1,98 +1,99 @@
-package io.github.alariclightin.predictionstrackerbot.botservice;
+package io.github.alariclightin.predictionstrackerbot.botservice.sending;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Locale;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import org.springframework.context.MessageSource;
-import org.springframework.integration.annotation.ServiceActivator;
-import org.springframework.messaging.handler.annotation.Header;
-import org.springframework.messaging.handler.annotation.Payload;
-import org.springframework.stereotype.Service;
-import org.telegram.telegrambots.meta.api.methods.AnswerCallbackQuery;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboard;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 
 import io.github.alariclightin.predictionstrackerbot.data.settings.UserTimezoneService;
-import io.github.alariclightin.predictionstrackerbot.messages.outbound.BotCallbackAnswer;
 import io.github.alariclightin.predictionstrackerbot.messages.outbound.BotKeyboard;
 import io.github.alariclightin.predictionstrackerbot.messages.outbound.BotMessage;
 import io.github.alariclightin.predictionstrackerbot.messages.outbound.BotMessageList;
 import io.github.alariclightin.predictionstrackerbot.messages.outbound.BotTextMessage;
 
-@Service
-class SendMessageService {
+class SendMessageCreator implements Supplier<SendMessage> {
     private final MessageSource messageSource;
     private final UserTimezoneService userTimezoneService;
 
-    SendMessageService(
+    private final long chatId;
+    private final Locale locale;
+    private final BotMessage botMessage;
+
+    SendMessageCreator(
         MessageSource messageSource,
-        UserTimezoneService userTimezoneService) {
+        UserTimezoneService userTimezoneService,
+        long chatId,
+        String languageCode,
+        BotMessage botMessage) {
         
         this.messageSource = messageSource;
         this.userTimezoneService = userTimezoneService;
+        this.chatId = chatId;
+        this.locale = Locale.forLanguageTag(languageCode);
+        this.botMessage = botMessage;
     }
 
-    @ServiceActivator(inputChannel = "botMessageChannel", outputChannel = "outcomingMessagesChannel")
-    public SendMessage create(
-        @Header("chatId") long chatId, 
-        // TODO store language code in user settings
-        @Header(name = "languageCode", required = false, defaultValue = "en") String languageCode, 
-        @Payload BotMessage botMessage) {
-
-        return createMessage(chatId, Locale.forLanguageTag(languageCode), botMessage);
+    @Override
+    public SendMessage get() {
+        return createMessage(botMessage); 
     }
 
-    private SendMessage createMessage(long userId, Locale locale, BotMessage botMessage) {
+    private SendMessage createMessage(BotMessage botMessage) {
         if (botMessage instanceof BotMessageList botMessageList) {
-            return getResultForMessageList(userId, locale, botMessageList);
+            return getResultForMessageList(botMessageList);
         }
         else if (botMessage instanceof BotTextMessage botTextMessage) {
-            return getResultForTextMessage(userId, locale, botTextMessage);
+            return getResultForTextMessage(botTextMessage);
         }
         else if (botMessage instanceof BotKeyboard botKeyboard) {
             return SendMessage.builder()
-                .chatId(userId)
+                .chatId(chatId)
                 .text("")
-                .replyMarkup(getKeyboard(userId, locale, botKeyboard))
+                .replyMarkup(getKeyboard(botKeyboard))
                 .build();
         }
         else
             throw new IllegalArgumentException("Unsupported message type: " + botMessage.getClass());
     }
-
-    private SendMessage getResultForMessageList(long userId, Locale locale, BotMessageList botMessageList) {
+    
+    private SendMessage getResultForMessageList(BotMessageList botMessageList) {
         return botMessageList.botMessages().stream()
-            .map(m -> createMessage(userId, locale, m))
+            .map(m -> createMessage(m))
             .collect(Collectors.collectingAndThen(Collectors.toList(), this::joinMessages));
     }
 
-    private SendMessage getResultForTextMessage(long userId, Locale locale, BotTextMessage botTextMessage) {
+    private SendMessage getResultForTextMessage(BotTextMessage botTextMessage) {
         String text = messageSource.getMessage(
             botTextMessage.messageId(), 
-            convertMessageArguments(userId, botTextMessage.args()), 
+            convertMessageArguments(botTextMessage.args()), 
             locale);
 
         return SendMessage.builder()
-            .chatId(userId)
+            .chatId(chatId)
             .text(text)
             .build();    
     }
 
     private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
-    private Object[] convertMessageArguments(long userId, Object[] args) {
+    private Object[] convertMessageArguments(Object[] args) {
+        ZoneId zoneId = userTimezoneService.getTimezone(chatId);
         Object[] result = new Object[args.length];
         for (int idx = 0; idx < result.length; idx++) {
             Object object = args[idx];
             if (object instanceof Instant instant) {
                 result[idx] = LocalDateTime
-                    .ofInstant(instant, userTimezoneService.getTimezone(userId))
+                    .ofInstant(instant, zoneId)
                     .format(DATE_TIME_FORMATTER); 
             }
             else
@@ -101,7 +102,7 @@ class SendMessageService {
         return result;
     }
 
-    private InlineKeyboardMarkup getKeyboard(long userId, Locale locale, BotKeyboard botKeyboard) {
+    private InlineKeyboardMarkup getKeyboard(BotKeyboard botKeyboard) {
         InlineKeyboardMarkup keyboardMarkup = new InlineKeyboardMarkup();
         keyboardMarkup.setKeyboard(
             botKeyboard.buttons().stream() 
@@ -133,7 +134,6 @@ class SendMessageService {
         
         StringBuilder text = new StringBuilder();
         ReplyKeyboard replyKeyboard = null;
-        String chatId = messages.get(0).getChatId();
 
         for (SendMessage message : messages) {
             if (!message.getText().isEmpty()) {
@@ -156,21 +156,4 @@ class SendMessageService {
             .build();
     }
 
-    @ServiceActivator(inputChannel = "botCallbackAnswerChannel", outputChannel = "outcomingMessagesChannel")
-    public AnswerCallbackQuery createAnswerCallbackQuery(
-        @Header("callbackId") String callbackQueryId, 
-        @Header("languageCode") String languageCode, 
-        @Payload BotCallbackAnswer botCallbackAnswer) {
-
-        String textId = botCallbackAnswer.messageId();
-        String text = textId != null && !textId.isEmpty()
-            ? messageSource.getMessage(textId, null, Locale.forLanguageTag(languageCode))
-            : "";
-
-        return AnswerCallbackQuery.builder()
-            .callbackQueryId(callbackQueryId)
-            .text(text)
-            .build();
-    }
-    
 }

@@ -1,4 +1,4 @@
-package io.github.alariclightin.predictionstrackerbot.botservice;
+package io.github.alariclightin.predictionstrackerbot.botservice.sending;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
@@ -9,40 +9,39 @@ import java.time.Instant;
 import java.time.ZoneId;
 
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.context.support.ReloadableResourceBundleMessageSource;
+import org.springframework.context.MessageSource;
+import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 
 import io.github.alariclightin.predictionstrackerbot.data.settings.UserTimezoneService;
-import io.github.alariclightin.predictionstrackerbot.messages.outbound.BotCallbackAnswer;
 import io.github.alariclightin.predictionstrackerbot.messages.outbound.BotKeyboard;
 import io.github.alariclightin.predictionstrackerbot.messages.outbound.BotMessageList;
 import io.github.alariclightin.predictionstrackerbot.messages.outbound.BotTextMessage;
 import io.github.alariclightin.predictionstrackerbot.messages.outbound.InlineButton;
+import io.github.alariclightin.predictionstrackerbot.testutils.TestMessageSource;
 
-class SendMessageServiceTest {
-    private static ReloadableResourceBundleMessageSource messageSource;
-    private SendMessageService sendMessageService;
-    private UserTimezoneService userTimezoneService;
+class SendMessageCreatorTest {
+    private static MessageSource messageSource;
+    private UserTimezoneService userTimezoneService = mock(UserTimezoneService.class);
 
     @BeforeAll
     static void messageSourceSetUp() {
-        messageSource = new ReloadableResourceBundleMessageSource();
-        messageSource.setBasename("classpath:messages/messages");
-        messageSource.setDefaultEncoding("UTF-8");
-    }
-
-    @BeforeEach
-    void setUp() {
-        userTimezoneService = mock(UserTimezoneService.class);
-        sendMessageService = new SendMessageService(messageSource, userTimezoneService);
+        messageSource = TestMessageSource.create();
     }
 
     @Test
     void shouldCreateSendMessageForTextMessage() {
-        BotTextMessage botTextMessage = new BotTextMessage("message.hello", "Name" );
-        var result = sendMessageService.create(1, "ru", botTextMessage);
+        var botTextMessage = new BotTextMessage("message.hello", "Name" );
+        
+        var creator = new SendMessageCreator(
+            messageSource,
+            userTimezoneService,
+            1,
+            "ru",
+            botTextMessage
+        );
+        SendMessage result = creator.get();
 
         assertThat(result)
             .hasFieldOrPropertyWithValue("chatId", "1")
@@ -51,10 +50,17 @@ class SendMessageServiceTest {
 
     @Test
     void shouldCreateSendMessageForMessageList() {
-        BotTextMessage botTextMessage1 = new BotTextMessage("message.hello", "Name" );
-        BotTextMessage botTextMessage2 = new BotTextMessage("message.test");
-        var result = sendMessageService.create(1, "en", 
-            new BotMessageList(botTextMessage1, botTextMessage2));
+        var botTextMessage1 = new BotTextMessage("message.hello", "Name" );
+        var botTextMessage2 = new BotTextMessage("message.test");
+
+        var creator = new SendMessageCreator(
+            messageSource,
+            userTimezoneService,
+            1,
+            "en",
+            new BotMessageList(botTextMessage1, botTextMessage2)
+        );
+        SendMessage result = creator.get();
 
         assertThat(result)
             .hasFieldOrPropertyWithValue("chatId", "1")
@@ -63,15 +69,21 @@ class SendMessageServiceTest {
 
     @Test
     void shouldCreateSendMessageForComplexMessageList() {
-        BotTextMessage botTextMessage1 = new BotTextMessage("message.hello", "Name" );
-        BotTextMessage botTextMessage2 = new BotTextMessage("message.test");
-        BotTextMessage botTextMessage3 = new BotTextMessage("message.hello", "Name 2" );
+        var botTextMessage1 = new BotTextMessage("message.hello", "Name" );
+        var botTextMessage2 = new BotTextMessage("message.test");
+        var botTextMessage3 = new BotTextMessage("message.hello", "Name 2" );
         
-        var result = sendMessageService.create(1, "en",
-                new BotMessageList(
-                    new BotMessageList(botTextMessage1, botTextMessage2),
-                    botTextMessage3)
+        var creator = new SendMessageCreator(
+            messageSource,
+            userTimezoneService,
+            1,
+            "en",
+            new BotMessageList(
+                new BotMessageList(botTextMessage1, botTextMessage2),
+                botTextMessage3)
         );
+        
+        SendMessage result = creator.get();
 
         assertThat(result)
             .hasFieldOrPropertyWithValue("chatId", "1")
@@ -80,7 +92,7 @@ class SendMessageServiceTest {
 
     @Test
     void shouldCreateSendMessageWithKeyboard() {
-        BotMessageList botMessage = new BotMessageList(
+        var botMessage = new BotMessageList(
             new BotTextMessage("message.hello", "Name" ),
             BotKeyboard.createOneRowKeyboard(
                 new InlineButton("button.yes", "command", "phase", "button-yes"),
@@ -88,7 +100,14 @@ class SendMessageServiceTest {
             )
         );
 
-        var result = sendMessageService.create(1, "en", botMessage);
+        var creator = new SendMessageCreator(
+            messageSource,
+            userTimezoneService,
+            1,
+            "en",
+            botMessage
+        );
+        SendMessage result = creator.get();
 
         assertThat(result)
             .hasFieldOrPropertyWithValue("chatId", "1")
@@ -116,35 +135,18 @@ class SendMessageServiceTest {
             
         when(userTimezoneService.getTimezone(1)).thenReturn(ZoneId.of("Europe/Moscow"));
 
-        var result = sendMessageService.create(1, "en", botTextMessage);
+        var creator = new SendMessageCreator(
+            messageSource,
+            userTimezoneService,
+            1,
+            "en",
+            botTextMessage
+        );
+        SendMessage result = creator.get();
 
         assertThat(result)
             .hasFieldOrPropertyWithValue("chatId", "1")
             .hasFieldOrPropertyWithValue("text", "Date: 2021-01-01 03:00");
     }
 
-    @Test
-    void shouldCreateAnswerCallbackForEmptyMessage() {
-        String callbackQueryId = "callback-query-id";
-        var botCallbackAnswer = new BotCallbackAnswer("");
-        var result = sendMessageService.createAnswerCallbackQuery(
-            callbackQueryId, "en", botCallbackAnswer);
-
-        assertThat(result)
-            .hasFieldOrPropertyWithValue("callbackQueryId", callbackQueryId)
-            .hasFieldOrPropertyWithValue("text", "");
-    }
-
-    @Test
-    void shouldCreateAnswerCallbackForNonEmptyMessage() {
-        String callbackQueryId = "callback-query-id";
-        String messageId = "message.test";
-        var botCallbackAnswer = new BotCallbackAnswer(messageId);
-        var result = sendMessageService.createAnswerCallbackQuery(
-            callbackQueryId, "en", botCallbackAnswer);
-
-        assertThat(result)
-            .hasFieldOrPropertyWithValue("callbackQueryId", callbackQueryId)
-            .hasFieldOrPropertyWithValue("text", "Test");
-    }
 }

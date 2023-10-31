@@ -9,7 +9,6 @@ import io.github.alariclightin.predictionstrackerbot.exceptions.UnexpectedUserMe
 import io.github.alariclightin.predictionstrackerbot.messagehandlers.MessageHandler;
 import io.github.alariclightin.predictionstrackerbot.messagehandlers.MessageHandlerBuilder;
 import io.github.alariclightin.predictionstrackerbot.messages.outbound.BotKeyboard;
-import io.github.alariclightin.predictionstrackerbot.messages.outbound.BotMessageList;
 import io.github.alariclightin.predictionstrackerbot.messages.outbound.BotTextMessage;
 import io.github.alariclightin.predictionstrackerbot.messages.outbound.InlineButton;
 
@@ -66,9 +65,9 @@ class AddPredictionCommandConfig {
 
     @Bean
     DeadlinePromptService deadlinePromptService() {
-        return () -> new BotMessageList(
-            new BotTextMessage("bot.responses.ask-deadline"),
-            DATE_TIME_KEYBOARD
+        return () -> new BotTextMessage(
+            DATE_TIME_KEYBOARD,     
+            "bot.responses.ask-deadline"
         );
     }
 

@@ -8,7 +8,6 @@ import io.github.alariclightin.predictionstrackerbot.data.predictions.ReminderDb
 import io.github.alariclightin.predictionstrackerbot.exceptions.UnexpectedUserMessageException;
 import io.github.alariclightin.predictionstrackerbot.messagehandlers.ActionResult;
 import io.github.alariclightin.predictionstrackerbot.messages.incoming.UserMessage;
-import io.github.alariclightin.predictionstrackerbot.messages.outbound.BotMessageList;
 import io.github.alariclightin.predictionstrackerbot.messages.outbound.BotTextMessage;
 import io.github.alariclightin.predictionstrackerbot.states.WaitedResponseState;
 
@@ -65,9 +64,7 @@ class SetResultPhaseHandler extends AbstractSetResultsHandler {
         if (questionsData.question() != null) {
             markReminderAsSent(questionsData.question().id());
             return new ActionResult(
-                new BotMessageList(
-                    buttonResultMessage, getPromptForResult(questionsData.question())
-                ), 
+                buttonResultMessage.add(getPromptForResult(questionsData.question())),
                 new WaitedResponseState(COMMAND, SET_RESULT_PHASE, questionsData)
             );
         }

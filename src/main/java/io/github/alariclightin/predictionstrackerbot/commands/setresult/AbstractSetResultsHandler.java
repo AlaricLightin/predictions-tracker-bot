@@ -9,7 +9,6 @@ import io.github.alariclightin.predictionstrackerbot.data.predictions.ReminderDb
 import io.github.alariclightin.predictionstrackerbot.messagehandlers.MessageHandler;
 import io.github.alariclightin.predictionstrackerbot.messages.outbound.BotKeyboard;
 import io.github.alariclightin.predictionstrackerbot.messages.outbound.BotMessage;
-import io.github.alariclightin.predictionstrackerbot.messages.outbound.BotMessageList;
 import io.github.alariclightin.predictionstrackerbot.messages.outbound.BotTextMessage;
 import io.github.alariclightin.predictionstrackerbot.messages.outbound.InlineButton;
 
@@ -66,11 +65,11 @@ abstract class AbstractSetResultsHandler implements MessageHandler {
         predictionsResultDbService.setResult(question.id(), result);
     }
 
-    protected BotMessage getPromptForResult(Question question) {
-        return new BotMessageList(
-            new BotTextMessage("bot.responses.setresults.set-result", 
-                question.createdAt(), question.text(), question.deadline()),
-            KEYBOARD
+    protected BotTextMessage getPromptForResult(Question question) {
+        return new BotTextMessage(
+            KEYBOARD,    
+            "bot.responses.setresults.set-result", 
+            question.createdAt(), question.text(), question.deadline()
         );
     }
 

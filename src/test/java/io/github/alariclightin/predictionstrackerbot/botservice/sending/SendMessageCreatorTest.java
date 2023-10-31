@@ -16,7 +16,6 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMa
 
 import io.github.alariclightin.predictionstrackerbot.data.settings.UserTimezoneService;
 import io.github.alariclightin.predictionstrackerbot.messages.outbound.BotKeyboard;
-import io.github.alariclightin.predictionstrackerbot.messages.outbound.BotMessageList;
 import io.github.alariclightin.predictionstrackerbot.messages.outbound.BotTextMessage;
 import io.github.alariclightin.predictionstrackerbot.messages.outbound.InlineButton;
 import io.github.alariclightin.predictionstrackerbot.testutils.TestMessageSource;
@@ -58,7 +57,7 @@ class SendMessageCreatorTest {
             userTimezoneService,
             1,
             "en",
-            new BotMessageList(botTextMessage1, botTextMessage2)
+            botTextMessage1.add(botTextMessage2)
         );
         SendMessage result = creator.get();
 
@@ -78,9 +77,7 @@ class SendMessageCreatorTest {
             userTimezoneService,
             1,
             "en",
-            new BotMessageList(
-                new BotMessageList(botTextMessage1, botTextMessage2),
-                botTextMessage3)
+            botTextMessage1.add(botTextMessage2).add(botTextMessage3)
         );
         
         SendMessage result = creator.get();
@@ -92,12 +89,13 @@ class SendMessageCreatorTest {
 
     @Test
     void shouldCreateSendMessageWithKeyboard() {
-        var botMessage = new BotMessageList(
-            new BotTextMessage("message.hello", "Name" ),
+        var botMessage = new BotTextMessage(
             BotKeyboard.createOneRowKeyboard(
                 new InlineButton("button.yes", "command", "phase", "button-yes"),
                 new InlineButton("button.no", "command", "phase", "button-no")
-            )
+            ),
+            "message.hello",
+            "Name"
         );
 
         var creator = new SendMessageCreator(

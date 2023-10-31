@@ -18,6 +18,7 @@ import io.github.alariclightin.predictionstrackerbot.messagehandlers.HandlersSea
 import io.github.alariclightin.predictionstrackerbot.messagehandlers.MessageHandler;
 import io.github.alariclightin.predictionstrackerbot.messages.incoming.UserTextMessage;
 import io.github.alariclightin.predictionstrackerbot.messages.outbound.BotMessage;
+import io.github.alariclightin.predictionstrackerbot.messages.outbound.BotMessageAssert;
 import io.github.alariclightin.predictionstrackerbot.states.StateHolderService;
 import io.github.alariclightin.predictionstrackerbot.states.WaitedResponseState;
 import io.github.alariclightin.predictionstrackerbot.testutils.TestUtils;
@@ -94,8 +95,6 @@ class MessageHandlingServiceImplTest {
         // then
         verify(stateHolderService, never()).saveState(anyLong(), any());
 
-        assertThat(result)
-            .extracting("messageId")
-            .isEqualTo("test");
+        BotMessageAssert.assertIsTextBotMessageWithId(result, "test");
     }
 }

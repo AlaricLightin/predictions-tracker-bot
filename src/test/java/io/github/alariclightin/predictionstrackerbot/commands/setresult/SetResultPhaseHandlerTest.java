@@ -9,6 +9,7 @@ import static org.mockito.Mockito.when;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.assertj.core.api.InstanceOfAssertFactories;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -22,9 +23,7 @@ import io.github.alariclightin.predictionstrackerbot.data.predictions.ReminderDb
 import io.github.alariclightin.predictionstrackerbot.exceptions.UnexpectedUserMessageException;
 import io.github.alariclightin.predictionstrackerbot.messagehandlers.ActionResult;
 import io.github.alariclightin.predictionstrackerbot.messages.incoming.UserMessage;
-import io.github.alariclightin.predictionstrackerbot.messages.outbound.BotKeyboard;
-import io.github.alariclightin.predictionstrackerbot.messages.outbound.BotMessage;
-import io.github.alariclightin.predictionstrackerbot.messages.outbound.BotMessageList;
+import io.github.alariclightin.predictionstrackerbot.messages.outbound.BotMessageAssert;
 import io.github.alariclightin.predictionstrackerbot.messages.outbound.BotTextMessage;
 import io.github.alariclightin.predictionstrackerbot.states.WaitedResponseState;
 import io.github.alariclightin.predictionstrackerbot.testutils.TestUtils;
@@ -63,11 +62,7 @@ class SetResultPhaseHandlerTest {
         assertThat(questionIdCaptor.getValue())
             .isEqualTo(questionId);
 
-        assertThat(result.botMessage())
-            .isInstanceOf(BotTextMessage.class)
-            .extracting(m -> ((BotTextMessage) m).messageId())
-            .isEqualTo("bot.responses.result-saved");
-
+        BotMessageAssert.assertIsTextBotMessageWithId(result.botMessage(), "bot.responses.result-saved");
         assertThat(result.newState())
             .isNull();
     }
@@ -83,11 +78,7 @@ class SetResultPhaseHandlerTest {
 
         ActionResult result = setResultPhaseHandler.handle(message, state);
 
-        assertThat(result.botMessage())
-            .isInstanceOf(BotTextMessage.class)
-            .extracting(m -> ((BotTextMessage) m).messageId())
-            .isEqualTo("bot.responses.result-skipped");
-
+        BotMessageAssert.assertIsTextBotMessageWithId(result.botMessage(), "bot.responses.result-skipped");
         assertThat(result.newState())
             .isNull();
     }
@@ -119,21 +110,15 @@ class SetResultPhaseHandlerTest {
 
         ActionResult result = setResultPhaseHandler.handle(message, state);
         assertThat(result.botMessage())
-            .isInstanceOf(BotMessageList.class);
-
-        List<BotMessage> botMessages = ((BotMessageList) result.botMessage()).botMessages();
-
-        assertThat(botMessages)
-            .hasSize(3)
-            .filteredOn(m -> m instanceof BotTextMessage)
-            .extracting(m -> ((BotTextMessage) m).messageId())
+            .asInstanceOf(InstanceOfAssertFactories.type(BotTextMessage.class))
+            .extracting(BotTextMessage::textDataList)
+            .asList()
+            .extracting("messageId")
             .containsExactly(firstExpectedMessageId, "bot.responses.setresults.set-result");
 
-        assertThat(botMessages)
-            .filteredOn(m -> m instanceof BotKeyboard)
-            .hasSize(1)
-            .element(0)
-            .extracting(m -> ((BotKeyboard) m).buttons())
+        assertThat(result.botMessage())
+            .asInstanceOf(InstanceOfAssertFactories.type(BotTextMessage.class))
+            .extracting(textMessage -> textMessage.keyboard().buttons())
             .asList()
             .hasSize(1)
             .element(0)
@@ -157,11 +142,7 @@ class SetResultPhaseHandlerTest {
 
         ActionResult result = setResultPhaseHandler.handle(message, state);
 
-        assertThat(result.botMessage())
-            .isInstanceOf(BotTextMessage.class)
-            .extracting(m -> ((BotTextMessage) m).messageId())
-            .isEqualTo("bot.responses.result-skipped-all");
-
+        BotMessageAssert.assertIsTextBotMessageWithId(result.botMessage(), "bot.responses.result-skipped-all");
         assertThat(result.newState())
             .isNull();
     }

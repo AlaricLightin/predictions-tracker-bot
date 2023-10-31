@@ -20,6 +20,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import io.github.alariclightin.predictionstrackerbot.data.settings.UserTimezoneService;
 import io.github.alariclightin.predictionstrackerbot.exceptions.UnexpectedUserMessageException;
 import io.github.alariclightin.predictionstrackerbot.messages.incoming.UserMessage;
+import io.github.alariclightin.predictionstrackerbot.messages.outbound.BotMessageAssert;
 import io.github.alariclightin.predictionstrackerbot.states.WaitedResponseState;
 import io.github.alariclightin.predictionstrackerbot.testutils.TestUtils;
 
@@ -54,8 +55,7 @@ class AddPredictionDatePhaseTest {
         
         var result = addPredictionDatePhase.handle(message, state);
 
-        assertThat(result.botMessage())
-            .hasFieldOrPropertyWithValue("messageId", expectedResponseId);
+        BotMessageAssert.assertIsTextBotMessageWithId(result.botMessage(), expectedResponseId);
 
         assertThat(result.newState())
             .hasFieldOrPropertyWithValue("phase", expectedNextPhase);

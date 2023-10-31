@@ -13,9 +13,7 @@ import io.github.alariclightin.predictionstrackerbot.data.predictions.Prediction
 import io.github.alariclightin.predictionstrackerbot.data.predictions.ReminderDbService;
 import io.github.alariclightin.predictionstrackerbot.exceptions.UnexpectedUserMessageException;
 import io.github.alariclightin.predictionstrackerbot.messagehandlers.ActionResult;
-import io.github.alariclightin.predictionstrackerbot.messages.outbound.BotKeyboard;
-import io.github.alariclightin.predictionstrackerbot.messages.outbound.BotMessageList;
-import io.github.alariclightin.predictionstrackerbot.messages.outbound.BotTextMessage;
+import io.github.alariclightin.predictionstrackerbot.messages.outbound.BotMessageAssert;
 import io.github.alariclightin.predictionstrackerbot.testutils.TestConsts;
 import io.github.alariclightin.predictionstrackerbot.testutils.TestUtils;
 
@@ -37,11 +35,7 @@ class SetResultsCommandHandlerTest {
         ActionResult result = setResultsCommandHandler.handle(
             TestUtils.createTextMessage("/" + TestConsts.SET_RESULTS_COMMAND), null);
 
-        assertThat(result.botMessage())
-            .isInstanceOf(BotTextMessage.class)
-            .extracting(m -> ((BotTextMessage) m).messageId())
-            .isEqualTo("bot.responses.setresults.no-questions-to-set-results");
-
+        BotMessageAssert.assertIsTextBotMessageWithId(result.botMessage(), "bot.responses.setresults.no-questions-to-set-results");
         assertThat(result.newState())
             .isNull();
     }
@@ -56,13 +50,11 @@ class SetResultsCommandHandlerTest {
         ActionResult result = setResultsCommandHandler.handle(
             TestUtils.createTextMessage("/" + TestConsts.SET_RESULTS_COMMAND), null);
 
+        BotMessageAssert.assertIsTextBotMessageWithId(result.botMessage(), "bot.responses.setresults.set-result");
+
         assertThat(result.botMessage())
-            .isInstanceOf(BotMessageList.class)
-            .extracting(m -> ((BotMessageList) m).botMessages())
-            .asList()
-            .anyMatch(m -> m instanceof BotTextMessage textMessage 
-                && textMessage.messageId().equals("bot.responses.setresults.set-result"))
-            .anyMatch(m -> m instanceof BotKeyboard);
+            .extracting("keyboard")
+            .isNotNull();
 
         assertThat(result.newState().data())
             .isInstanceOf(QuestionsData.class)
@@ -79,13 +71,11 @@ class SetResultsCommandHandlerTest {
 
         ActionResult result = setResultsCommandHandler.createMessage(List.of(1, 2));
 
+        BotMessageAssert.assertIsTextBotMessageWithId(result.botMessage(), "bot.responses.setresults.set-result");
+
         assertThat(result.botMessage())
-            .isInstanceOf(BotMessageList.class)
-            .extracting(m -> ((BotMessageList) m).botMessages())
-            .asList()
-            .anyMatch(m -> m instanceof BotTextMessage textMessage 
-                && textMessage.messageId().equals("bot.responses.setresults.set-result"))
-            .anyMatch(m -> m instanceof BotKeyboard);
+            .extracting("keyboard")
+            .isNotNull();
 
         assertThat(result.newState().data())
             .isInstanceOf(QuestionsData.class)

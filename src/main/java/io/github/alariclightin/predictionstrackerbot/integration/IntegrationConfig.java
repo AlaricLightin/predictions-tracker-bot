@@ -23,13 +23,21 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import io.github.alariclightin.predictionstrackerbot.messages.incoming.ButtonCallbackQuery;
 import io.github.alariclightin.predictionstrackerbot.messages.incoming.UserTextMessage;
 import io.github.alariclightin.predictionstrackerbot.messages.outbound.BotCallbackAnswer;
+import io.github.alariclightin.predictionstrackerbot.messages.outbound.BotFile;
 import io.github.alariclightin.predictionstrackerbot.messages.outbound.BotMessage;
+import io.github.alariclightin.predictionstrackerbot.messages.outbound.BotTextMessage;
 
 @Configuration
 class IntegrationConfig {
     
     @Bean
     PublishSubscribeChannel outcomingMessagesChannel() {
+        return MessageChannels.publishSubscribe().getObject();
+    }
+
+
+    @Bean
+    PublishSubscribeChannel outcomingFileMessagesChannel() {
         return MessageChannels.publishSubscribe().getObject();
     }
 
@@ -75,7 +83,8 @@ class IntegrationConfig {
     @Bean
     PayloadTypeRouter afterHandlingRouter() {
         var result = new PayloadTypeRouter();
-        result.setChannelMapping(BotMessage.class.getName(), "botMessageChannel");
+        result.setChannelMapping(BotTextMessage.class.getName(), "botMessageChannel");
+        result.setChannelMapping(BotFile.class.getName(), "botFileChannel");
         result.setChannelMapping(BotCallbackAnswer.class.getName(), "botCallbackAnswerChannel");
         return result;
     }

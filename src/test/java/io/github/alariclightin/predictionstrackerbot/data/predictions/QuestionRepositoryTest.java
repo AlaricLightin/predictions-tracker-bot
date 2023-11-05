@@ -28,4 +28,15 @@ class QuestionRepositoryTest extends TestWithContainer {
         assertThat(result)
             .containsExactly(10, 20);
     }
+
+    @Test
+    @Sql(scripts = { "classpath:sql/questions-with-predictions.sql" }, 
+        executionPhase = ExecutionPhase.BEFORE_TEST_METHOD)
+    void shouldGetPredictionsDataForExport() {
+        List<PredictionDataForExport> result = questionRepository.getPredictionsData(USER_ID);
+        assertThat(result)
+            .hasSize(2)
+            .extracting(PredictionDataForExport::text)
+            .containsExactly("Question 1", "Question 2");
+    }
 }

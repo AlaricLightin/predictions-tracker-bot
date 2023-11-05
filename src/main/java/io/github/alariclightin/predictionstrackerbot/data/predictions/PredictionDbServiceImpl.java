@@ -6,7 +6,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-class PredictionDbServiceImpl implements PredictionDbService, PredictionsResultDbService {
+class PredictionDbServiceImpl implements 
+    PredictionDbService, 
+    PredictionsResultDbService,
+    PredictionsExportDbService {
+
     private final PredictionRepository predictionRepository;
     private final QuestionRepository questionRepository;
     private final ReminderDao reminderDao;
@@ -51,6 +55,12 @@ class PredictionDbServiceImpl implements PredictionDbService, PredictionsResultD
     public void setResult(int id, boolean result) {
         questionRepository.setResult(id, result);
         reminderDao.delete(id);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<PredictionDataForExport> getData(long userId) {
+        return questionRepository.getPredictionsData(userId);
     }
     
 }

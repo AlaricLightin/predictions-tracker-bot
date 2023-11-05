@@ -20,5 +20,21 @@ interface QuestionRepository extends CrudRepository<Question, Integer> {
     @Modifying
     @Query("UPDATE predictions.questions SET result = :result WHERE id = :id")
     void setResult(int id, boolean result);
+
+    @Query("""
+            SELECT 
+                q.text AS text,
+                q.deadline AS deadline,
+                q.author_id AS author_id,
+                q.created_at AS created_at,
+                q.result AS result,
+                p.probability AS probability
+            FROM predictions.questions q
+            JOIN predictions.predictions p ON q.id = p.question_id
+            WHERE q.author_id = :userId
+                AND p.user_id = :userId
+            ORDER BY q.created_at
+           """)
+    List<PredictionDataForExport> getPredictionsData(long userId);
     
 }

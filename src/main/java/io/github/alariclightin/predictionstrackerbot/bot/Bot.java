@@ -1,12 +1,18 @@
 package io.github.alariclightin.predictionstrackerbot.bot;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.util.List;
 
 import org.springframework.integration.annotation.ServiceActivator;
+import org.springframework.messaging.handler.annotation.Header;
+import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.commands.SetMyCommands;
+import org.telegram.telegrambots.meta.api.methods.send.SendDocument;
+import org.telegram.telegrambots.meta.api.objects.InputFile;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.commands.BotCommand;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
@@ -58,4 +64,18 @@ public class Bot extends TelegramLongPollingBot {
             throw new RuntimeException(e);
         }
     }
+
+    @ServiceActivator(inputChannel = "outcomingFileMessagesChannel")
+    public void sendFile(@Header("chatId") String chatId, @Header("filename") String fileName, @Payload byte[] fileData) {
+        try( var stream = new ByteArrayInputStream(fileData) ) {
+            execute(SendDocument.builder()
+                .chatId(chatId)
+                .document(new InputFile(stream, fileName))
+                .build()
+            );
+        } catch (TelegramApiException|IOException e) {
+            throw new RuntimeException(e);
+        }
+    } 
+
 }

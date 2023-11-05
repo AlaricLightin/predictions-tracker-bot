@@ -21,6 +21,7 @@ class CommandManagementServiceImplIntegrationTest extends TestWithContainer {
             .containsExactly(
                 TestConsts.ADD_PREDICTION_COMMAMD,
                 TestConsts.CANCEL_COMMAND,
+                TestConsts.PREDICTIONS_EXPORT,
                 TestConsts.SET_RESULTS_COMMAND,
                 TestConsts.SET_TIMEZONE_COMMAND,
                 TestConsts.START_COMMAND 

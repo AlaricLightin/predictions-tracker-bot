@@ -5,6 +5,7 @@ import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import org.assertj.core.groups.Tuple;
 import org.junit.jupiter.api.BeforeEach;
@@ -35,7 +36,11 @@ public abstract class AbstractGatewayTest extends TestWithContainer {
     @Autowired
     private PublishSubscribeChannel outcomingMessagesChannel;
 
+    @Autowired
+    private PublishSubscribeChannel outcomingFileMessagesChannel;
+
     protected OutcomingMessageGateway mockedOutcomingGateway = mock(OutcomingMessageGateway.class);
+    protected OutcomingFileMessageGateway mockedOutcomingFileGateway = mock(OutcomingFileMessageGateway.class);
 
     private ChannelInterceptor outcomingChannelInterceptor = new ChannelInterceptor() {
         @Override
@@ -49,9 +54,25 @@ public abstract class AbstractGatewayTest extends TestWithContainer {
         }
     };
 
+    @SuppressWarnings("null")
+    private ChannelInterceptor outcomingFileChannelInterceptor = new ChannelInterceptor() {
+        @Override
+        public Message<?> preSend(Message<?> message, MessageChannel channel) {
+            if (message.getPayload() instanceof byte[] fileContent) {
+                mockedOutcomingFileGateway.sendFile(
+                    message.getHeaders().get("chatId").toString(), 
+                    message.getHeaders().get("filename").toString(), 
+                    fileContent
+                );
+            }
+            return message;
+        }
+    };
+
     @BeforeEach
-    void setUp() {
+    void setUpChannels() {
         outcomingMessagesChannel.addInterceptor(outcomingChannelInterceptor);
+        outcomingFileMessagesChannel.addInterceptor(outcomingFileChannelInterceptor);
     }
 
     protected void sendTextUpdate(String text) {
@@ -112,5 +133,20 @@ public abstract class AbstractGatewayTest extends TestWithContainer {
         verify(mockedOutcomingGateway, atLeastOnce()).sendAnswerCallback(response.capture());
         assertThat(response.getValue().getText())
             .contains(expectedFragments);
+    }
+
+    protected void assertFileSended(String chatId, String fileName, CharSequence... expectedFragmentsInData) {
+        ArgumentCaptor<String> chatIdCaptor = ArgumentCaptor.forClass(String.class);
+        ArgumentCaptor<String> fileNameCaptor = ArgumentCaptor.forClass(String.class);
+        ArgumentCaptor<byte[]> fileDataCaptor = ArgumentCaptor.forClass(byte[].class);
+        verify(mockedOutcomingFileGateway, atLeastOnce()).sendFile(
+            chatIdCaptor.capture(), fileNameCaptor.capture(), fileDataCaptor.capture()
+        );
+        assertThat(chatIdCaptor.getValue())
+            .isEqualTo(chatId);
+        assertThat(fileNameCaptor.getValue())
+            .isEqualTo(fileName);
+        assertThat(new String(fileDataCaptor.getValue(), StandardCharsets.UTF_8))
+            .contains(expectedFragmentsInData);
     }
 }

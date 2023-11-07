@@ -55,10 +55,10 @@ class AddPredictionTimePhaseTest {
 
         var result = addPredictionTimePhase.handle(message, state);
 
-        BotMessageAssert.assertIsTextBotMessageWithId(result.botMessage(), "bot.responses.ask-probability");
+        BotMessageAssert.assertIsTextBotMessageWithId(result.botMessage(), "bot.responses.ask-confidence");
         
         assertThat(result.newState())
-            .hasFieldOrPropertyWithValue("phase", AddPredictionConsts.PROBABILITY_PHASE)
+            .hasFieldOrPropertyWithValue("phase", AddPredictionConsts.CONFIDENCE_PHASE)
             .extracting("data")
             .hasFieldOrPropertyWithValue("instant", expectedInstantInData);
     }

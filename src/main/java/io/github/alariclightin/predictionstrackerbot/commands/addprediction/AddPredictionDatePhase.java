@@ -126,10 +126,10 @@ class AddPredictionDatePhase implements MessageHandler {
 
     private ActionResult createResultForDateTime(PredictionData data) {
         return new ActionResult(
-            new BotTextMessage("bot.responses.ask-probability"),
+            new BotTextMessage("bot.responses.ask-confidence"),
             new WaitedResponseState(
                 AddPredictionConsts.COMMAND_NAME, 
-                AddPredictionConsts.PROBABILITY_PHASE, 
+                AddPredictionConsts.CONFIDENCE_PHASE, 
                 data
             )
         );

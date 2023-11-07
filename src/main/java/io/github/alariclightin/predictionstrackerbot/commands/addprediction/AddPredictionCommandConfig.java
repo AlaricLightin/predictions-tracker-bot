@@ -72,30 +72,30 @@ class AddPredictionCommandConfig {
     }
 
     @Bean
-    MessageHandler addPredictionProbabilityPhase(
+    MessageHandler addPredictionConfidencePhase(
         PredictionSaver predictionSaver
     ) {
 
         return new MessageHandlerBuilder<PredictionData>()
             .setCommandName(AddPredictionConsts.COMMAND_NAME)
-            .setPhaseName(AddPredictionConsts.PROBABILITY_PHASE)
+            .setPhaseName(AddPredictionConsts.CONFIDENCE_PHASE)
             
             .setStateUpdater((text, data) -> {
                 try {
-                    int probability = Integer.parseInt(text);
-                    if (probability <= 0 || probability >= 100)
-                        throw new UnexpectedUserMessageException("bot.responses.error.probability-out-of-range");
-                    return data.addProbability(probability);
+                    int confidence = Integer.parseInt(text);
+                    if (confidence <= 0 || confidence >= 100)
+                        throw new UnexpectedUserMessageException("bot.responses.error.confidence-out-of-range");
+                    return data.addConfidence(confidence);
                 }
                 catch (NumberFormatException e) {
-                    throw new UnexpectedUserMessageException("bot.responses.error.propability-not-a-number");
+                    throw new UnexpectedUserMessageException("bot.responses.error.confidence-not-a-number");
                 }
             })
             
             .setResponseMessageFunc((message, data) -> {
                 return new BotTextMessage(
                     "bot.responses.prediction-added",
-                    data.getText(), data.getInstant(), data.getProbability());
+                    data.getText(), data.getInstant(), data.getConfidence());
             })
             
             .setResultAction(predictionSaver)

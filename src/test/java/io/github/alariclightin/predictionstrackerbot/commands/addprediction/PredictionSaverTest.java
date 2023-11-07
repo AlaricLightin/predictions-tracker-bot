@@ -31,10 +31,10 @@ class PredictionSaverTest {
             .addText("Prediction text")
             .addDate(LocalDate.of(2022, 1, 1))
             .addInstant(LocalDateTime.of(2022, 1, 1, 12, 0).toInstant(ZoneOffset.UTC))
-            .addProbability(60);
+            .addConfidence(60);
 
         UserMessage message = TestUtils.createMessage(
-            Integer.toString(data.getProbability()));
+            Integer.toString(data.getConfidence()));
 
         predictionSaver.apply(message, data);
         
@@ -51,7 +51,7 @@ class PredictionSaverTest {
         
         assertThat(predictionCaptor.getValue())
             .hasFieldOrPropertyWithValue("userId", TestUtils.CHAT_ID)
-            .hasFieldOrPropertyWithValue("probability", data.getProbability());
+            .hasFieldOrPropertyWithValue("confidence", data.getConfidence());
     }
 
 }

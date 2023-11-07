@@ -28,7 +28,7 @@ class PredictionSaver implements ResultAction<PredictionData> {
 
         Prediction prediction = new Prediction(question, userId,
                 message.getDateTime(),
-                data.getProbability());
+                data.getConfidence());
         predictionDbService.addPrediction(question, prediction);
     }
     

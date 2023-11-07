@@ -6,5 +6,5 @@ class AddPredictionConsts {
     static final String TEXT_PHASE = "text";
     static final String DATE_PHASE = "date";
     static final String TIME_PHASE = "time";
-    static final String PROBABILITY_PHASE = "probability";
+    static final String CONFIDENCE_PHASE = "confidence";
 }

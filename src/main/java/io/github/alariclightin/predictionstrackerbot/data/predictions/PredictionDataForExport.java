@@ -5,7 +5,7 @@ import java.time.OffsetDateTime;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
-@JsonPropertyOrder({"text", "createdAt", "deadline", "probability", "result"})
+@JsonPropertyOrder({"text", "createdAt", "deadline", "confidence", "result"})
 public record PredictionDataForExport(
     String text,
 
@@ -15,7 +15,7 @@ public record PredictionDataForExport(
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss'Z'")
     OffsetDateTime deadline,
 
-    int probability,
+    int confidence,
 
     Boolean result
 ) {

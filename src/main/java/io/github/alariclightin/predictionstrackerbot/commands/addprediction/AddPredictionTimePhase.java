@@ -46,10 +46,10 @@ class AddPredictionTimePhase implements MessageHandler {
                 .toInstant();
             if (!Instant.now(clock).isAfter(instant))
                 return new ActionResult(
-                    new BotTextMessage("bot.responses.ask-probability"), 
+                    new BotTextMessage("bot.responses.ask-confidence"), 
                     new WaitedResponseState(
                         AddPredictionConsts.COMMAND_NAME, 
-                        AddPredictionConsts.PROBABILITY_PHASE, 
+                        AddPredictionConsts.CONFIDENCE_PHASE, 
                         data.addInstant(instant)
                     )
                 );

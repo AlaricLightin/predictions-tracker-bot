@@ -7,7 +7,7 @@ class PredictionData {
     private String text;
     private LocalDate date;
     private Instant instant;
-    private int probability;
+    private int confidence;
     
     String getText() {
         return text;
@@ -21,8 +21,8 @@ class PredictionData {
         return instant;
     }
     
-    int getProbability() {
-        return probability;
+    int getConfidence() {
+        return confidence;
     }
 
     PredictionData addText(String text) {
@@ -40,8 +40,8 @@ class PredictionData {
         return this;
     }
 
-    PredictionData addProbability(int probability) {
-        this.probability = probability;
+    PredictionData addConfidence(int confidence) {
+        this.confidence = confidence;
         return this;
     }
 }

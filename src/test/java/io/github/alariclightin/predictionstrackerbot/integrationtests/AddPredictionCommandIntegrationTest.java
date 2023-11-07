@@ -96,7 +96,7 @@ class AddPredictionCommandIntegrationTest extends AbstractGatewayTest {
                 void shouldHandleCorrectDeadlineTimeText() {
                     sendTextUpdate(DEADLINE_TIME);
                     
-                    assertResponseTextContainsFragments("probability");
+                    assertResponseTextContainsFragments("confidence");
 
                     assertThat(JdbcTestUtils.countRowsInTable(jdbcTemplate, "predictions.questions"))
                         .isZero();
@@ -112,7 +112,7 @@ class AddPredictionCommandIntegrationTest extends AbstractGatewayTest {
                     }
 
                     @Test
-                    void shouldHandleProbabilityText() {
+                    void shouldHandleConfidenceText() {
                         sendTextUpdate("60");
                         
                         assertResponseTextContainsFragments("Prediction was added.", "test prediction", "60");
@@ -128,18 +128,18 @@ class AddPredictionCommandIntegrationTest extends AbstractGatewayTest {
                     }
 
                     @Test
-                    void shouldHandleWhenProbabilityIsNotANumber() {
+                    void shouldHandleWhenConfidenceIsNotANumber() {
                         sendTextUpdate("not a number");
                         
-                        assertResponseTextContainsFragments("Probability must be a number");
+                        assertResponseTextContainsFragments("Confidence must be a number");
                     }
 
                     @ParameterizedTest
                     @ValueSource(strings = { "-1", "0", "100" })
-                    void shouldHandleWhenProbabilityOutOfRange(String value) {
+                    void shouldHandleWhenConfidenceOutOfRange(String value) {
                         sendTextUpdate(value);
 
-                        assertResponseTextContainsFragments("Probability must be between 1 and 99");
+                        assertResponseTextContainsFragments("Confidence must be between 1 and 99");
                     }
 
                 }
@@ -156,7 +156,7 @@ class AddPredictionCommandIntegrationTest extends AbstractGatewayTest {
             void shouldHandleCorrectDateTimeText() {
                 sendTextUpdate(DEADLINE_DATE + " " + DEADLINE_TIME);
                 
-                assertResponseTextContainsFragments("probability");
+                assertResponseTextContainsFragments("confidence");
             }
 
             @Test
@@ -164,7 +164,7 @@ class AddPredictionCommandIntegrationTest extends AbstractGatewayTest {
                 sendButtonCallbackQueryUpdate(
                     TestConsts.ADD_PREDICTION_COMMAMD, "date", "ONE_HOUR");
 
-                assertResponseTextContainsFragments("probability");
+                assertResponseTextContainsFragments("confidence");
             }
 
             @Nested
@@ -176,7 +176,7 @@ class AddPredictionCommandIntegrationTest extends AbstractGatewayTest {
                 }
 
                 @Test
-                void shouldHandleCorrectProbabilityText() {
+                void shouldHandleCorrectConfidenceText() {
                     sendTextUpdate("60");
                     
                     assertResponseTextContainsFragments("Prediction was added.", "test prediction", "60");

@@ -14,7 +14,7 @@ CREATE TABLE IF NOT EXISTS predictions.predictions (
     question_id INT NOT NULL,
     user_id BIGINT NOT NULL,
     created_at TIMESTAMP WITH TIME ZONE NOT NULL,
-    probability SMALLINT NOT NULL,
+    confidence SMALLINT NOT NULL,
 
     FOREIGN KEY (question_id) REFERENCES predictions.questions(id)
 );

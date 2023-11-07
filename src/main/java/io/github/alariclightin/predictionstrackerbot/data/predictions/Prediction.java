@@ -20,14 +20,14 @@ public record Prediction(
     @Column("created_at")
     Instant createdAt,
 
-    @Column("probability")
-    int probability
+    @Column("confidence")
+    int confidence
 ) {
-    public Prediction(Question question, long userId, Instant createdAt, int probability) {
-        this(0, question.id(), userId, createdAt, probability);
+    public Prediction(Question question, long userId, Instant createdAt, int confidence) {
+        this(0, question.id(), userId, createdAt, confidence);
     }
 
     public Prediction cloneWithQuestionId(int questionId) {
-        return new Prediction(this.id, questionId, this.userId, this.createdAt, this.probability);
+        return new Prediction(this.id, questionId, this.userId, this.createdAt, this.confidence);
     }
 }

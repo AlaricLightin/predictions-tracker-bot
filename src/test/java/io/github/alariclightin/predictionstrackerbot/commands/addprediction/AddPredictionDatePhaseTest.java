@@ -100,8 +100,8 @@ class AddPredictionDatePhaseTest {
             Arguments.of(
                 "2020-01-01 02:00",
                 ZoneId.of("Europe/Moscow"),
-                "bot.responses.ask-probability",
-                AddPredictionConsts.PROBABILITY_PHASE,
+                "bot.responses.ask-confidence",
+                AddPredictionConsts.CONFIDENCE_PHASE,
                 null,
                 Instant.parse("2019-12-31T23:00:00Z")
             ),
@@ -127,8 +127,8 @@ class AddPredictionDatePhaseTest {
             Arguments.of(
                 "ONE_MINUTE",
                 ZoneId.of("Europe/Paris"),
-                "bot.responses.ask-probability",
-                AddPredictionConsts.PROBABILITY_PHASE,
+                "bot.responses.ask-confidence",
+                AddPredictionConsts.CONFIDENCE_PHASE,
                 null,
                 CURRENT_INSTANT.plusSeconds(60)
             ),
@@ -136,8 +136,8 @@ class AddPredictionDatePhaseTest {
             Arguments.of(
                 "ONE_HOUR",
                 ZoneId.of("Europe/Paris"),
-                "bot.responses.ask-probability",
-                AddPredictionConsts.PROBABILITY_PHASE,
+                "bot.responses.ask-confidence",
+                AddPredictionConsts.CONFIDENCE_PHASE,
                 null,
                 CURRENT_INSTANT.plusSeconds(3600)
             ),

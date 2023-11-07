@@ -28,7 +28,7 @@ interface QuestionRepository extends CrudRepository<Question, Integer> {
                 q.author_id AS author_id,
                 q.created_at AS created_at,
                 q.result AS result,
-                p.probability AS probability
+                p.confidence AS confidence
             FROM predictions.questions q
             JOIN predictions.predictions p ON q.id = p.question_id
             WHERE q.author_id = :userId

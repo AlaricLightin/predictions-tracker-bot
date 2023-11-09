@@ -19,8 +19,8 @@ import io.github.alariclightin.predictionstrackerbot.data.settings.MessageSettin
 import io.github.alariclightin.predictionstrackerbot.data.settings.MessageSettingsService;
 import io.github.alariclightin.predictionstrackerbot.messages.outbound.BotKeyboard;
 import io.github.alariclightin.predictionstrackerbot.messages.outbound.BotTextMessage;
-import io.github.alariclightin.predictionstrackerbot.messages.outbound.InlineButton;
 import io.github.alariclightin.predictionstrackerbot.testutils.TestMessageSource;
+import io.github.alariclightin.predictionstrackerbot.testutils.TestUtils;
 
 class SendMessageCreatorTest {
     private static MessageSource messageSource;
@@ -96,8 +96,8 @@ class SendMessageCreatorTest {
         setMockSettings("en", "Europe/London");
         var botMessage = new BotTextMessage(
             BotKeyboard.createOneRowKeyboard(
-                new InlineButton("button.yes", "command", "phase", "button-yes"),
-                new InlineButton("button.no", "command", "phase", "button-no")
+                TestUtils.createInlineButton("button.yes", "command", "phase", "button-yes"),
+                TestUtils.createInlineButton("button.no", "command", "phase", "button-no")
             ),
             "message.hello",
             "Name"

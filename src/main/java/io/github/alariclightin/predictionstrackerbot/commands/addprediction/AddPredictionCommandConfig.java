@@ -10,7 +10,6 @@ import io.github.alariclightin.predictionstrackerbot.messagehandlers.MessageHand
 import io.github.alariclightin.predictionstrackerbot.messagehandlers.MessageHandlerBuilder;
 import io.github.alariclightin.predictionstrackerbot.messages.outbound.BotKeyboard;
 import io.github.alariclightin.predictionstrackerbot.messages.outbound.BotTextMessage;
-import io.github.alariclightin.predictionstrackerbot.messages.outbound.InlineButton;
 
 @Configuration
 class AddPredictionCommandConfig {
@@ -37,28 +36,18 @@ class AddPredictionCommandConfig {
             .build();
     }
 
-    private static InlineButton createButton(
-        String messageId,
-        DateTimeAction action) {
-
-        return new InlineButton(messageId, 
-            AddPredictionConsts.COMMAND_NAME, AddPredictionConsts.DATE_PHASE, action.toString());
-    }
-
     private static final BotKeyboard DATE_TIME_KEYBOARD = new BotKeyboard(
         List.of(
             List.of(
                 // TODO show first button only for debug
-                createButton("bot.buttons.one-minute", DateTimeAction.ONE_MINUTE),
-                createButton("bot.buttons.one-hour", DateTimeAction.ONE_HOUR)
+                DateTimeAction.ONE_MINUTE,
+                DateTimeAction.ONE_HOUR
             ),
             List.of(
-                createButton("bot.buttons.today", DateTimeAction.TODAY),
-                createButton("bot.buttons.tomorrow", DateTimeAction.TOMORROW)
+                DateTimeAction.TODAY, DateTimeAction.TOMORROW
             ),
             List.of(
-                createButton("bot.buttons.next-month", DateTimeAction.NEXT_MONTH),
-                createButton("bot.buttons.next-year", DateTimeAction.NEXT_YEAR)
+                DateTimeAction.NEXT_MONTH, DateTimeAction.NEXT_YEAR
             )
         )
     );

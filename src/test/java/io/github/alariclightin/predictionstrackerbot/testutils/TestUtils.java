@@ -11,6 +11,8 @@ import io.github.alariclightin.predictionstrackerbot.data.predictions.Question;
 import io.github.alariclightin.predictionstrackerbot.messages.incoming.UserMessage;
 import io.github.alariclightin.predictionstrackerbot.messages.incoming.UserTextMessage;
 import io.github.alariclightin.predictionstrackerbot.messages.outbound.BotTextMessage;
+import io.github.alariclightin.predictionstrackerbot.messages.outbound.CommandInlineButton;
+import io.github.alariclightin.predictionstrackerbot.messages.outbound.InlineButton;
 
 public class TestUtils {
     public static final Long CHAT_ID = 123L;
@@ -57,6 +59,35 @@ public class TestUtils {
             TestUtils.CHAT_ID,
             MESSAGE_INSTANT, 
             result);
+    }
+
+    public static InlineButton createInlineButton(
+        String messageId,
+        String command,
+        String phase,
+        String buttonId
+    ) {
+        return new CommandInlineButton() {
+            @Override
+            public String messageId() {
+                return messageId;
+            }
+
+            @Override
+            public String command() {
+                return command;
+            }
+
+            @Override
+            public String phase() {
+                return phase;
+            }
+
+            @Override
+            public String buttonId() {
+                return buttonId;
+            }
+        };
     }
 
 }

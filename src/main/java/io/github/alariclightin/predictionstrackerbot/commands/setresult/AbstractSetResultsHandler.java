@@ -10,7 +10,6 @@ import io.github.alariclightin.predictionstrackerbot.messagehandlers.MessageHand
 import io.github.alariclightin.predictionstrackerbot.messages.outbound.BotKeyboard;
 import io.github.alariclightin.predictionstrackerbot.messages.outbound.BotMessage;
 import io.github.alariclightin.predictionstrackerbot.messages.outbound.BotTextMessage;
-import io.github.alariclightin.predictionstrackerbot.messages.outbound.InlineButton;
 
 abstract class AbstractSetResultsHandler implements MessageHandler {
     private final PredictionsResultDbService predictionsResultDbService;
@@ -28,15 +27,8 @@ abstract class AbstractSetResultsHandler implements MessageHandler {
     protected static final String SET_RESULT_PHASE = "set-result";
 
     private static final BotKeyboard KEYBOARD = BotKeyboard.createOneRowKeyboard(
-        createButton("bot.buttons.yes", ResultUserAction.YES),
-        createButton("bot.buttons.no", ResultUserAction.NO),
-        createButton("bot.buttons.skip", ResultUserAction.SKIP),
-        createButton("bot.buttons.skip-all", ResultUserAction.SKIP_ALL)
+        ResultUserAction.values()
     );
-
-    private static InlineButton createButton(String messageId, ResultUserAction action) {
-        return new InlineButton(messageId, COMMAND, SET_RESULT_PHASE, action.toString());
-    }
 
     @Override
     public String getCommandName() {

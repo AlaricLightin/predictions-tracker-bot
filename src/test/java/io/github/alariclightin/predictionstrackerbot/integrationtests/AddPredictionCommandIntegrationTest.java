@@ -14,6 +14,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.test.jdbc.JdbcTestUtils;
 
 import io.github.alariclightin.predictionstrackerbot.data.settings.UserTimezoneService;
@@ -26,7 +27,7 @@ class AddPredictionCommandIntegrationTest extends AbstractGatewayTest {
     @MockBean
     private Clock clock;
 
-    @MockBean
+    @SpyBean
     private UserTimezoneService userTimezoneService;
 
     private static final Instant CURRENT_INSTANT = Instant.parse("2020-01-01T00:00:00Z");;

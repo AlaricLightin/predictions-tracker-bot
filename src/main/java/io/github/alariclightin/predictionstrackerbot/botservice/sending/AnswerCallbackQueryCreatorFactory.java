@@ -8,5 +8,5 @@ import io.github.alariclightin.predictionstrackerbot.messages.outbound.BotCallba
 
 interface AnswerCallbackQueryCreatorFactory {
     Supplier<AnswerCallbackQuery> create(
-        String callbackQueryId, String languageCode, BotCallbackAnswer botCallbackAnswer);
+        String callbackQueryId, long userId, BotCallbackAnswer botCallbackAnswer);
 }

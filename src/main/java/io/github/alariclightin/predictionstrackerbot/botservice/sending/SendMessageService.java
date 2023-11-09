@@ -20,12 +20,10 @@ class SendMessageService {
     @ServiceActivator(inputChannel = "botMessageChannel", outputChannel = "outcomingMessagesChannel")
     public SendMessage create(
         @Header("chatId") long chatId, 
-        // TODO store language code in user settings
-        @Header(name = "languageCode", required = false, defaultValue = "en") String languageCode, 
         @Payload BotMessage botMessage) {
 
         Supplier<SendMessage> creator = sendMessageCreatorFactory.getCreator(
-            chatId, languageCode, botMessage);
+            chatId, botMessage);
         return creator.get();
     }
 

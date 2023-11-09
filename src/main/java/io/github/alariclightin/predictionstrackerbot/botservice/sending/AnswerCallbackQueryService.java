@@ -23,11 +23,11 @@ class AnswerCallbackQueryService {
     @ServiceActivator(inputChannel = "botCallbackAnswerChannel", outputChannel = "outcomingMessagesChannel")
     public AnswerCallbackQuery createAnswerCallbackQuery(
         @Header("callbackId") String callbackQueryId, 
-        @Header("languageCode") String languageCode, 
+        @Header("chatId") long userId, 
         @Payload BotCallbackAnswer botCallbackAnswer) {
 
         Supplier<AnswerCallbackQuery> creator = answerCallbackQueryCreatorFactory.create(
-            callbackQueryId, languageCode, botCallbackAnswer);
+            callbackQueryId, userId, botCallbackAnswer);
         return creator.get();
     }
 }

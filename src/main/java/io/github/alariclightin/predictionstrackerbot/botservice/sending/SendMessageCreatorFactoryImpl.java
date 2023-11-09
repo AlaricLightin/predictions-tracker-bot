@@ -6,29 +6,28 @@ import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 
-import io.github.alariclightin.predictionstrackerbot.data.settings.UserTimezoneService;
+import io.github.alariclightin.predictionstrackerbot.data.settings.MessageSettingsService;
 import io.github.alariclightin.predictionstrackerbot.messages.outbound.BotMessage;
 
 @Service
 class SendMessageCreatorFactoryImpl implements SendMessageCreatorFactory {
     private final MessageSource messageSource;
-    private final UserTimezoneService userTimezoneService;
+    private final MessageSettingsService messageSettingsService;
 
     SendMessageCreatorFactoryImpl(
         MessageSource messageSource,
-        UserTimezoneService userTimezoneService) {
+        MessageSettingsService messageSettingsService) {
         
         this.messageSource = messageSource;
-        this.userTimezoneService = userTimezoneService;
+        this.messageSettingsService = messageSettingsService;
     }
 
     @Override
-    public Supplier<SendMessage> getCreator(long chatId, String languageCode, BotMessage botMessage) {
+    public Supplier<SendMessage> getCreator(long chatId, BotMessage botMessage) {
         return new SendMessageCreator(
             messageSource,
-            userTimezoneService,
+            messageSettingsService,
             chatId,
-            languageCode,
             botMessage
         );
     }

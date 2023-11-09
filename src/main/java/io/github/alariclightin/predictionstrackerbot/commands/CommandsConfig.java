@@ -8,8 +8,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import io.github.alariclightin.predictionstrackerbot.messagehandlers.MessageHandler;
-import io.github.alariclightin.predictionstrackerbot.messagehandlers.MessageHandlerBuilder;
-import io.github.alariclightin.predictionstrackerbot.messages.outbound.BotTextMessage;
 
 @Configuration
 class CommandsConfig {
@@ -26,12 +24,4 @@ class CommandsConfig {
         return result;
     }
 
-    @Bean
-    MessageHandler startCommand() {
-        return new MessageHandlerBuilder<>()
-            .setCommandName("start")
-            .setResponseMessageFunc((message, data) -> 
-                new BotTextMessage("bot.responses.start", message.getUser().getFirstName()))
-            .build();
-    }
 }

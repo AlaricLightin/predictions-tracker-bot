@@ -2,44 +2,44 @@ package io.github.alariclightin.predictionstrackerbot.botservice.sending;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.Locale;
 import java.util.function.Supplier;
 import org.springframework.context.MessageSource;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 
-import io.github.alariclightin.predictionstrackerbot.data.settings.UserTimezoneService;
+import io.github.alariclightin.predictionstrackerbot.data.settings.MessageSettings;
+import io.github.alariclightin.predictionstrackerbot.data.settings.MessageSettingsService;
 import io.github.alariclightin.predictionstrackerbot.messages.outbound.BotKeyboard;
 import io.github.alariclightin.predictionstrackerbot.messages.outbound.BotMessage;
 import io.github.alariclightin.predictionstrackerbot.messages.outbound.BotTextMessage;
 
 class SendMessageCreator implements Supplier<SendMessage> {
     private final MessageSource messageSource;
-    private final UserTimezoneService userTimezoneService;
+    private final MessageSettingsService messageSettingsService;
 
     private final long chatId;
-    private final Locale locale;
     private final BotMessage botMessage;
+
+    private MessageSettings messageSettings;
 
     SendMessageCreator(
         MessageSource messageSource,
-        UserTimezoneService userTimezoneService,
+        MessageSettingsService messageSettingsService,
         long chatId,
-        String languageCode,
         BotMessage botMessage) {
         
         this.messageSource = messageSource;
-        this.userTimezoneService = userTimezoneService;
+        this.messageSettingsService = messageSettingsService;
         this.chatId = chatId;
-        this.locale = Locale.forLanguageTag(languageCode);
         this.botMessage = botMessage;
     }
 
     @Override
     public SendMessage get() {
+        messageSettings = messageSettingsService.getSettings(chatId);
+
         if (botMessage instanceof BotTextMessage botTextMessage) {
             return getResultForTextMessage(botTextMessage);
         }
@@ -56,7 +56,7 @@ class SendMessageCreator implements Supplier<SendMessage> {
                     messageSource.getMessage(
                             textData.messageId(),
                             convertMessageArguments(textData.args()),
-                            locale));
+                            messageSettings.locale()));
         }
 
 
@@ -70,13 +70,12 @@ class SendMessageCreator implements Supplier<SendMessage> {
     private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
     private Object[] convertMessageArguments(Object[] args) {
-        ZoneId zoneId = userTimezoneService.getTimezone(chatId);
         Object[] result = new Object[args.length];
         for (int idx = 0; idx < result.length; idx++) {
             Object object = args[idx];
             if (object instanceof Instant instant) {
                 result[idx] = LocalDateTime
-                    .ofInstant(instant, zoneId)
+                    .ofInstant(instant, messageSettings.timezone())
                     .format(DATE_TIME_FORMATTER); 
             }
             else
@@ -96,7 +95,7 @@ class SendMessageCreator implements Supplier<SendMessage> {
                 row.stream()
                     .map(button -> {
                         String text = messageSource.getMessage(
-                            button.messageId(), null, locale);
+                            button.messageId(), null, messageSettings.locale());
                         return InlineKeyboardButton.builder()
                             .text(text)
                             .callbackData(button.getCallbackData())

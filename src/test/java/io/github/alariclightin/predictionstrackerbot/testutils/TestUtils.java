@@ -42,6 +42,7 @@ public class TestUtils {
         var user = mock(User.class);
         when(user.getId()).thenReturn(CHAT_ID);
         when(user.getLanguageCode()).thenReturn(LANGUAGE_CODE);
+        when(user.getFirstName()).thenReturn("Test Name");
         when(message.getUser()).thenReturn(user);
         when(message.getDateTime()).thenReturn(Instant.now());
 

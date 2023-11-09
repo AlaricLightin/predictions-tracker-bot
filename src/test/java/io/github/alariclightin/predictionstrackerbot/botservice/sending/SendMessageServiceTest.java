@@ -23,13 +23,12 @@ class SendMessageServiceTest {
     @Test
     void shouldCreateSendMessage() {
         final long chatId = 456;
-        final String languageCode = "en";
         SendMessage sendMessage = mock(SendMessage.class);
         BotMessage botMessage = mock(BotMessage.class);
-        when(sendMessageCreatorFactory.getCreator(chatId, languageCode, botMessage))
+        when(sendMessageCreatorFactory.getCreator(chatId, botMessage))
             .thenReturn(() -> sendMessage);
 
-        var result = sendMessageService.create(chatId, languageCode, botMessage);
+        var result = sendMessageService.create(chatId, botMessage);
         assertThat(result)
             .isEqualTo(sendMessage);
     }

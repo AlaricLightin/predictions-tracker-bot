@@ -99,11 +99,6 @@ class IntegrationConfig {
         headersToAdd.put("chatId", 
             new ExpressionEvaluatingHeaderValueMessageProcessor<>(chatIdExpression, String.class));
 
-        Expression languageCodeExpression = new SpelExpressionParser().parseExpression(
-            "payload.getMessage().getFrom().getLanguageCode()");
-        headersToAdd.put("languageCode",
-            new ExpressionEvaluatingHeaderValueMessageProcessor<>(languageCodeExpression, String.class));
-
         return new HeaderEnricher(headersToAdd);
     }
 
@@ -122,11 +117,6 @@ class IntegrationConfig {
             "payload.getCallbackQuery().getFrom().getId()");
         headersToAdd.put("chatId", 
             new ExpressionEvaluatingHeaderValueMessageProcessor<>(chatIdExpression, String.class));
-
-        Expression languageCodeExpression = new SpelExpressionParser().parseExpression(
-            "payload.getCallbackQuery().getFrom().getLanguageCode()");
-        headersToAdd.put("languageCode",
-            new ExpressionEvaluatingHeaderValueMessageProcessor<>(languageCodeExpression, String.class));
 
         return new HeaderEnricher(headersToAdd);
     }

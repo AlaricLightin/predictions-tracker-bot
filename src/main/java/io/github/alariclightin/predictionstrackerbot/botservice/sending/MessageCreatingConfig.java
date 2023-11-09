@@ -4,18 +4,22 @@ import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import io.github.alariclightin.predictionstrackerbot.data.settings.UserLanguageService;
+
 @Configuration
 class MessageCreatingConfig {
 
     @Bean
     AnswerCallbackQueryCreatorFactory answerCallbackQueryCreatorFactory(
-        MessageSource messageSource
+        MessageSource messageSource,
+        UserLanguageService userLanguageService
     ) {
-        return (callbackQueryId, languageCode, botCallbackAnswer) ->
+        return (callbackQueryId, userId, botCallbackAnswer) ->
             new AnswerCallbackQueryCreator(
                 messageSource,
+                userLanguageService,
                 callbackQueryId,
-                languageCode,
+                userId,
                 botCallbackAnswer
             );
     }

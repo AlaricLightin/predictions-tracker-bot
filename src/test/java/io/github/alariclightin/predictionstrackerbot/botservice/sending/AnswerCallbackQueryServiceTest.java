@@ -23,14 +23,14 @@ class AnswerCallbackQueryServiceTest {
     @Test
     void shouldCreateAnswerCallbackQuery() {
         final String callbackQueryId = "callback-query-id";
-        final String languageCode = "en";
+        final long userId = 456;
         var botCallbackAnswer = mock(BotCallbackAnswer.class);
         var answerCallbackQuery = mock(AnswerCallbackQuery.class);
-        when(answerCallbackQueryCreatorFactory.create(callbackQueryId, languageCode, botCallbackAnswer))
+        when(answerCallbackQueryCreatorFactory.create(callbackQueryId, userId, botCallbackAnswer))
             .thenReturn(() -> answerCallbackQuery);
 
         var result = answerCallbackQueryService.createAnswerCallbackQuery(
-            callbackQueryId, languageCode, botCallbackAnswer);
+            callbackQueryId, userId, botCallbackAnswer);
 
         assertThat(result)
             .isEqualTo(answerCallbackQuery);

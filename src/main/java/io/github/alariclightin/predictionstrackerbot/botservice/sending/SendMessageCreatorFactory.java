@@ -8,5 +8,5 @@ import io.github.alariclightin.predictionstrackerbot.messages.outbound.BotMessag
 
 interface SendMessageCreatorFactory {
     Supplier<SendMessage> getCreator(
-        long chatId, String languageCode, BotMessage botMessage);
+        long chatId, BotMessage botMessage);
 }

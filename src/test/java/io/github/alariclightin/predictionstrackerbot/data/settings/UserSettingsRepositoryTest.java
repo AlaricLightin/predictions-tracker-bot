@@ -59,4 +59,46 @@ class UserSettingsRepositoryTest extends TestWithContainer {
         assertThat(result)
             .isEqualTo(1);
     }
+
+    @Test
+    void shouldSetLanguageCodeByUserIdIfSettingsNotExist() {
+        userSettingsRepository.setLanguageCodeByUserId(USER_ID, "en");
+        
+        var result = JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, "users.user_settings",
+            "user_id = 345 AND language_code = 'en'");
+        
+        assertThat(result)
+            .isEqualTo(1);
+    }
+
+    @Test
+    @Sql(statements = {"INSERT INTO users.user_settings (user_id, language_code) VALUES (345, 'ru')"})
+    void shouldSetLanguageCodeByUserIfSettingsExist() {
+        userSettingsRepository.setLanguageCodeByUserId(USER_ID, "en");
+        
+        var result = JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, "users.user_settings", 
+            "user_id = 345 AND language_code = 'en'");
+        
+        assertThat(result)
+            .isEqualTo(1);
+    }
+
+    @Test
+    @Sql(statements = {"INSERT INTO users.user_settings (user_id, language_code) VALUES (345, 'ru')"})
+    void shouldGetLanguageCodeByUserIdWhenItIsSet() {
+        var result = userSettingsRepository.getLanguageCodeByUserId(USER_ID);
+        
+        assertThat(result)
+            .isPresent()
+            .hasValue("ru");
+    }
+
+    @Test
+    void shouldGetEmptyLanguageCodeByUserIdWhenItIsNotSet() {
+        var result = userSettingsRepository.getLanguageCodeByUserId(USER_ID);
+        
+        assertThat(result)
+            .isEmpty();
+    }
+
 }

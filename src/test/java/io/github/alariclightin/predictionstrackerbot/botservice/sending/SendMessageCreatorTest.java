@@ -19,6 +19,7 @@ import io.github.alariclightin.predictionstrackerbot.data.settings.MessageSettin
 import io.github.alariclightin.predictionstrackerbot.data.settings.MessageSettingsService;
 import io.github.alariclightin.predictionstrackerbot.messages.outbound.BotKeyboard;
 import io.github.alariclightin.predictionstrackerbot.messages.outbound.BotTextMessage;
+import io.github.alariclightin.predictionstrackerbot.messages.outbound.MessageSourceArgument;
 import io.github.alariclightin.predictionstrackerbot.testutils.TestMessageSource;
 import io.github.alariclightin.predictionstrackerbot.testutils.TestUtils;
 
@@ -147,6 +148,27 @@ class SendMessageCreatorTest {
         assertThat(result)
             .hasFieldOrPropertyWithValue("chatId", String.valueOf(USER_ID))
             .hasFieldOrPropertyWithValue("text", "Date: 2021-01-01 03:00");
+    }
+
+    @Test
+    void shouldCreateMessageWithLocalizedParamater() {
+        setMockSettings("en", "Europe/London");
+        var botTextMessage = new BotTextMessage(
+            "message.button-string",
+            new MessageSourceArgument("button.yes")
+        );
+            
+        var creator = new SendMessageCreator(
+            messageSource,
+            messageSettingsService,
+            USER_ID,
+            botTextMessage
+        );
+        SendMessage result = creator.get();
+
+        assertThat(result)
+            .hasFieldOrPropertyWithValue("chatId", String.valueOf(USER_ID))
+            .hasFieldOrPropertyWithValue("text", "Button: Yes");
     }
 
     private void setMockSettings(String language, String timezoneString) {

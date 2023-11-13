@@ -14,6 +14,7 @@ import io.github.alariclightin.predictionstrackerbot.data.settings.MessageSettin
 import io.github.alariclightin.predictionstrackerbot.messages.outbound.BotKeyboard;
 import io.github.alariclightin.predictionstrackerbot.messages.outbound.BotMessage;
 import io.github.alariclightin.predictionstrackerbot.messages.outbound.BotTextMessage;
+import io.github.alariclightin.predictionstrackerbot.messages.outbound.MessageSourceArgument;
 
 class SendMessageCreator implements Supplier<SendMessage> {
     private final MessageSource messageSource;
@@ -77,6 +78,10 @@ class SendMessageCreator implements Supplier<SendMessage> {
                 result[idx] = LocalDateTime
                     .ofInstant(instant, messageSettings.timezone())
                     .format(DATE_TIME_FORMATTER); 
+            }
+            else if (object instanceof MessageSourceArgument argument) {
+                result[idx] = messageSource.getMessage(
+                    argument.messageId(), null, messageSettings.locale());
             }
             else
                 result[idx] = object;

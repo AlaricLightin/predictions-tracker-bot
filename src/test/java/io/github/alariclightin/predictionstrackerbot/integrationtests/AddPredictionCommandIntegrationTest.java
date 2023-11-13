@@ -181,11 +181,12 @@ class AddPredictionCommandIntegrationTest extends AbstractGatewayTest {
                     sendTextUpdate("60");
                     
                     assertResponseTextContainsFragments("Prediction was added.", "test prediction", "60");
-                        assertThat(TestDbUtils.getQuestions(jdbcTemplate))
-                            .hasSize(1)
-                            .first()
-                            .hasFieldOrPropertyWithValue("text", PREDICTION_TEXT)
-                            .hasFieldOrPropertyWithValue("deadline", CURRENT_INSTANT.plusSeconds(3600));
+                        
+                    assertThat(TestDbUtils.getQuestions(jdbcTemplate))
+                        .hasSize(1)
+                        .first()
+                        .hasFieldOrPropertyWithValue("text", PREDICTION_TEXT)
+                        .hasFieldOrPropertyWithValue("deadline", CURRENT_INSTANT.plusSeconds(3600));
 
                     assertThat(JdbcTestUtils.countRowsInTable(jdbcTemplate, "predictions.predictions"))
                         .isEqualTo(1);

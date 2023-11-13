@@ -12,11 +12,10 @@ import io.github.alariclightin.predictionstrackerbot.messages.outbound.BotTextMe
 public class MessageHandlerBuilder<T> {
     private String commandName;
     private String phaseName = MessageHandler.START_PHASE;
-    private String nextPhasePromptMessageId;
     private BiFunction<UserMessage, T, BotMessage> responseMessageFunc;
-    private StateUpdater<T> stateUpdater;
+    private StateUpdater<T> stateUpdater = (text, state) -> null;
     private String nextPhase;
-    private ResultAction<T> resultAction; 
+    private ResultAction<T> resultAction = (userId, state) -> {}; 
 
     public MessageHandlerBuilder<T> setCommandName(String commandName) {
         this.commandName = commandName;
@@ -32,7 +31,12 @@ public class MessageHandlerBuilder<T> {
      * Sets the message id of the prompt message that will be sent to the user
      */
     public MessageHandlerBuilder<T> setNextPhasePromptMessageId(String promptMessageId) {
-        this.nextPhasePromptMessageId = promptMessageId;
+        this.responseMessageFunc = (message, data) -> new BotTextMessage(promptMessageId);
+        return this;
+    }
+
+    public MessageHandlerBuilder<T> setNextPhasePromptMessage(BotMessage promptMessage) {
+        this.responseMessageFunc = (message, data) -> promptMessage;
         return this;
     }
 
@@ -60,29 +64,17 @@ public class MessageHandlerBuilder<T> {
     }
 
     public MessageHandler build() {
-        if (this.commandName == null)
+        if (commandName == null)
             throw new IllegalStateException("Command name must be set");
 
-        if (this.nextPhasePromptMessageId == null && this.responseMessageFunc == null)
-            throw new IllegalStateException("Prompt message id or function must be set");
-
-        BiFunction<UserMessage, T, BotMessage> promptMessageIdFunc = this.responseMessageFunc != null
-            ? this.responseMessageFunc
-            : (message, data) -> new BotTextMessage(this.nextPhasePromptMessageId);    
-
-        StateUpdater<T> stateUpdater = this.stateUpdater != null
-            ? this.stateUpdater
-            : (text, state) -> null;
-
-        ResultAction<T> resultAction = this.resultAction != null
-            ? this.resultAction
-            : (userId, state) -> {};
+        if (responseMessageFunc == null)
+            throw new IllegalStateException("Prompt function must be set");
 
         return new SimpleMessageHandler<T>(
-            this.commandName,
-            this.phaseName,
-            promptMessageIdFunc,
-            this.nextPhase,
+            commandName,
+            phaseName,
+            responseMessageFunc,
+            nextPhase,
             stateUpdater,
             resultAction
         );

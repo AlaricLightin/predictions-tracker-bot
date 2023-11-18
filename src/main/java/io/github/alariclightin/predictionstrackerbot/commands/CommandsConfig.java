@@ -1,27 +1,43 @@
 package io.github.alariclightin.predictionstrackerbot.commands;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.Set;
+import java.util.TimeZone;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import io.github.alariclightin.predictionstrackerbot.messagehandlers.MessageHandler;
+import io.github.alariclightin.predictionstrackerbot.data.settings.UserTimezoneService;
+import io.github.alariclightin.predictionstrackerbot.exceptions.UnexpectedUserMessageException;
+import io.github.alariclightin.predictionstrackerbot.messagehandlers.HandlersSequence;
+import io.github.alariclightin.predictionstrackerbot.messagehandlers.SimpleInputCommandBuilder;
+import io.github.alariclightin.predictionstrackerbot.messages.outbound.BotTextMessage;
 
 @Configuration
 class CommandsConfig {
 
-    @Bean("messageHandlersMap")
-    Map<String, Map<String, MessageHandler>> messageHandlersMap(
-        List<MessageHandler> messageHandlersMap) {
+    private static final Set<String> TIMEZONES = Set.of(TimeZone.getAvailableIDs()); 
+
+    @Bean
+    HandlersSequence setTimezoneCommandSequence(UserTimezoneService timezoneService) {
+        return new SimpleInputCommandBuilder<String>("settimezone")
+            .setPromptMessageId("bot.responses.settimezone.ask-timezone")
             
-        Map<String, Map<String, MessageHandler>> result = new HashMap<>();
-        messageHandlersMap.forEach(handler -> {
-            var commandMap = result.computeIfAbsent(handler.getCommandName(), k -> new HashMap<>());
-            commandMap.put(handler.getPhaseName(), handler);
-        });
-        return result;
+            .setResultFunction(text -> {
+                if (TIMEZONES.contains(text)) {
+                    return text;
+                }
+                else {
+                    throw new UnexpectedUserMessageException("bot.responses.error.wrong-timezone");
+                }
+            })
+
+            .setResponseMessageFunc((message, input) -> 
+                new BotTextMessage("bot.responses.settimezone.timezone-is-set", input))
+
+            .setResultAction((message, input) -> 
+                timezoneService.setTimezone(message.getUser().getId(), input))
+            
+            .build();
     }
 
 }
